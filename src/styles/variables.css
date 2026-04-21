@@ -1,0 +1,126 @@
+:root{
+    --primary-gray: #d1c8c1;
+    --primary-gray2: #6E6146;
+    --text-color: #3a3d45
+}
+
+
+
+/* xs */
+.heading1{
+  font-size: var(--text-lg) ;
+}
+
+.heading2{
+  font-size: var(--text-sm) ;
+}
+
+.p-text-black{
+  color:  var(--text-color)
+}
+
+.p-text{
+  font-size: var(--text-sm);
+}
+
+.card-heading{
+  font-size: var(--text-lg)
+}
+
+.bannerHeading{
+  font-size: var(--text-2xl) ; 
+}
+.bannerSubHeading{
+  font-size: var(--text-base) ; 
+}
+
+
+
+
+
+/*  sm */
+@media (min-width: 640px) {
+
+
+
+}
+
+/* md */
+@media (min-width: 768px) {
+
+.heading1{
+  font-size: var(--text-3xl) ;
+}
+
+.heading2{
+  font-size: var(--text-xl) ;
+}
+
+.card-herading{
+  font-size: var(--text-2xl)
+}
+
+.bannerHeading{
+  font-size: var(--text-5xl) ; 
+}
+
+.bannerSubHeading{
+   font-size: var(--text-xl) ; 
+}
+.p-text{
+  font-size: var(--text-base);
+}
+
+}
+
+  /* lg*/
+@media (min-width: 1024px) {
+
+
+}
+
+/* xl */
+@media (min-width: 1280px) {
+
+}
+
+/* 2xl */
+@media (min-width: 1536px) {
+
+}
+
+
+
+
+
+
+
+
+
+
+.bg-primary-gray {
+  background-color:var( --primary-gray)
+}
+
+.bg-primary-gray2 {
+  background-color:var( --primary-gray2)
+}
+
+.text-primary-gray{
+  color: var( --primary-gray);
+}
+.text-primary-gray2{
+  color: var( --primary-gray2);
+}
+
+.border-primary-gray{
+  border-color: var( --primary-gray);
+}
+
+.border-primary-gray2{
+  border-color: var( --primary-gray2);
+}
+
+.primary-font-family{
+  font-family: 'sikta banner' ,serif;
+}

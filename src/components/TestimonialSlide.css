@@ -1,0 +1,33 @@
+v
+
+.testimonial-swiper .swiper {
+  width: 100%;
+}
+
+.testimonial-swiper .swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  display: flex;
+  height: unset;
+  justify-content: center;
+  align-items: center;
+}
+
+.testimonial-swiper .swiper-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.testimonial-swiper .swiper-wrapper{
+  display: flex;
+  border-radius: 15px;
+}
+
+.testimonial-swiper .swiper-pagination-bullet{
+  background-color: var(--primary-gray);
+}
+
+
+

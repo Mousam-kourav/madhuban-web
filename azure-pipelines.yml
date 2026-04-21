@@ -1,0 +1,107 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: frontend-agent
+
+stages:
+  # -----------------------------------
+  # DEV DEPLOY
+  # -----------------------------------
+  - stage: Dev
+    displayName: "Deploy to Development"
+    jobs:
+      - job: DeployDev
+        displayName: "Deploy to Vercel - Dev"
+        variables:
+          VERCEL_PROJECT_ID: "prj_yOx7scYgthWesZcIl4MFacxbVFuk"
+          VERCEL_ORG_ID: "6KISCDOq3iy327pqF30GOiBS"
+          VERCEL_TOKEN: "vcp_7fhZwpRsmBuEc5UyVRd4zAyVHdAejLwDy9j4nyVvmhOTT8Vuvh4NDrfU"
+
+        steps:
+          # Install Vercel CLI
+          - script: |
+              npm install -g vercel@latest
+            displayName: "Install Vercel CLI"
+
+          # Clean .vercel folder if exists
+          - script: |
+              if exist .vercel rmdir /s /q .vercel
+            displayName: "Remove existing .vercel folder"
+
+          # Link Project
+          - script: |
+              vercel link --yes
+            displayName: "Link Vercel Project"
+            env:
+              VERCEL_TOKEN: $(VERCEL_TOKEN)
+              VERCEL_PROJECT_ID: $(VERCEL_PROJECT_ID)
+              VERCEL_ORG_ID: $(VERCEL_ORG_ID)
+
+          # Pull environment variables
+          - script: |
+              vercel env pull .env.production --yes
+            displayName: "Pull Vercel environment variables"
+            env:
+              VERCEL_TOKEN: $(VERCEL_TOKEN)
+
+          # Deploy
+          - script: |
+              vercel deploy --prod --yes
+            displayName: "Deploy to Vercel (production)"
+            env:
+              VERCEL_TOKEN: $(VERCEL_TOKEN)
+
+  # -----------------------------------
+  # PROD DEPLOY
+  # -----------------------------------
+  # - stage: Prod
+  #   displayName: 'Deploy to Production'
+  #   dependsOn: Dev
+  #   condition: succeeded()
+  #   jobs:
+  #     - deployment: DeployProd
+  #       environment: Production
+  #       displayName: 'Deploy to Vercel - Prod'
+  #       variables:
+  #         VERCEL_PROJECT_ID: 'prj_jZiWbaB0vs78tR6iOILxGYti024W'
+  #         VERCEL_ORG_ID: 'gPLVlvJxaFI0eeU4D9A2btu2'
+  #         VERCEL_TOKEN: 'ARyuWAO6SJoPOyVWycwuqALp'
+
+  #       strategy:
+  #         runOnce:
+  #           deploy:
+  #             steps:
+
+  #               # Install CLI
+  #               - script: |
+  #                   npm install -g vercel@latest
+  #                 displayName: 'Install Vercel CLI'
+
+  #               # Clean old link
+  #               - script: |
+  #                   if exist .vercel rmdir /s /q .vercel
+  #                 displayName: 'Remove existing .vercel'
+
+  #               # Link to the production project
+  #               - script: |
+  #                   vercel link --yes
+  #                 displayName: 'Link Vercel Project'
+  #                 env:
+  #                    VERCEL_TOKEN: $(VERCEL_TOKEN)
+  #                    VERCEL_PROJECT_ID: $(VERCEL_PROJECT_ID)
+  #                    VERCEL_ORG_ID: $(VERCEL_ORG_ID)
+  #               # Pull environment variables
+  #               - script: |
+  #                   vercel env pull .env.production --yes
+  #                 displayName: 'Pull Vercel environment variables'
+  #                 env:
+  #                    VERCEL_TOKEN: $(VERCEL_TOKEN)
+  #               # Deploy to production
+  #               - script: |
+  #                   vercel deploy --prod --yes
+  #                 displayName: 'Deploy to Vercel (production)'
+  #                 env:
+  #                    VERCEL_TOKEN: $(VERCEL_TOKEN)

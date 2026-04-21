@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #D1C8C1; /* warm beige/taupe (changed from green) */
+  margin: 0;
+  padding: 0;
+}
+
+.farm-to-table {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Banner Section */
+.banner-container {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  overflow: hidden;
+  border-bottom-left-radius: 60px;
+  border-bottom-right-radius: 60px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.banner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: slowMotion 20s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 0;
+  filter: brightness(0.75) saturate(1.2);
+  border-bottom-left-radius: 60px;
+  border-bottom-right-radius: 60px;
+}
+
+@keyframes slowMotion {
+  0% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgb(89 112 89 / 50%); */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #6E6146; /* warm brown tone for overlay text */
+  text-align: center;
+  padding: 2rem;
+  z-index: 1;
+  pointer-events: none;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.banner-overlay h1 {
+  /* font-family: 'Playfair Display', serif; */
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+
+.banner-overlay p {
+  font-size: 1.8rem;
+  font-style: italic;
+  font-weight: 500;
+  max-width: 600px;
+  line-height: 1.4;
+}
+
+/* Gallery Section */
+.gallery-section {
+  padding: 3rem 4rem;
+  /* box-shadow: inset 0 10px 20px #C7E0A9; */
+  /* border: 2px solid red; */
+}
+
+
+
+
+/* Grid */
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  margin-bottom: 4rem;
+}
+
+/* Each media item */
+.media-item {
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border-radius: 25px;
+  /* box-shadow: 0 6px 14px rgba(46, 77, 37, 0.15); */
+  transition: transform 0.5s ease, box-shadow 0.3s ease;
+  background: #ffffffcc;
+  /* border: 2px solid #81C784; */
+}
+
+.media-item:hover {
+  transform: scale(1.07);
+  box-shadow: 0 14px 30px rgba(78, 56, 35, 0.28); /* warmer brown shadow */
+}
+
+.media-item img,
+.media-item video {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 23px;
+  transition: transform 0.4s ease;
+}
+
+.media-item:hover img,
+.media-item:hover video {
+  transform: scale(1.12);
+}
+
+.media-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.2rem 1rem;
+  /* background: linear-gradient(180deg, transparent 0%, rgba(46, 77, 37, 0.85) 90%); */
+  color: #EFE7DF; /* light warm text over dark gradient */
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.25rem;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 0.03em;
+  user-select: none;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.45);
+}
+
+/* Modal Section */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(34, 83, 34, 0.95); */
+  background: rgb(110,97,70);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  backdrop-filter: blur(7px);
+  animation: fadeInModal 0.35s ease forwards;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-content {
+  max-width: 90%;
+  max-height: 90vh;
+  position: relative;
+  text-align: center;
+  border-radius: 30px;
+  background: #D1C8C1;
+  /* box-shadow: 0 15px 30px rgba(34, 83, 34, 0.3); */
+  padding: 1rem 1.5rem 2rem;
+}
+
+.modal-content img,
+.modal-content video {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 25px;
+  /* box-shadow: 0 10px 20px rgba(34, 83, 34, 0.25); */
+}
+
+.modal-content h3 {
+  color: #2E4D25;
+  margin-top: 1.5rem;
+  font-size: 2rem;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+.close {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  /* background: #4CAF50; */
+  background: #D1C8C1;
+  
+  color: white;
+  font-size: 1.8rem;
+  border-radius: 50%;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  /* box-shadow: 0 0 10px #81C784; */
+}
+
+.close:hover {
+  background: #afa49b;
+  /* box-shadow: 0 0 15px #4CAF50; */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .media-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-content h3 {
+    font-size: 1.6rem;
+  }
+}

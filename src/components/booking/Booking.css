@@ -1,0 +1,9 @@
+.bookingForm input:-webkit-autofill,
+.bookingForm input:-webkit-autofill:hover,
+.bookingForm input:-webkit-autofill:focus,
+.bookingForm textarea:-webkit-autofill,
+.bookingForm select:-webkit-autofill {
+  -webkit-text-fill-color: #fff;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset;
+  transition: background-color 9999s ease-in-out 0s;
+}

@@ -1,0 +1,148 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Brand direct utilities (use these in custom components) ─────────────── */
+@theme {
+  --color-earth-brown: #6E6146;
+  --color-warm-beige: #D1C8C1;
+  --color-cream: #FAF7F2;
+  --color-charcoal: #2A2A2A;
+  --color-ivory: #FEFCF8;
+  --color-gold-accent: #C9A84C;
+  --color-moss-green: #4A6741;
+  --color-blush-dusk: #D4A76A;
+  --color-success: #4A6741;
+  --color-warning: #C9A84C;
+  --color-error: #B84A4A;
+
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-dm-sans);
+}
+
+/* ── shadcn semantic → Tailwind utility mappings ────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-dm-sans);
+  --font-heading: var(--font-cormorant);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ── Semantic tokens mapped to brand palette ─────────────────────────────── */
+:root {
+  --background: #FAF7F2;
+  --foreground: #2A2A2A;
+  --card: #FEFCF8;
+  --card-foreground: #2A2A2A;
+  --popover: #FEFCF8;
+  --popover-foreground: #2A2A2A;
+  --primary: #6E6146;
+  --primary-foreground: #FEFCF8;
+  --secondary: #D1C8C1;
+  --secondary-foreground: #2A2A2A;
+  --muted: #FAF7F2;
+  --muted-foreground: #8B8578;
+  --accent: #D1C8C1;
+  --accent-foreground: #2A2A2A;
+  --destructive: #B84A4A;
+  --border: #EAE5DC;
+  --input: #EAE5DC;
+  --ring: #6E6146;
+  --radius: 1rem;
+
+  /* Sidebar (admin panel) */
+  --sidebar: #FAF7F2;
+  --sidebar-foreground: #2A2A2A;
+  --sidebar-primary: #6E6146;
+  --sidebar-primary-foreground: #FEFCF8;
+  --sidebar-accent: #D1C8C1;
+  --sidebar-accent-foreground: #2A2A2A;
+  --sidebar-border: #EAE5DC;
+  --sidebar-ring: #6E6146;
+}
+
+/* Dark mode — kept for shadcn compatibility, not actively used by site */
+.dark {
+  --background: #1C1A17;
+  --foreground: #FAF7F2;
+  --card: #2A2620;
+  --card-foreground: #FAF7F2;
+  --popover: #2A2620;
+  --popover-foreground: #FAF7F2;
+  --primary: #C9A84C;
+  --primary-foreground: #2A2A2A;
+  --secondary: #3A3530;
+  --secondary-foreground: #FAF7F2;
+  --muted: #2A2620;
+  --muted-foreground: #D1C8C1;
+  --accent: #3A3530;
+  --accent-foreground: #FAF7F2;
+  --destructive: #B84A4A;
+  --border: #3A3530;
+  --input: #3A3530;
+  --ring: #C9A84C;
+  --sidebar: #1C1A17;
+  --sidebar-foreground: #FAF7F2;
+  --sidebar-primary: #C9A84C;
+  --sidebar-primary-foreground: #2A2A2A;
+  --sidebar-accent: #2A2620;
+  --sidebar-accent-foreground: #FAF7F2;
+  --sidebar-border: #3A3530;
+  --sidebar-ring: #C9A84C;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -4,6 +4,9 @@ import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { Heading } from '@/components/ui/heading';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { Faq } from '@/components/ui/faq';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Forest Resort near Ratapani Tiger Reserve, Bhopal',
@@ -26,6 +29,31 @@ export default function HomePage() {
             <Button size="lg">Book Your Stay</Button>
             <Button variant="outline" size="lg">Explore Rooms</Button>
           </div>
+        </Container>
+      </Section>
+
+      <Section label="Phase 1 smoke test">
+        <Container>
+          <Breadcrumb pathname="/stay/safari-tent" className="mb-8" />
+
+          <Card className="mb-8 max-w-md">
+            <CardHeader>
+              <CardTitle>Design System — Phase 1 Complete</CardTitle>
+              <CardDescription>
+                Container · Section · Heading · Button · Input · Textarea · Label · Card · Faq · Breadcrumb · ResortImage · Seo
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Faq
+            heading="Test FAQ"
+            items={[
+              {
+                question: 'Is this a real FAQ?',
+                answer: 'No — this is a Phase 1 smoke test confirming FAQPage JSON-LD emits correctly in initial HTML.',
+              },
+            ]}
+          />
         </Container>
       </Section>
     </main>

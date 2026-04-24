@@ -78,8 +78,41 @@
 
 ---
 
-## Next: Phase 1 Part 2 — Remaining Design System Primitives
-Input / Textarea / Label (shadcn install + brand restyle)
-Card (shadcn install + brand restyle)
-Faq component — accordion with FAQPage JSON-LD auto-emit (`'use client'`)
-Breadcrumb component — visual + BreadcrumbList JSON-LD (server component)
+## Phase 1 — Design System Foundation (Part 2) ✅ COMPLETE (2026-04-24)
+
+### What shipped
+
+**shadcn components installed + restyled** (`src/components/ui/`)
+- `input.tsx` — h-12 (48px tap target), px-3 padding; uses `@base-ui/react/input`
+- `textarea.tsx` — min-h-[96px], resize-y, px-3 py-3; removed `field-sizing-content`
+- `label.tsx` — `text-charcoal` added; `'use client'` per shadcn convention
+- `card.tsx` — `rounded-[16px]`, `bg-cream`, `border border-border shadow-sm`; all 6 sub-components (Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter)
+- `accordion.tsx` — shadcn generated via `npx shadcn add accordion`; uses `@base-ui/react/accordion`
+
+**New composite components** (`src/components/ui/`)
+- `faq.tsx` — `'use client'`; accordion UI wrapping `@base-ui/react/accordion`; auto-emits `FAQPage` JSON-LD via internal `<Seo>` call; answer text tagged `data-speakable="true"` for Phase 3 SpeakableSpecification
+- `breadcrumb.tsx` — server component; derives items from `pathname` prop or accepts explicit `items`; filters route group segments (`(marketing)` etc.) defensively; no-op (returns null + no JSON-LD) when `items.length <= 1`; auto-emits `BreadcrumbList` JSON-LD; visual: `<nav aria-label="Breadcrumb">` with Links + ChevronRight + `aria-current="page"` on last item
+
+**Homepage smoke test**
+- `src/app/(marketing)/page.tsx` updated with Card + Breadcrumb (pathname="/stay/safari-tent") + Faq test section
+- `pnpm typecheck` ✅ · `pnpm build` ✅ (36 routes, `○ /` static) · `curl /` JSON-LD verified:
+  - `"@type":"FAQPage"` ✅ in initial HTML
+  - `"@type":"BreadcrumbList"` ✅ in initial HTML
+
+### Decisions made
+- `Faq` is `'use client'` (accordion state) — JSON-LD still lands in initial HTML because Next.js SSRs client components on first request; Google crawlers see it
+- `Breadcrumb` is a server component — no interactivity needed
+- `breadcrumbList` import in `breadcrumb.tsx` uses the schema generator from `@/lib/schema`
+
+---
+
+## Phase 1 open items (carry to Phase 2)
+- **`business.ts` sameAs has 9 entries; CLAUDE.md §7.3 says 10** — 10th social profile not documented. Needs client confirmation.
+
+---
+
+## Next: Phase 2 — Global Shell
+Header (sticky-on-scroll + booking widget + mega-menu for Stay)
+Footer (4 columns, Somaiya branding, working newsletter)
+WhatsApp floater
+Cookie banner with real consent gating

@@ -17,7 +17,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default function HomePage() {
   return (
-    <main>
+    <>
       <Section label="Welcome to Madhuban Eco Retreat">
         <Container>
           <Heading
@@ -56,6 +56,6 @@ export default function HomePage() {
           />
         </Container>
       </Section>
-    </main>
+    </>
   );
 }

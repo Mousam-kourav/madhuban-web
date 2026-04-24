@@ -106,13 +106,61 @@
 
 ---
 
-## Phase 1 open items (carry to Phase 2)
+## Phase 1 open items (carry forward)
 - **`business.ts` sameAs has 9 entries; CLAUDE.md §7.3 says 10** — 10th social profile not documented. Needs client confirmation.
 
 ---
 
-## Next: Phase 2 — Global Shell
-Header (sticky-on-scroll + booking widget + mega-menu for Stay)
-Footer (4 columns, Somaiya branding, working newsletter)
-WhatsApp floater
-Cookie banner with real consent gating
+## Phase 2A — Global Shell: Header + Footer ✅ COMPLETE (2026-04-24)
+
+### What shipped
+
+**Nav config** (`src/lib/content/navigation.ts`)
+- Single source of truth for all nav arrays: `PRIMARY_NAV`, `EXPLORE_NAV`, `FOOTER_EXPLORE`, `FOOTER_VISIT`, `LEGAL_NAV`
+- Pure helper functions `isLinkActive(pathname, href)` and `isExploreActive(pathname)` co-located here
+
+**UI additions** (`src/components/ui/`)
+- `social-icons.tsx` — self-hosted inline SVG components for Instagram, Facebook, YouTube, LinkedIn, WhatsApp. lucide-react 1.8.0 dropped brand icons; these replace the Wikipedia-hosted icons from the old codebase (CLAUDE.md §10.2)
+- `dropdown-menu.tsx` + `sheet.tsx` — shadcn components installed (Base UI primitives)
+- `button.tsx` — restored h-12 default size (shadcn sheet install had overwritten Phase 1 WCAG fix)
+
+**Header** (`src/components/marketing/header/`)
+- `top-bar.tsx` — desktop-only earth-brown strip (phone, email, 5 social icons); non-sticky, scrolls out naturally
+- `nav-desktop.tsx` — primary nav + Explore DropdownMenu; `openOnHover` + `closeDelay={150}` on Base UI trigger; `isLinkActive` on each item, `isExploreActive` on dropdown trigger; `aria-current="page"` on active links
+- `mobile-drawer.tsx` — Sheet side="left"; flat nav (PRIMARY_NAV + "Explore" section + EXPLORE_NAV); contact + social at bottom; 48px tap targets
+- `index.tsx` — `'use client'`; scroll listener (passive, Y > 40) toggles h-20 → h-16 + shadow; skip-to-content link first in DOM; hamburger opens drawer
+
+**Footer** (`src/components/marketing/footer/`)
+- `newsletter-form.tsx` — `'use client'`; single `status: 'idle'|'loading'|'success'|'error'` state; fetches `/api/newsletter`; inline error with `role=alert`; success replaces form
+- `index.tsx` — server component; 4-column grid `[2fr_1fr_1fr_1fr]`; brand block with address, tagline, social, WhatsApp CTA; Explore + Visit columns; NewsletterForm island; earth-brown bottom strip with Somaiya attribution + legal links; all column headings semantic `<h3>`
+
+**Route stubs** (2 new pages, 36 → 38 routes)
+- `(marketing)/aranyashala/page.tsx` — placeholder with metadata + Heading
+- `(marketing)/souvenir-shop/page.tsx` — same pattern
+
+**API upgrade**
+- `api/newsletter/route.ts` — upgraded from 501 stub to Zod-validated endpoint (400 on bad email, 200 on success); Resend + Supabase deferred to Phase 5
+
+**Layout wired**
+- `(marketing)/layout.tsx` — Header + `<main id="main-content">` + Footer
+
+### Decisions made
+- `lucide-react` 1.8.0 has no brand icons (they were removed years ago). Self-hosted inline SVG components chosen over installing another icon library — consistent with CLAUDE.md "lucide-react only" spirit (which targets UI icons, not brand marks) and §10.2 (self-host social icons)
+- `openOnHover` moved to `Menu.Trigger` in Base UI 1.4.1 (was previously on Root) — verified from CHANGELOG before use
+- TopBar: non-sticky, scrolls out naturally — the browser's default behavior. No JS, no opacity tricks
+- Active link matching: `pathname === href || pathname.startsWith(href + '/')` — the `+ '/'` suffix prevents false matches (e.g. `/stay` matching a hypothetical `/stay-anywhere`)
+- `status: 'idle'|'loading'|'success'|'error'` single state in NewsletterForm (not separate booleans)
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm build` ✅ 38 routes, compiled in 4.7s
+
+---
+
+## Phase 2 open items (carry to Phase 2B)
+- WhatsApp floater (floating button, bottom-right)
+- Cookie banner with real consent gating (`use-consent` hook, `ConsentGate`, 3-button banner)
+
+---
+
+## Next: Phase 3 — Homepage (all 11 sections)

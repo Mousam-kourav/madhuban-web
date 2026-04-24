@@ -27,12 +27,59 @@
 - Playwright deferred to Phase 11 (300MB of binaries not needed until E2E phase)
 - shadcn dark mode vars kept for shadcn component compatibility; site itself does not use dark mode
 
-### Pending
-- Supabase `database.types.ts` stub — needs project ID to generate real types (`pnpm supabase gen types`)
-- Vitest config file (`vitest.config.ts`) — to be added in Phase 1 when first tests are written
-- Steps 15–28 of Phase 0 plan (Supabase lib stubs ✅ done above, still pending: PROGRESS.md ← this file, README rewrite, branch + push, Vercel preview verify)
+---
+
+## Phase 1 — Design System Foundation (Part 1) ✅ COMPLETE (2026-04-24)
+
+### What shipped
+
+**404 fix**
+- Deleted `src/app/page.tsx` (boilerplate root page that collided with `(marketing)/page.tsx` at `/`)
+- `(marketing)/page.tsx` now returns real content; `pnpm build` confirms `○ /` static prerender
+
+**UI primitives** (`src/components/ui/`)
+- `container.tsx` — max-width 1280px wrapper, responsive `px-4 md:px-6 lg:px-8`, server component
+- `section.tsx` — semantic `<section>`, `py-12 md:py-20` rhythm, `aria-label` prop, server component
+- `heading.tsx` — decorative heading (display font, rotated-square diamond ornament, hover-expanding lines via CSS `group`); `as` h1–h6, `color` theme, optional `subheading`; server component
+- `button.tsx` — restyled to brand tokens; default size raised to `h-12` (48px WCAG tap target); variants: default/secondary/outline/ghost/link
+- `image-wrapper.tsx` (`ResortImage`) — wraps `next/image`; typed `alt` required; auto-prefixes R2 base URL for `/r2/` paths; server component
+- `seo.tsx` — renders `<script type="application/ld+json">`; escapes `<` → `<`; server component
+
+**Lib files** (`src/lib/`)
+- `seo.ts` — `buildMetadata()` helper; assembles Next.js `Metadata` with canonical URL, OG, Twitter card, optional noIndex; title format: `{page} — Madhuban Eco Retreat`
+- `content/business.ts` — `BUSINESS as const`; single NAP source of truth with name, legalName, parent, phone, email, address (with `full` display field), geo, `sameAs`, cancellationPolicy, advancePayment
+
+**Schema generators** (`src/lib/schema/`)
+- `types.ts` — shared input interfaces: `FaqItem`, `PostalAddress`, `GeoCoordinates`, `MonetaryAmount`, `ImageObject`
+- `faq-page.ts` — `faqPage({ items })` → `FAQPage` + `Question` + `Answer` schema
+- `lodging-business.ts` — `lodgingBusiness()` → `LodgingBusiness` + `LocalBusiness`; optional `aggregateRating`
+- `resort.ts` — `resort()` → `Resort` with amenity features and star rating
+- `room.ts` — `room({ name, path, pricePerNight, ... })` → `HotelRoom` + `Offer` + `UnitPriceSpecification`
+- `article.ts` — `article({ title, path, publishedAt, ... })` → `BlogPosting` with `Organization` author/publisher
+- `breadcrumb-list.ts` — `breadcrumbList({ items })` explicit; `breadcrumbListFromPath(pathname)` auto-generates from slug
+- `speakable.ts` — `speakable({ path, cssSelectors })` → `SpeakableSpecification` targeting `[data-speakable]` by default
+- `index.ts` — barrel export for all generators
+
+**Homepage**
+- `src/app/(marketing)/page.tsx` — placeholder using Container + Section + Heading + Button; `buildMetadata()` for page metadata
+- `pnpm build` ✅ · `pnpm typecheck` ✅ · `curl /` → 200 OK ✅
+
+### Decisions made
+- `Button` uses `@base-ui/react/button` (shadcn v4 direction, already installed) — not Radix
+- Schema generators: typed inputs, loose `Record<string, unknown>` output — no `schema-dts` dependency
+- `font-display` / `font-body` Tailwind utilities: confirmed wired via `next/font → CSS var → @theme → utility class`
+- Heading diamond: CSS rotated `<span>` (not Unicode ◆) — font-independent, no render artifacts
+- `buildMetadata` title separator: em dash `—` to match `layout.tsx` template (CLAUDE.md §7.1 uses em dash; session instruction said pipe — using em dash for consistency)
+- `cancellationPolicy` key corrected: `threeToSevenDays` (typo `threToSevenDays` fixed before commit)
+
+### Phase 1 open items
+- **`business.ts` sameAs has 9 entries; CLAUDE.md §7.3 says 10** — 10th social profile not documented in CLAUDE.md. Needs client confirmation before next schema pass.
+- Deferred to Phase 1 Part 2: `Input`, `Textarea`, `Label` (shadcn), `Card` (shadcn), `Faq` (accordion + FAQPage auto-emit), `Breadcrumb` (BreadcrumbList JSON-LD + visual)
 
 ---
 
-## Next: Phase 1 — Design System
-Button, Input, Card, Container, Heading, Section, Image wrapper, SEO component, FAQ component with JSON-LD
+## Next: Phase 1 Part 2 — Remaining Design System Primitives
+Input / Textarea / Label (shadcn install + brand restyle)
+Card (shadcn install + brand restyle)
+Faq component — accordion with FAQPage JSON-LD auto-emit (`'use client'`)
+Breadcrumb component — visual + BreadcrumbList JSON-LD (server component)

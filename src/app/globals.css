@@ -146,3 +146,13 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes float-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .animate-float-in {
+    animation: float-in 400ms ease-out;
+  }
+}

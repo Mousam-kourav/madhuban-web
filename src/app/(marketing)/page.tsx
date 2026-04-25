@@ -15,12 +15,18 @@ import { DiningPreview } from '@/components/marketing/homepage/dining-preview';
 import { NearbyAttractions } from '@/components/marketing/homepage/nearby-attractions';
 import { Testimonials } from '@/components/marketing/homepage/testimonials';
 import { BlogPreview } from '@/components/marketing/homepage/blog-preview';
+import { CorporateOffsiteTeaser } from '@/components/marketing/homepage/corporate-offsite-teaser';
+import { FollowOurJourney } from '@/components/marketing/homepage/follow-our-journey';
+import { NewsletterCta } from '@/components/marketing/homepage/newsletter-cta';
+import { FaqSection } from '@/components/marketing/homepage/faq-section';
 import { lodgingBusiness } from '@/lib/schema/lodging-business';
 import { resort } from '@/lib/schema/resort';
 import { speakable } from '@/lib/schema/speakable';
 import { roomItemList } from '@/lib/schema/item-list';
+import { faqPage } from '@/lib/schema/faq-page';
 import { ANSWER_BLOCK } from '@/lib/content/homepage';
 import { ROOMS } from '@/lib/content/rooms';
+import { HOMEPAGE_FAQS } from '@/lib/content/faqs';
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
@@ -42,6 +48,7 @@ export default function HomePage() {
           resort(),
           speakable({ path: '/', cssSelectors: ['.answer-block'] }),
           roomItemList(ROOMS),
+          faqPage({ items: HOMEPAGE_FAQS.map(({ question, answer }) => ({ question, answer })) }),
         ]}
       />
 
@@ -75,7 +82,13 @@ export default function HomePage() {
 
       <BlogPreview />
 
-      {/* PHASE 3 SESSION D: Newsletter, corporate offsite teaser, FAQ */}
+      <CorporateOffsiteTeaser />
+
+      <FollowOurJourney />
+
+      <NewsletterCta />
+
+      <FaqSection />
     </>
   );
 }

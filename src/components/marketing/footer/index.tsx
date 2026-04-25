@@ -141,7 +141,7 @@ export function Footer() {
           </div>
 
           {/* Column 4 — Newsletter */}
-          <div>
+          <div id="footer-newsletter">
             <FooterHeading>Stay Updated</FooterHeading>
             <p className="text-sm text-charcoal/70 mb-4 leading-relaxed">
               Get updates on offers, new experiences, and sustainability initiatives.

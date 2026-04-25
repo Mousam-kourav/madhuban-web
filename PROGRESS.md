@@ -224,4 +224,95 @@ All Phase 2 deliverables shipped:
 
 ---
 
-## Next: Phase 3 — Homepage (all 11 sections)
+## Phase 3A — Homepage: Hero + Welcome + Stats ✅ COMPLETE (2026-04-25)
+
+### What shipped
+
+**Content files**
+- `src/lib/content/images.ts` — typed `HeroImage` registry; `readonly [HeroImage, HeroImage, HeroImage]` tuple prevents unsafe index access under `noUncheckedIndexedAccess`; R2_BASE sourced from `NEXT_PUBLIC_R2_BASE`
+- `src/lib/content/homepage.ts` — all Phase 3A copy (`HERO_COPY`, `WELCOME_COPY`, `STATS`, `ANSWER_BLOCK`); live-site content preserved verbatim per §10.3; top-of-file TODO comment for post-launch editorial pass
+
+**Hero carousel** (`src/components/marketing/hero/`)
+- `index.tsx` — server shell
+- `carousel.tsx` — `'use client'`; 3 slides, 6s auto-rotation, CSS `opacity` fade (600ms); slide 1: `priority` + LCP-optimised; slides 2–3: `loading="eager"` + `fetchPriority="low"`
+- Two-state pause architecture: `userPaused` (explicit button, persists) vs `envPaused` (hover/focus/visibility, auto-clears)
+- Reduced-motion: lazy `useState` initializer reads `window.matchMedia` on first client render — no effect-body setState, no flash
+- Pause on hover, keyboard focus (`onFocus`/`onBlur` with `contains()` check), and `visibilitychange`
+- ARIA: `aria-roledescription="carousel"`, slide `role="group"`, dot `role="tablist"`, polite announcer (only when user-paused)
+- Dots: bottom-center mobile / bottom-right desktop; Pause/Play: top-right mobile / bottom-right desktop
+
+**Homepage sections** (`src/components/marketing/homepage/`)
+- `welcome.tsx` — server component; `Heading` h2 + 2 paragraphs + secondary CTA
+- `stats.tsx` — server component; 4-col desktop / 2-col mobile; `border-l md:first:border-l-0` divider pattern; all figures from live sustainability section
+
+**Homepage wiring** (`src/app/(marketing)/page.tsx`)
+- `titleOverride` for verbatim indexed title; live meta description preserved with TODO comment
+- JSON-LD: `LodgingBusiness` + `Resort` + `SpeakableSpecification` (targets `.answer-block`)
+- Answer block (40–80 words, AEO) between Welcome and Stats
+
+**Supporting changes**
+- `src/lib/seo.ts` — added `titleOverride?` param; OG title also uses override when set
+- `src/app/globals.css` — `--header-height: 5rem` in `:root`; `.hero-height` utility (80svh mobile / `calc(100svh - var(--header-height))` desktop)
+- `src/components/ui/button.tsx` — `nativeButton` auto-resolves to `false` when `render` is provided; eliminated 6 Base UI console warnings across Header, Footer, Hero, Welcome with zero callsite changes
+- `next.config.ts` — R2 `remotePatterns` hostname updated to correct bucket ID
+- `src/lib/consent/consent-context.tsx` — `startTransition` wrapper satisfies `react-hooks/set-state-in-effect` lint rule (Phase 2B regression fix)
+- `src/components/marketing/footer/newsletter-form.tsx` — apostrophe escaped (Phase 2A regression fix)
+
+### Decisions made
+- H1 uses hardcoded JSX with `<br className="hidden lg:block">` for controlled desktop line break — not the `HERO_COPY.h1` string, since `&amp;` entity requires JSX context and the break is presentational
+- `userPaused` initialised via lazy `useState(prefersReducedMotion)` — avoids setState-in-effect lint error and avoids the brief flash of auto-rotation that would occur if initialised `false` then corrected in `useEffect`
+- Stats dividers use `md:border-l md:first:border-l-0` (not `border-r last:border-r-0`) — more reliable across CSS grid in all browsers
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors, zero warnings
+- `pnpm build` ✅ 38 routes, compiled in 5.2s
+- Visual QA: carousel rotates, CTAs correct size, stats dividers clean, cookie banner regression OK, console clean
+
+---
+
+---
+
+## Phase 3B — Homepage: Rooms Preview + Experiences Grid + Dining Preview ✅ COMPLETE (2026-04-25)
+
+### What shipped
+
+**Content files**
+- `src/lib/content/rooms.ts` — typed `Room` + `RoomImage` registry; all 6 accommodations with slugs, prices, taglines, href, and per-slug R2 image paths (480/800/1280 widths, webp + jpg). R2_BASE warn-loud pattern mirrors `images.ts`.
+- `src/lib/content/experiences.ts` — typed `Experience` registry; 3 experiences with verbatim live-site copy per §10.3; image paths pre-wired to R2 at `home/experiences/{slug}-{size}.{ext}` with TODO comment (files not yet uploaded — intentional, shows as 404 in DevTools).
+- `src/lib/content/dining.ts` — `DINING_PREVIEW` const with heading, body, CTA, and image pre-wired to `home/dining/dining-hero-{size}.{ext}` with TODO comment.
+
+**Schema**
+- `src/lib/schema/item-list.ts` — `roomItemList(rooms)` → `ItemList` schema with 6 `ListItem` entries, each a `Product` with `name`, `url`, `image`, and `Offer` (price, INR, InStock)
+- `src/lib/schema/index.ts` — barrel export updated to include `item-list`
+
+**Utility**
+- `src/lib/utils.ts` — `formatPrice(amount)` added; uses `en-IN` locale for Indian numbering (5000 → "5,000")
+
+**Homepage sections** (`src/components/marketing/homepage/`)
+- `rooms-preview.tsx` — server component; 3/2/1 col grid; `<ul role="list">` with `<article aria-labelledby>` per card; uses Phase 1 `Card` primitive (image wrapper div + CardHeader + CardContent + CardFooter); first image `loading="eager"`, rest lazy; price formatted via `formatPrice`; hover scale 1.02 + shadow-md via CSS transition; "View All Accommodations" CTA at bottom → `/stay`
+- `experiences-grid.tsx` — server component; 3/1 col grid; same Card pattern; `line-clamp-4` description; "Ideal For" label; ChevronRight icon link; "Explore All Experiences" outline CTA → `/experiences`; heading uses `&#8217;` for Ratapani's apostrophe (avoids `react/no-unescaped-entities`)
+- `dining-preview.tsx` — server component; 50/50 CSS grid layout (image left, text right); stacks on mobile; `aspect-video` image; `Heading` with left-align override via `[&>div]:justify-start`
+
+**Homepage wiring**
+- `src/app/(marketing)/page.tsx` — imports and renders `RoomsPreview`, `ExperiencesGrid`, `DiningPreview` after `StatsBar`; `roomItemList(ROOMS)` added to `Seo` schemas array
+
+### Decisions made
+- `formatPrice` in `src/lib/utils.ts` (not a new `src/lib/utils/` folder) — avoids premature folder split for a single 2-line utility
+- Card image uses `<div className="relative aspect-[3/2] overflow-hidden">` + `<Image fill>` — not `CardTitle` wrapper (which is a div with no `as` prop); Card primitive left unchanged per Phase 1 freeze
+- `CardTitle` skipped; room name rendered as `<h3>` directly in `CardHeader` — preserves heading semantics without modifying the Phase 1 Card primitive
+- Experiences image alt text written for the new files (not yet on live site); dining image alt from spec
+- URL slugs corrected from session prompt: `forest-walks-and-nature-trails`, `bird-watching-and-wilderness`, `recreational-facilities` — canonical §5 URLs, not the truncated slugs in the session prompt
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors, zero warnings
+- `pnpm build` ✅ 38 routes, no regressions
+
+### Known open items
+- Experience + dining images not yet uploaded to R2 — 4 placeholder 404s intentional (TODO comments in content files)
+- Room images at `home/rooms/{slug}-{480,800,1280}.{webp,jpg}` also need uploading to R2
+
+---
+
+## Next: Phase 3 Session C — Nearby attractions, testimonials, blog preview sections

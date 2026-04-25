@@ -1,61 +1,60 @@
+// TODO: Live meta description says "mud villas" but rooms are "mud houses".
+// Preserved per CLAUDE.md §10.3. Update during editorial pass.
+
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo';
-import { Container } from '@/components/ui/container';
+import { Seo } from '@/components/ui/seo';
 import { Section } from '@/components/ui/section';
-import { Heading } from '@/components/ui/heading';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Faq } from '@/components/ui/faq';
+import { Container } from '@/components/ui/container';
+import { HeroSection } from '@/components/marketing/hero';
+import { WelcomeSection } from '@/components/marketing/homepage/welcome';
+import { StatsBar } from '@/components/marketing/homepage/stats';
+import { lodgingBusiness } from '@/lib/schema/lodging-business';
+import { resort } from '@/lib/schema/resort';
+import { speakable } from '@/lib/schema/speakable';
+import { ANSWER_BLOCK } from '@/lib/content/homepage';
+
+const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Forest Resort near Ratapani Tiger Reserve, Bhopal',
+  titleOverride: 'Madhuban Eco Retreat | Best Eco Resort Near Bhopal',
   description:
-    'Eco-luxury forest resort 60 km from Bhopal, adjacent to Ratapani Tiger Reserve. Safari tents, mud houses, pool villa, glamping, dining & nature experiences.',
+    'Discover Madhuban Eco Retreat, a premier eco resort near Bhopal & Ratapani. Enjoy safari tents, mud villas, forest walks & sustainable luxury. Book your stay!',
   path: '/',
+  ogImage: `${R2_BASE}/home/hero/hero-aerial-sunset-1920.jpg`,
 });
 
 export default function HomePage() {
   return (
     <>
-      <Section label="Welcome to Madhuban Eco Retreat">
+      <Seo
+        schemas={[
+          lodgingBusiness(),
+          resort(),
+          speakable({ path: '/', cssSelectors: ['.answer-block'] }),
+        ]}
+      />
+
+      <HeroSection />
+
+      <WelcomeSection />
+
+      {/* AEO answer block — speakable via .answer-block CSS selector */}
+      <Section
+        label="About Madhuban Eco Retreat"
+        className="py-8 md:py-10 bg-warm-beige/30"
+      >
         <Container>
-          <Heading
-            as="h1"
-            text="Madhuban Eco Retreat"
-            subheading="Eco-luxury forest resort adjacent to Ratapani Tiger Reserve · 60 km from Bhopal"
-          />
-          <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Button size="lg">Book Your Stay</Button>
-            <Button variant="outline" size="lg">Explore Rooms</Button>
-          </div>
+          <p className="answer-block mx-auto max-w-3xl text-center font-body text-base leading-relaxed text-charcoal/80">
+            {ANSWER_BLOCK}
+          </p>
         </Container>
       </Section>
 
-      <Section label="Phase 1 smoke test">
-        <Container>
-          <Breadcrumb pathname="/stay/safari-tent" className="mb-8" />
+      <StatsBar />
 
-          <Card className="mb-8 max-w-md">
-            <CardHeader>
-              <CardTitle>Design System — Phase 1 Complete</CardTitle>
-              <CardDescription>
-                Container · Section · Heading · Button · Input · Textarea · Label · Card · Faq · Breadcrumb · ResortImage · Seo
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <Faq
-            heading="Test FAQ"
-            items={[
-              {
-                question: 'Is this a real FAQ?',
-                answer: 'No — this is a Phase 1 smoke test confirming FAQPage JSON-LD emits correctly in initial HTML.',
-              },
-            ]}
-          />
-        </Container>
-      </Section>
+      {/* PHASE 3 SESSION B: Rooms preview, Experiences, Dining */}
     </>
   );
 }

@@ -14,6 +14,11 @@ interface BuildMetadataInput {
   ogImage?: string;
   /** When true, emits robots: noindex, nofollow. Use for admin, booking/payment, staging. */
   noIndex?: boolean;
+  /**
+   * When set, used as the full <title> verbatim — no brand suffix appended.
+   * Use only for pages whose exact title is already indexed (e.g. homepage).
+   */
+  titleOverride?: string;
 }
 
 /**
@@ -32,19 +37,21 @@ export function buildMetadata({
   path,
   ogImage,
   noIndex = false,
+  titleOverride,
 }: BuildMetadataInput): Metadata {
   const canonical = `${BASE_URL}${path}`;
   const image = ogImage ?? DEFAULT_OG_IMAGE;
+  const fullTitle = titleOverride ?? `${title} — ${SITE_NAME}`;
 
   return {
     metadataBase: new URL(BASE_URL),
-    title: `${title} — ${SITE_NAME}`,
+    title: fullTitle,
     description,
     alternates: {
       canonical,
     },
     openGraph: {
-      title,
+      title: titleOverride ?? title,
       description,
       url: canonical,
       siteName: SITE_NAME,
@@ -54,7 +61,7 @@ export function buildMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: titleOverride ?? title,
       description,
       images: [image],
     },

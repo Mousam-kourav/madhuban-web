@@ -33,7 +33,7 @@
 5. **Server Components by default. `'use client'` only when truly needed** (useState, event handlers, browser APIs). Never `'use client'` on a section just because it has animations.
 6. **Every page that has FAQs emits `FAQPage` JSON-LD.** Non-negotiable. See §7.
 7. **Every page is LCP <2.5s on mobile, LH 95+.** Non-negotiable. Build with this in mind, don't optimize later.
-8. **No tracking script fires before cookie consent.** See §13.
+8. **No tracking script fires before cookie consent.** See §12.
 9. **No client-side secrets.** Supabase service role key, Razorpay secret, Resend API key — server-side only. Enforce with TypeScript + ESLint.
 10. **No more duplicate components. One template, data-driven** — especially experience pages and policy pages (both were duplicated 3-4× in the old codebase).
 
@@ -334,6 +334,10 @@ All current rooms are under ₹7,500/night so all 12% GST. If any room price is 
 - `resort-images` — public bucket. All marketing images.
 - `invoices` — private. Signed URLs only, 1-hour expiry.
 
+### Slug ↔ R2 filename consistency (enforced)
+
+When a room or experience slug in §5 is **plural** (e.g. `glamping-tents`), all R2 image filenames for that entity **must use the same plural form** (e.g. `glamping-tents-480.webp`, not `glamping-tent-480.webp`). Singular-vs-plural mismatch caused a Phase 3B production bug (see §23.1). Always cross-check §5 slugs against R2 filenames before uploading or bundling images.
+
 ---
 
 ## 7 — SEO (this is the priority — treat it first-class, not a Phase 9 afterthought)
@@ -341,42 +345,22 @@ All current rooms are under ₹7,500/night so all 12% GST. If any room price is 
 ### 7.1 Metadata — every page uses `generateMetadata()`
 
 ```ts
-// lib/seo.ts
-export function buildMetadata({
-  title,
-  description,
-  canonical,
-  ogImage,
-}: BuildMetadataInput): Metadata {
-  const base = 'https://www.madhubanecoretreat.com';
-  return {
-    metadataBase: new URL(base),
-    title,                              // ≤60 chars
-    description,                        // ≤160 chars
-    alternates: { canonical: `${base}${canonical}` },
-    openGraph: {
-      title,
-      description,
-      url: `${base}${canonical}`,
-      siteName: 'Madhuban Eco Retreat',
-      images: [ogImage || `${base}/og-default.jpg`],
-      locale: 'en_IN',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [ogImage || `${base}/og-default.jpg`],
-    },
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
-  };
-}
+// lib/seo.ts — shipped interface (as of Phase 3)
+buildMetadata({
+  title,          // page-specific title, ≤38 chars — brand suffix " — Madhuban Eco Retreat" auto-appended (full ≤60)
+  description,    // ≤160 chars, active voice, includes primary keyword and location
+  path,           // URL path, e.g. '/stay/safari-tent' — builds canonical URL + OG url
+  ogImage?,       // full URL to OG image. Falls back to /og-default.jpg
+  noIndex?,       // true → emits robots: noindex,nofollow. Use for /admin, /booking/payment, staging previews.
+  titleOverride?, // full <title> verbatim — brand suffix NOT appended. See use-case note below.
+})
 ```
 
 **Character rules:**
 - Title: ≤60 chars including pipe. `Page — Madhuban Eco Retreat` (keep "Madhuban Eco Retreat" suffix short for brand)
 - Description: ≤160 chars, active voice, includes primary keyword and location
+
+**`titleOverride` use-case:** Only for pages whose exact title is already indexed in Google and must stay verbatim (e.g. homepage uses `'Madhuban Eco Retreat | Best Eco Resort Near Bhopal'`). Avoid for all new pages — they should receive the auto-appended brand suffix `" — Madhuban Eco Retreat"`.
 
 ### 7.2 JSON-LD schema — every relevant page
 
@@ -682,11 +666,13 @@ Old code fires GA4, GTM, and Contentsquare on page load, before consent. That st
 Nothing fires until `consent.analytics === true` or `consent.marketing === true` (depending on the tool).
 
 ```ts
-// hooks/use-consent.ts
+// lib/consent/consent-context.tsx
 export type ConsentState = {
   necessary: true;         // always
   analytics: boolean;      // GA4, Vercel Analytics
   marketing: boolean;      // GTM (for ad pixels), Contentsquare
+  timestamp: number;       // Date.now() at consent time — used to enforce 6-month expiry on read
+  version: 1;              // bump CONSENT_VERSION in consent-context.tsx to force re-consent when categories change
 };
 ```
 
@@ -694,7 +680,7 @@ export type ConsentState = {
 
 Three buttons: Accept All, Reject All, Manage Preferences. No dark patterns. "Reject All" is the same visual weight as "Accept All". Manage Preferences opens a dialog with three toggles (Necessary fixed-on, Analytics, Marketing).
 
-Stored in `consent_v1` cookie. 365-day expiry. Visible on every page until consent given.
+Stored in **localStorage** under key `madhuban_consent`. ~6-month expiry enforced on read (consent is discarded and the banner re-shown if `Date.now() - timestamp > EXPIRY_MS`). Visible on every page until consent is recorded.
 
 ### 12.4 Script loading
 
@@ -723,7 +709,7 @@ GA4, GTM, Contentsquare loaded conditionally via `next/script` with `strategy="l
 10. **Preconnect** to Cloudflare R2 bucket and Razorpay checkout:
 
 ```tsx
-<link rel="preconnect" href="https://pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev" crossOrigin="anonymous" />
+<link rel="preconnect" href="https://pub-988c0a6b938742458b908a7a49295f61.r2.dev" crossOrigin="anonymous" />
 <link rel="preconnect" href="https://checkout.razorpay.com" />
 ```
 
@@ -803,7 +789,7 @@ ADMIN_JWT_SECRET=
 ADMIN_SESSION_EXPIRY_HOURS=12
 
 # Image CDN
-NEXT_PUBLIC_R2_BASE=https://pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev
+NEXT_PUBLIC_R2_BASE=https://pub-988c0a6b938742458b908a7a49295f61.r2.dev
 
 # Analytics (consent-gated)
 NEXT_PUBLIC_GA4_ID=G-DBTW8G5KT3
@@ -812,6 +798,8 @@ NEXT_PUBLIC_GTM_ID=GTM-MKKPGJ72
 # Monitoring
 SENTRY_DSN=
 ```
+
+⚠️ **`NEXT_PUBLIC_R2_BASE` and `next.config.ts` must stay in sync.** When `NEXT_PUBLIC_R2_BASE` changes, the hostname in `next.config.ts` → `images.remotePatterns` **must also be updated to match exactly**. Next.js validates remote hostnames at request time; a mismatch produces silent 404s in production while dev (which bypasses `remotePatterns` checks) continues to work fine. Both values must be identical.
 
 Rotate and add Vercel token to Azure pipeline secrets (NOT committed to `azure-pipelines.yml` anymore).
 
@@ -897,4 +885,18 @@ The rebuild is successful when all of these are true:
 
 ---
 
-*Last updated: {{DATE}} — Version 1.0 — Architectural decisions locked by Mousam Kourav and Claude (browser session)*
+## 23 — Known Incidents & Learnings
+
+Failures and near-misses from the rebuild. Read before touching slugs, images, or R2 paths.
+
+### 23.1 Phase 3B — Glamping Tent slug/filename mismatch
+
+**What happened:** Initial R2 image upload used singular filenames (`glamping-tent-480.webp`, `glamping-tent-800.webp`) while the canonical slug in §5 is plural (`glamping-tents`). The `next build` passed because Next.js Image does not validate remote URLs at compile time, and dev mode served images from relative paths that bypassed `remotePatterns`. Production images 404'd silently.
+
+**Resolution:** R2 files renamed to plural form (`glamping-tents-480.webp`, etc.) to match the §5 slug exactly.
+
+**Rule added:** §6 now requires slug ↔ R2 filename parity. Always verify §5 slugs against R2 filenames before uploading images or wiring image paths in content files.
+
+---
+
+*Last updated: 2026-04-25 — Version 1.1 — Architectural decisions locked by Mousam Kourav and Claude (browser session)*

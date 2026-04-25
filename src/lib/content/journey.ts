@@ -1,4 +1,9 @@
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
+if (!R2_BASE) {
+  if (typeof window !== 'undefined' || process.env.NODE_ENV !== 'production') {
+    console.warn('[journey.ts] NEXT_PUBLIC_R2_BASE is not set. Journey photos will 404.');
+  }
+}
 
 export type JourneyPhoto = {
   id: number;

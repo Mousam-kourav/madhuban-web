@@ -351,4 +351,65 @@ All Phase 2 deliverables shipped:
 
 ---
 
-## Next: Phase 3 Session D — Newsletter CTA, corporate offsite teaser, FAQ section (homepage completion)
+## Phase 3D — Homepage: Newsletter CTA + Corporate Offsite Teaser + FAQ ✅ COMPLETE (2026-04-25)
+Shipped in a prior session. See commit 38f0e83.
+
+---
+
+## Phase 4A — Room Detail Pages (Redesign) ✅ COMPLETE (2026-04-25)
+
+### What shipped
+
+**9 files written on branch `feat/phase-4a-redesign-room-detail-pages`:**
+
+**Extended content** (`src/lib/content/rooms.ts`)
+- Extended `Room` type with: `genre`, `longDescription: readonly string[]` (3 paragraphs), `occupancy`, `bedConfig`, `size`, `amenities: readonly string[]`, `highlights: readonly RoomHighlight[]` (4 per room), `gallery: readonly RoomGalleryImage[]` (5 per room), `faqs: readonly RoomFaq[]` (7 per room — 42 total)
+- New types: `RoomGalleryImage` (webp + jpg at mobile/desktop sizes), `RoomFaq`
+- `RoomHighlight.icon: string` — lucide-react icon name resolved at render time via `ICON_MAP` in `room-detail-page.tsx`
+- `galleryImages(slug, alts)` helper builds R2 gallery paths at `home/rooms/{slug}-{n}-{800,1280}.{webp,jpg}`
+- All 6 rooms fully populated with corrected prices: Safari Tent ₹12,000 · Mud House 1 ₹10,000 · Mud House 2 ₹9,000 · Pool Side Villa ₹12,000 · Glamping Tent ₹7,500 · Camping Tent ₹2,500
+- `MUD_HOUSE_GALLERY_ALTS` shared between mud-house-1 and mud-house-2 (identical rooms visually, different R2 slugs)
+
+**Schema** (`src/lib/schema/room.ts`)
+- Renamed `room()` → `hotelRoom(room: Room)` — accepts full `Room` object, no separate input type
+- Computes R2 image array (slots 1–3 at 1280px) internally from `room.slug`
+- Uses `room.longDescription[0] ?? ''` as description (noUncheckedIndexedAccess guard)
+
+**Globals** (`src/app/globals.css`)
+- Added `--color-forest-green: #2D3B2D` to `@theme` block (new Tailwind utility)
+- Added `.drop-cap > p:first-of-type::first-letter` CSS (display font, italic, floated, 3.5rem)
+- Added `details > summary { list-style: none }` + `::-webkit-details-marker { display: none }` triangle removal
+
+**Room detail components** (`src/components/marketing/room-detail/`)
+- `room-detail-page.tsx` — server component; 8 sections: Hero (aspect-[4/3] md:aspect-[16/9], Image fill priority, gradient overlay, italic h1), Booking Band (60/40 grid, genre + meta left, booking card right), Description (drop-cap, 3 paragraphs), Highlights (4-col icon grid, `ICON_MAP[h.icon] ?? Sparkles`), Gallery (CSS grid, first image `lg:col-span-2 lg:aspect-[16/7]`), Amenities (2-col list, Check icons), FAQ (native `<details>`, first item open, ChevronDown rotate), CTA (`bg-forest-green` section, ivory buttons)
+- `mobile-sticky-bar.tsx` — `'use client'`; `IntersectionObserver` on `#room-hero`; `h-[72px]` fixed bar; CSS `translate-y-full` → `translate-y-0` transition (replaces `if (!visible) return null` — avoids initial flash on fast scroll); `tabIndex={-1}` on link when hidden; `md:hidden`
+
+**Room pages**
+- `src/app/(marketing)/stay/[slug]/page.tsx` — replaced stub; `generateStaticParams` (6 slugs); `generateMetadata` (async params, R2 OG image); renders `Seo` (3 schemas: `hotelRoom`, `faqPage`, `breadcrumbListFromPath`), `RoomDetailPage`, `MobileStickyBar`
+- `src/app/(marketing)/stay/page.tsx` — replaced stub; listing page with 4 sections: h1 Heading, description paragraph, 6-card grid (reuses Card primitive + genre eyebrow on each card), bottom CTA with WhatsApp + Book Now
+
+**Other**
+- `src/lib/content/faqs.ts` — updated `accommodations` FAQ answer with corrected prices matching rooms.ts
+- `CLAUDE.md` §4 — added `--color-forest-green: #2D3B2D` to brand color token docs
+- `CLAUDE.md` §19 — added Phase 5 scope addendum (Supabase migration, room CRUD, image upload, ISR refactor)
+
+### Decisions made
+- `ICON_MAP[h.icon] ?? Sparkles` — icon name encoded in data; resolved at render time. Keeps content/rendering cleanly separated without coupling `rooms.ts` to lucide imports
+- Native `<details>`/`<summary>` for FAQ — zero JS, pure server component; `open={i === 0}` for initial state
+- Mobile sticky bar uses CSS transform transition (not conditional render) — prevents 72px layout shift on slow scroll
+- `[...r.faqs]` spread in page.tsx — converts `readonly RoomFaq[]` to mutable `FaqItem[]` for `faqPage()` without changing the schema types
+- Gallery grid: `aspect-[3/2]` on all images; first image gets `lg:col-span-2 lg:aspect-[16/7]` at desktop only
+- `<article className="pb-[72px] md:pb-0">` wrapper in `RoomDetailPage` — matches `h-[72px]` sticky bar exactly
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors, zero warnings
+- `pnpm build` ✅ 44 routes (6 new SSG room detail pages, `/stay` listing page), compiled in 5.3s
+
+### Known open items
+- Gallery images at `home/rooms/{slug}-{n}-{800,1280}.{webp,jpg}` not yet on R2 (will 404 until uploaded)
+- `hotelRoom` in schema/index.ts barrel: old `room` export removed; any existing callers of `room()` must be updated to `hotelRoom()` (no existing callers found — was only stubbed)
+
+---
+
+## Next: Phase 4B — Experiences pages (hub + 3 detail pages, one template)

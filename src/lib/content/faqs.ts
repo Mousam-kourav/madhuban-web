@@ -11,7 +11,7 @@ export const HOMEPAGE_FAQS: readonly Faq[] = [
     id: 'accommodations',
     question: 'What types of accommodations are available?',
     answer:
-      'Madhuban offers six accommodation types: Safari Tents (₹5,000/night), Mud House 1 with bathtub (₹6,000/night), Mud House 2 (₹5,500/night), Pool Side Villa (₹5,500/night), Glamping Tents (₹4,500/night), and Camping Tents (₹2,500/night). All prices include GST and are per night.',
+      'Madhuban offers six accommodation types: Camping Tents (₹2,500/night), Glamping Tents (₹7,500/night), Mud House 2 (₹9,000/night), Mud House 1 with private bathtub (₹10,000/night), Safari Tents (₹12,000/night), and Pool Side Villa (₹12,000/night). All prices include GST and are per night.',
   },
   {
     id: 'cancellation',

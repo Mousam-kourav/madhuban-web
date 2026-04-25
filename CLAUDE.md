@@ -208,6 +208,7 @@ src/
   --color-gold-accent: #C9A84C;          /* small gold highlights, stars, badges */
   --color-moss-green:  #4A6741;          /* tags, eco-badges only */
   --color-blush-dusk:  #D4A76A;          /* hover states */
+  --color-forest-green: #2D3B2D;         /* dark CTA sections, room-detail bottom CTA */
 
   /* Semantic */
   --color-success: #4A6741;
@@ -834,6 +835,12 @@ Rotate and add Vercel token to Azure pipeline secrets (NOT committed to `azure-p
 | **P12** | 16 | Launch: DNS cutover, Razorpay live keys (post-KYC), Google Search Console resubmit sitemap, Sentry on, monitor for 72 hours |
 
 Skippable if blocked: Razorpay live (stays sandbox until KYC), admin panel can ship to v1 with Bookings module only + CMS in v2.
+
+**Phase 5 scope addendum** (decided Phase 4A session, 2026-04-25):
+- Migrate room content (rooms.ts) from static TS to Supabase `rooms` table
+- Build admin panel room CRUD (name, slug, description, amenities, images, pricing, status)
+- Image upload flow for room gallery (R2 via admin panel)
+- Refactor `/stay/[slug]` pages to fetch from Supabase at runtime (ISR, not static) once DB is seeded
 
 ---
 

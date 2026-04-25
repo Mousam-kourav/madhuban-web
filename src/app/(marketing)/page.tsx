@@ -9,10 +9,15 @@ import { Container } from '@/components/ui/container';
 import { HeroSection } from '@/components/marketing/hero';
 import { WelcomeSection } from '@/components/marketing/homepage/welcome';
 import { StatsBar } from '@/components/marketing/homepage/stats';
+import { RoomsPreview } from '@/components/marketing/homepage/rooms-preview';
+import { ExperiencesGrid } from '@/components/marketing/homepage/experiences-grid';
+import { DiningPreview } from '@/components/marketing/homepage/dining-preview';
 import { lodgingBusiness } from '@/lib/schema/lodging-business';
 import { resort } from '@/lib/schema/resort';
 import { speakable } from '@/lib/schema/speakable';
+import { roomItemList } from '@/lib/schema/item-list';
 import { ANSWER_BLOCK } from '@/lib/content/homepage';
+import { ROOMS } from '@/lib/content/rooms';
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
@@ -33,6 +38,7 @@ export default function HomePage() {
           lodgingBusiness(),
           resort(),
           speakable({ path: '/', cssSelectors: ['.answer-block'] }),
+          roomItemList(ROOMS),
         ]}
       />
 
@@ -54,7 +60,13 @@ export default function HomePage() {
 
       <StatsBar />
 
-      {/* PHASE 3 SESSION B: Rooms preview, Experiences, Dining */}
+      <RoomsPreview />
+
+      <ExperiencesGrid />
+
+      <DiningPreview />
+
+      {/* PHASE 3 SESSION C: Nearby attractions, testimonials, blog */}
     </>
   );
 }

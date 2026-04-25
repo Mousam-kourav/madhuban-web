@@ -157,9 +157,70 @@
 
 ---
 
-## Phase 2 open items (carry to Phase 2B)
-- WhatsApp floater (floating button, bottom-right)
-- Cookie banner with real consent gating (`use-consent` hook, `ConsentGate`, 3-button banner)
+---
+
+## Phase 2B Part 1 — WhatsApp Floater ✅ COMPLETE (2026-04-24)
+
+### What shipped
+- `src/components/marketing/whatsapp-floater.tsx` — fixed bottom-right `<a>`, `animate-float-in` CSS entry, `z-40`
+- Mounted in `(marketing)/layout.tsx` below `<main>` so it appears on all marketing pages
+- Updated in Phase 2B Part 2 to `'use client'` + hide while banner visible
+
+---
+
+## Phase 2B Part 2 — Cookie Consent Banner ✅ COMPLETE (2026-04-25)
+
+### What shipped
+
+**Consent architecture** (`src/lib/consent/`)
+- `consent-context.tsx` — `ConsentProvider` + `useConsent` hook
+  - localStorage key: `madhuban_consent` · version: `1` · expiry: 6 months
+  - `isLoaded` starts `false` (SSR-safe); set `true` after hydration `useEffect`
+  - `isConsentState()` type guard validates shape without `any`
+  - `rejectAll()` stores `{ analytics: false, marketing: false }` — legally correct
+  - `reset()` clears storage and returns `state` to `null` (re-shows banner)
+  - `version` field: bump to force re-consent if categories change in future
+- `consent-gate.tsx` — `<ConsentGate category="analytics|marketing">` renders children only when consent given; fallback prop defaults to `null`
+
+**Banner UI** (`src/components/consent/cookie-banner.tsx`)
+- Main panel: Cookie icon + title + description + Cookie Policy link + 3 equal buttons
+- Button order (legally correct): **Reject All** (ghost) · **Customize** (outline) · **Accept All** (default) — all `size="default"` h-12, no dark patterns
+- Customize panel: replaces main content in same container (no modal); 3 rows — Necessary (always-on text, no toggle) · Analytics (Switch) · Marketing (Switch); Save Preferences + Accept All
+- Switches use `aria-labelledby` pointing to adjacent `<div id>` labels
+- `role="dialog" aria-modal="false" aria-label="Cookie preferences"` on root
+- Focus management: `bannerRef.current?.querySelector('button, [href]')?.focus()` 50ms after `visible` becomes true
+- Escape does NOT close (user must make a choice)
+- SSR safety: `if (!isLoaded || state !== null) return null` — no server-side render, no hydration mismatch
+- Entry animation: `requestAnimationFrame` toggles `translate-y-4 opacity-0` → `translate-y-0 opacity-100`, CSS `transition-all duration-300 ease-out`, no Framer Motion
+- Mobile: full-width bottom sheet, `rounded-t-2xl`, `max-h-[80vh]` scroll guard
+- Desktop: bottom-right card `md:max-w-[420px] md:bottom-6 md:right-6`, `rounded-2xl`
+
+**Integration**
+- `src/app/layout.tsx` — `<body>` wrapped with `<ConsentProvider>`; `<CookieBanner />` mounted once at root
+- `src/components/marketing/whatsapp-floater.tsx` — `'use client'`; hides (`return null`) while `isLoaded && state === null` (banner visible); reappears once consent recorded
+
+**shadcn Switch** (`src/components/ui/switch.tsx`) — installed via `pnpm dlx shadcn@latest add switch`
+
+### Decisions made
+- `ConsentGate` is `'use client'` (uses context hook) — correct; it wraps tracking scripts which are always client-only
+- WhatsApp floater hides entirely (both viewports) while banner visible — simpler than responsive offset math, no magic pixel values
+- `rejectAll()` stores a full consent record with `analytics: false` so banner doesn't reappear on next page load (user chose; respect it)
+- `text-muted-foreground` used for gray text (not `text-muted` which resolves to background color `#FAF7F2` in this token setup)
+- Focus targets first `button` or `[href]` in banner via DOM query — avoids threading refs through sub-components
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm build` ✅ 38 routes, clean
+
+---
+
+## Phase 2 — Global Shell ✅ COMPLETE (2026-04-25)
+
+All Phase 2 deliverables shipped:
+- ✅ Header (sticky, mega-menu, mobile drawer)
+- ✅ Footer (4-column, newsletter form, Somaiya attribution)
+- ✅ WhatsApp floater
+- ✅ Cookie consent banner + ConsentContext + ConsentGate
 
 ---
 

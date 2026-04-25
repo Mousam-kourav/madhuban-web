@@ -1,20 +1,19 @@
-/**
- * WhatsApp chat floater — fixed position bottom-right, present on all marketing pages.
- *
- * Forward-compat note: When the Cookie consent banner ships in Phase 2B Part 2,
- * this floater will need to either hide (on mobile bottom sheet) or shift up
- * (on desktop card). Integration will happen via ConsentContext — no changes
- * needed here until then.
- */
+'use client';
 
 import { BUSINESS } from '@/lib/content/business';
 import { IconWhatsApp } from '@/components/ui/social-icons';
+import { useConsent } from '@/lib/consent/consent-context';
 
 const phone = BUSINESS.phone.replace(/\D/g, '');
 const message = encodeURIComponent("Hi, I'd like to know more about Madhuban Eco Retreat.");
 const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
 
 export function WhatsAppFloater() {
+  const { isLoaded, state } = useConsent();
+
+  // Hide while cookie banner is visible — prevents bottom overlap on mobile
+  if (isLoaded && state === null) return null;
+
   return (
     <a
       href={whatsappUrl}

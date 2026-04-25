@@ -18,6 +18,7 @@
 
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -81,10 +82,13 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<ConsentState | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // SSR safety: only read localStorage after hydration
+  // SSR safety: only read localStorage after hydration.
+  // startTransition marks these as non-urgent so React doesn't treat them as cascading renders.
   useEffect(() => {
-    setState(readStored());
-    setIsLoaded(true);
+    startTransition(() => {
+      setState(readStored());
+      setIsLoaded(true);
+    });
   }, []);
 
   const acceptAll = useCallback(() => {

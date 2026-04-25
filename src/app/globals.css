@@ -64,6 +64,18 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ── Hero section height ─────────────────────────────────────────────────── */
+.hero-height {
+  height: 80svh;
+}
+
+@media (min-width: 768px) {
+  .hero-height {
+    /* Full viewport height minus sticky header (h-20 = 5rem at initial unscrolled state) */
+    height: calc(100svh - var(--header-height));
+  }
+}
+
 /* ── Semantic tokens mapped to brand palette ─────────────────────────────── */
 :root {
   --background: #FAF7F2;
@@ -85,6 +97,9 @@
   --input: #EAE5DC;
   --ring: #6E6146;
   --radius: 1rem;
+
+  /* Layout */
+  --header-height: 5rem; /* h-20 = 80px; calibrated to initial unscrolled header height */
 
   /* Sidebar (admin panel) */
   --sidebar: #FAF7F2;

@@ -41,7 +41,7 @@ export function NewsletterForm() {
   if (status === 'success') {
     return (
       <p className="text-sm text-moss-green font-medium py-2">
-        Thanks! You're subscribed. Check your inbox.
+        {"Thanks! You're subscribed. Check your inbox."}
       </p>
     );
   }

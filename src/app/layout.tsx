@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
+import { ConsentProvider } from "@/lib/consent/consent-context";
+import { CookieBanner } from "@/components/consent/cookie-banner";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -52,7 +54,12 @@ export default function RootLayout({
         />
         <link rel="preconnect" href="https://checkout.razorpay.com" />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+          <ConsentProvider>
+            {children}
+            <CookieBanner />
+          </ConsentProvider>
+        </body>
     </html>
   );
 }

@@ -12,6 +12,9 @@ import { StatsBar } from '@/components/marketing/homepage/stats';
 import { RoomsPreview } from '@/components/marketing/homepage/rooms-preview';
 import { ExperiencesGrid } from '@/components/marketing/homepage/experiences-grid';
 import { DiningPreview } from '@/components/marketing/homepage/dining-preview';
+import { NearbyAttractions } from '@/components/marketing/homepage/nearby-attractions';
+import { Testimonials } from '@/components/marketing/homepage/testimonials';
+import { BlogPreview } from '@/components/marketing/homepage/blog-preview';
 import { lodgingBusiness } from '@/lib/schema/lodging-business';
 import { resort } from '@/lib/schema/resort';
 import { speakable } from '@/lib/schema/speakable';
@@ -66,7 +69,13 @@ export default function HomePage() {
 
       <DiningPreview />
 
-      {/* PHASE 3 SESSION C: Nearby attractions, testimonials, blog */}
+      <NearbyAttractions />
+
+      <Testimonials />
+
+      <BlogPreview />
+
+      {/* PHASE 3 SESSION D: Newsletter, corporate offsite teaser, FAQ */}
     </>
   );
 }

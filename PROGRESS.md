@@ -315,4 +315,40 @@ All Phase 2 deliverables shipped:
 
 ---
 
-## Next: Phase 3 Session C — Nearby attractions, testimonials, blog preview sections
+---
+
+## Phase 3C — Homepage: Nearby Attractions + Testimonials + Blog Preview ✅ COMPLETE (2026-04-25)
+
+### What shipped
+
+**Content files**
+- `src/lib/content/nearby.ts` — typed `NearbyAttraction` registry; 4 attractions (Bhimbetka, Ratapani, Salkanpur Devi Temple, Bhojpur Temple); 2-size image type (mobile 480px, desktop 800px — no tablet, source images are small); R2 paths at `home/nearby/{slug}-{480|800}.{webp|jpg}`; TODO comment noting bhojpur-temple is a placeholder image
+- `src/lib/content/testimonials.ts` — 6 verbatim live-site Google reviews per §10.3; no images; template literals used for strings containing apostrophes
+- `src/lib/content/blog.ts` — 3 placeholder blog posts; 2-size image type; all image paths at `home/blog/{slug}-{480|800}` **do not exist in R2 yet** — intentional placeholder; TODO Phase 5 comment at top; hrefs use `/blogs/[slug]` per CLAUDE.md §5
+
+**Homepage sections** (`src/components/marketing/homepage/`)
+- `nearby-attractions.tsx` — server component; `bg-warm-beige/30` section; 4/2/1 col grid; `<ul role="list">` + `<article aria-labelledby>` per card; distance pill `absolute top-2 right-2` on image with `bg-earth-brown/90 text-ivory` pill; `line-clamp-2` description; no card links (TODO comment — no detail pages yet)
+- `testimonials.tsx` — server component; `bg-cream` section; CSS `columns-1 md:columns-2 gap-6` layout (not CSS grid) to handle natural height variation across 6 reviews; `break-inside-avoid mb-6` on each article; decorative `&ldquo;` quote mark in display font at 20% earth-brown opacity; author + location in CardContent (not CardFooter — avoids forced `border-t bg-muted/50` override)
+- `blog-preview.tsx` — server component; `bg-cream` section; 3/1 col grid; `date-fns` `format(parseISO(publishedAt), 'MMM d, yyyy')` for build-time date formatting; `<time dateTime>` for semantic HTML; `CardFooter` used for "Read more →" link; "View All Posts" CTA → `/blogs` using inline-styled Link (consistent with existing rooms-preview and dining-preview CTA pattern)
+
+**Homepage wiring**
+- `src/app/(marketing)/page.tsx` — 3 imports added; `NearbyAttractions`, `Testimonials`, `BlogPreview` inserted after `DiningPreview`; SESSION D comment preserved
+
+### Decisions made
+- CSS columns masonry layout for testimonials (Correction 3) — avoids empty space from grid + unequal card heights
+- Blog hrefs use `/blogs/[slug]` (not `/blog/[slug]`) — CLAUDE.md §5 is URL source of truth; brief had a typo
+- Blog images left without `unoptimized` prop (Correction 2) — terminal 404 noise acceptable, no tech debt
+- "View All Posts" CTA uses inline-styled Link (not `Button variant="outline"`) — consistent with existing CTA pattern in rooms-preview.tsx and dining-preview.tsx; Button's `outline` variant uses shadcn semantic tokens (`border-border`) not brand tokens
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors, zero warnings
+- `pnpm build` ✅ 40 routes (main already had 40 before this session — no new pages added in 3C)
+
+### Known open items
+- Nearby attraction images at `home/nearby/{slug}-{480,800}.{webp,jpg}` not yet uploaded to R2
+- Blog images at `home/blog/{slug}-{480,800}.{webp,jpg}` not yet uploaded (Phase 5 + real posts)
+
+---
+
+## Next: Phase 3 Session D — Newsletter CTA, corporate offsite teaser, FAQ section (homepage completion)

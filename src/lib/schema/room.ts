@@ -1,60 +1,45 @@
 import { BUSINESS } from '@/lib/content/business';
+import type { Room } from '@/lib/content/rooms';
 
-interface RoomInput {
-  name: string;
-  description: string;
-  /** Full URL path, e.g. '/stay/safari-tent'. Base URL is prepended. */
-  path: string;
-  /** GST-inclusive nightly rate in INR. */
-  pricePerNight: number;
-  maxOccupancy?: number;
-  amenities?: string[];
-  /** Full image URL. */
-  image?: string;
-}
+const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 /**
  * Generates HotelRoom schema for an individual accommodation page.
- * Use on each /stay/[slug] page alongside LodgingBusiness and FAQPage.
+ * Use on each /stay/[slug] page alongside FAQPage and BreadcrumbList.
  *
  * @example
- * <Seo schemas={[room({ name: 'Safari Tent', path: '/stay/safari-tent', pricePerNight: 5000, ... })]} />
+ * <Seo schemas={[hotelRoom(room), faqPage({ items: [...room.faqs] }), breadcrumbListFromPath(`/stay/${room.slug}`)]} />
  */
-export function room({
-  name,
-  description,
-  path,
-  pricePerNight,
-  maxOccupancy = 2,
-  amenities = [],
-  image,
-}: RoomInput): Record<string, unknown> {
-  const url = `${BUSINESS.url}${path}`;
+export function hotelRoom(room: Room): Record<string, unknown> {
+  const url = `${BUSINESS.url}/stay/${room.slug}`;
+  const images = [1, 2, 3].map(
+    (n) => `${R2_BASE}/home/rooms/${room.slug}-${n}-1280.webp`,
+  );
 
   return {
     '@context': 'https://schema.org',
     '@type': 'HotelRoom',
-    name,
-    description,
+    name: room.name,
+    description: room.longDescription[0] ?? '',
     url,
-    ...(image && { image }),
+    image: images,
     occupancy: {
       '@type': 'QuantitativeValue',
       minValue: 1,
-      maxValue: maxOccupancy,
+      maxValue: room.occupancy.adults + room.occupancy.children,
     },
-    amenityFeature: amenities.map((feature) => ({
+    amenityFeature: room.amenities.map((feature) => ({
       '@type': 'LocationFeatureSpecification',
       name: feature,
       value: true,
     })),
     offers: {
       '@type': 'Offer',
-      price: pricePerNight,
+      price: room.pricePerNight,
       priceCurrency: 'INR',
       priceSpecification: {
         '@type': 'UnitPriceSpecification',
-        price: pricePerNight,
+        price: room.pricePerNight,
         priceCurrency: 'INR',
         unitText: 'NIGHT',
         description: 'GST inclusive',

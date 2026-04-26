@@ -22,8 +22,16 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const slugs = await getAllPublishedSlugs();
-  return slugs.map((slug) => ({ slug }));
+  try {
+    const slugs = await getAllPublishedSlugs();
+    return slugs.map((slug) => ({ slug }));
+  } catch (err) {
+    console.warn(
+      "[generateStaticParams /blogs/[slug]] Supabase query failed — returning []. Pages will render via ISR.",
+      err,
+    );
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

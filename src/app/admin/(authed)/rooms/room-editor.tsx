@@ -54,10 +54,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <details open className="group bg-white rounded-2xl border border-[var(--color-border)] overflow-hidden">
       <summary className="flex items-center justify-between px-6 py-4 cursor-pointer select-none hover:bg-[var(--color-cream)]/50 transition-colors list-none">
-        <span className="font-body text-sm font-semibold tracking-wider uppercase text-[var(--color-muted)]">
+        <span className="font-body text-sm font-semibold tracking-wider uppercase text-[var(--color-earth-brown)]">
           {title}
         </span>
-        <ChevronDown className="w-4 h-4 text-[var(--color-muted)] transition-transform group-open:rotate-180" />
+        <ChevronDown className="w-4 h-4 text-[var(--color-earth-brown)] transition-transform group-open:rotate-180" />
       </summary>
       <div className="px-6 pb-6 pt-2 space-y-4">{children}</div>
     </details>
@@ -67,7 +67,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="block font-body text-xs text-[var(--color-muted)] mb-1.5">
+      <label htmlFor={htmlFor} className="block font-body text-xs text-[var(--color-charcoal)] mb-1.5">
         {label}
       </label>
       {children}
@@ -809,7 +809,7 @@ export function RoomEditor({ room, initialFaqs }: Props) {
 
           {/* Add FAQ */}
           <div className="rounded-xl border border-dashed border-[var(--color-border)] p-4 space-y-2">
-            <p className="font-body text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wider">Add FAQ</p>
+            <p className="font-body text-xs font-semibold text-[var(--color-earth-brown)] uppercase tracking-wider">Add FAQ</p>
             <textarea
               value={newFaqQ}
               onChange={(e) => setNewFaqQ(e.target.value)}

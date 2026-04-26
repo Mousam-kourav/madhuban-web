@@ -842,6 +842,16 @@ Skippable if blocked: Razorpay live (stays sandbox until KYC), admin panel can s
 - Image upload flow for room gallery (R2 via admin panel)
 - Refactor `/stay/[slug]` pages to fetch from Supabase at runtime (ISR, not static) once DB is seeded
 
+**Phase 5A complete** (2026-04-26): Admin platform + Blog shipped.
+- Auth: Supabase magic link. Single authorized user: `madhubanecoretreat@gmail.com`.
+- Editor: Tiptap v3 (StarterKit + Link + Image + Placeholder). `immediatelyRender: false` required for Next.js App Router hydration.
+- Blog body stored as Tiptap JSON in `blog_posts.body` (jsonb). Rendered server-side via recursive `renderTiptap()` — no `dangerouslySetInnerHTML`.
+- Image upload: POST `/api/admin/upload` → sharp resize 1200px WebP → R2 S3 PutObject.
+- Public routes: `/blogs` (ISR 60s) + `/blogs/[slug]` (ISR 60s + `generateStaticParams`). Canonical URL is `/blogs` — CLAUDE.md §5. `/blog` and `/blog/:slug` → 308 redirect in `next.config.ts`.
+- `database.types.ts` updated from `Record<string, never>` stub to typed `blog_posts` table. Regenerate with `pnpm supabase gen types typescript --project-id <id>` once project ID available.
+- Seed: `pnpm tsx scripts/seed-launch-post.ts` (upsert-safe, re-runnable).
+- Setup doc: `SUPABASE_SETUP.md` — SQL, RLS policies, auth config, type-gen command.
+
 ---
 
 ## 20 — Working With Me (Claude Code)

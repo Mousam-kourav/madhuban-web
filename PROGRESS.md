@@ -412,4 +412,87 @@ Shipped in a prior session. See commit 38f0e83.
 
 ---
 
+## Phase 5A — Admin Platform + Blog ✅ COMPLETE (2026-04-26)
+
+### What shipped
+
+**Dependencies added**
+- `@tiptap/react`, `@tiptap/pm`, `@tiptap/starter-kit`, `@tiptap/extension-link`, `@tiptap/extension-image`, `@tiptap/extension-placeholder` — rich text editor
+- `sharp` — server-side image resize to WebP before R2 upload
+- `@aws-sdk/client-s3` — R2 upload via S3-compatible API
+- `dotenv` (devDep) — seed script env loading
+
+**Supabase infrastructure**
+- `src/lib/supabase/browser.ts` — browser client (canonical name; `client.ts` preserved for backward compat)
+- `src/lib/supabase/middleware.ts` — session refresh helper for Next middleware
+- `middleware.ts` (project root) — refreshes Supabase session on every request
+- `src/lib/supabase/database.types.ts` — updated from `Record<string, never>` stub to full typed `blog_posts` table definition (Insert/Update/Row)
+
+**Blog types, queries, renderer**
+- `src/lib/blog/types.ts` — `BlogPost`, `BlogPostSummary`, `TiptapDoc`, `TiptapNode`, `TiptapMark` types
+- `src/lib/blog/queries.ts` — `getPublishedPosts()`, `getPublishedPost(slug)`, `getAllPublishedSlugs()`, `getRelatedPosts(slug)`
+- `src/lib/blog/render-tiptap.tsx` — recursive React renderer for Tiptap JSON (no dangerouslySetInnerHTML); handles all StarterKit node types + Link + Image; exports `extractHeadings()` for TOC
+- `src/lib/schema/blog-posting.ts` — `blogPosting()` JSON-LD schema generator
+
+**Admin routes** (all dynamic, auth-gated)
+- `src/app/admin/layout.tsx` — root (noindex robots)
+- `src/app/admin/login/page.tsx` — split-screen login: forest hero left, form right
+- `src/app/admin/login/login-form.tsx` — magic link submit with sent/error states
+- `src/app/admin/auth/callback/route.ts` — exchange code for session, redirect to /admin
+- `src/app/admin/(authed)/layout.tsx` — auth gate via server client; redirect to /admin/login if no session
+- `src/app/admin/(authed)/admin-sidebar.tsx` — forest-green sidebar; nav, disabled items with tooltips, logout form
+- `src/app/admin/(authed)/page.tsx` — dashboard with post count
+- `src/app/admin/(authed)/posts/page.tsx` — posts list table (status, category, dates)
+- `src/app/admin/(authed)/posts/new/page.tsx` — renders PostEditor (new)
+- `src/app/admin/(authed)/posts/[id]/edit/page.tsx` — renders PostEditor (edit, pre-loaded from DB)
+- `src/app/admin/(authed)/posts/post-editor.tsx` — Tiptap editor with cover upload, title, slug, toolbar, 30s auto-save, save draft, publish buttons
+- `src/app/admin/(authed)/posts/post-toolbar.tsx` — floating forest-green pill toolbar (H1, H2, B, I, link, quote, image, more)
+- `src/app/admin/(authed)/posts/post-sidebar.tsx` — right rail: status, category, tags, SEO title/desc with char counters, SEO checklist, social preview
+- `src/app/admin/(authed)/logout/route.ts` — sign out, redirect to /admin/login
+
+**API routes**
+- `src/app/api/admin/upload/route.ts` — POST multipart; auth check; sharp resize to WebP 1200px; R2 PutObject; returns public URL
+- `src/app/api/admin/posts/route.ts` — GET (list) + POST (create with slug uniqueness check)
+- `src/app/api/admin/posts/[id]/route.ts` — GET + PATCH (auto-sets published_at; revalidates /blogs paths) + DELETE
+
+**Public blog pages** (ISR, revalidate=60)
+- `src/app/(marketing)/blogs/page.tsx` — hero, category filter bar, 3-col card grid, Newsletter CTA
+- `src/app/(marketing)/blogs/[slug]/page.tsx` — hero, TOC sidebar, Tiptap renderer, Plan Your Retreat CTA, related posts; BlogPosting + BreadcrumbList JSON-LD
+- `src/app/(marketing)/blogs/blog-card.tsx` — cover image, category badge, meta, title, excerpt, author
+- `src/app/(marketing)/blogs/[slug]/toc.tsx` — client TOC with IntersectionObserver active-section highlight
+- `src/app/(marketing)/blog/page.tsx` + `blog/[slug]/page.tsx` — redirect to canonical `/blogs` and `/blogs/[slug]`
+
+**Seed script**
+- `scripts/seed-launch-post.ts` — inserts "Eco Resort vs Luxury Resort" post via service role client; run once with `pnpm tsx scripts/seed-launch-post.ts`
+
+### Decisions made
+- Canonical blog URL: `/blogs` (matches CLAUDE.md §5 + existing nav). Phase 5A kickoff said `/blog` — overridden by CLAUDE.md "URLs are sacred". `/blog` and `/blog/[slug]` redirect to the plural form.
+- Database types: defined typed stub for `blog_posts` table (no Supabase project ID for `gen types` yet). Update by running `pnpm supabase gen types typescript --project-id <id> > src/lib/supabase/database.types.ts` once project ID is available.
+- Slug derivation in PostEditor moved from `useEffect` to `title onChange` handler to satisfy react-hooks/set-state-in-effect lint rule.
+- Admin auth: Supabase magic link (email OTP). Single authorized email: `madhubanecoretreat@gmail.com` checked server-side in every API route.
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors, zero warnings
+- `pnpm build` ✅ 53 routes (16 new routes vs Phase 4A's 37), compiled cleanly
+
+### Manual verification steps (user runs)
+1. `pnpm dev` → visit `/admin/login` → split screen renders
+2. Submit `madhubanecoretreat@gmail.com` → check inbox, click magic link → lands on `/admin`
+3. `/admin/posts` → empty list → click "New Post"
+4. Run `pnpm tsx scripts/seed-launch-post.ts` → ✅ output
+5. `/blogs` → seed post card visible
+6. `/blogs/eco-resort-vs-luxury-resort-real-difference` → renders with TOC, body, CTA
+7. View source → `BlogPosting` JSON-LD present
+8. Try `/admin` while logged out → redirect to `/admin/login`
+9. Logout → returns to `/admin/login`
+
+### Known open items
+- No cover image on seed post (null) — upload via admin editor after login
+- Database types stub: run `pnpm supabase gen types` once project ID is confirmed in Vercel env
+- Filter bar category buttons are static/unwired (v1 — JS filtering deferred)
+- Blog sitemap: `sitemap.ts` does not yet include blog posts — add in Phase 6 (blog post slugs from Supabase)
+
+---
+
 ## Next: Phase 4B — Experiences pages (hub + 3 detail pages, one template)

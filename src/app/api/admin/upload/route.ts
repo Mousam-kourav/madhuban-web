@@ -57,7 +57,13 @@ export async function POST(request: NextRequest) {
     .webp({ quality: 85 })
     .toBuffer();
 
-  const filename = `blog-images/${Date.now()}-${slugifyFilename(file.name)}.webp`;
+  const rawFolder = formData.get("folder");
+  const folder =
+    typeof rawFolder === "string" && rawFolder.trim()
+      ? rawFolder.trim().replace(/[^a-z0-9\-_/]/g, "")
+      : "blog-images";
+
+  const filename = `${folder}/${Date.now()}-${slugifyFilename(file.name)}.webp`;
 
   const s3 = new S3Client({
     endpoint: `https://${process.env.R2_ACCOUNT_ID!}.r2.cloudflarestorage.com`,

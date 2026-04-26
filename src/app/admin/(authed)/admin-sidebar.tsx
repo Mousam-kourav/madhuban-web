@@ -19,10 +19,10 @@ import {
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
   { icon: FileText, label: "Blog Posts", href: "/admin/posts" },
+  { icon: Bed, label: "Rooms", href: "/admin/rooms" },
 ];
 
 const DISABLED_ITEMS = [
-  { icon: Bed, label: "Rooms", note: "Coming in 5B" },
   { icon: Calendar, label: "Reservations", note: "Coming in Phase 7" },
 ];
 

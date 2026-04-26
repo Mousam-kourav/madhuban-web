@@ -495,4 +495,76 @@ Shipped in a prior session. See commit 38f0e83.
 
 ---
 
-## Next: Phase 4B — Experiences pages (hub + 3 detail pages, one template)
+---
+
+## Phase 5B — Room CMS ✅ COMPLETE (2026-04-26)
+
+### What shipped
+
+**Schema (ALTER, not CREATE)**
+- Discovered: Supabase already had 16 tables from a prior booking-engine handoff. `rooms` table existed with 9 booking-engine columns. `CREATE TABLE IF NOT EXISTS` was a NO-OP.
+- Applied: `ALTER TABLE rooms ADD COLUMN` for 11 new CMS columns (`tagline`, `genre`, `href`, `hero_image`, `long_description`, `bed_config`, `size_label`, `highlights`, `gallery`, `seo_title`, `seo_description`). Booking-engine columns untouched.
+- New table: `room_faqs` (id, room_id, question, answer, display_order) with FK → rooms cascade delete. RLS: admin full access, public select on active rooms.
+
+**Seed script** (`scripts/seed-rooms.ts`)
+- Reads from `rooms.ts` (dynamic import after dotenv, so R2_BASE is loaded first), UPDATEs existing rows by slug, DELETEs + re-inserts FAQs per room. Idempotent / re-runnable.
+- Output on first run: 6 rooms updated, 42 FAQs inserted (7 per room).
+
+**Types** (`src/lib/types/rooms.ts`)
+- `DbRoom`, `DbRoomFaq`, `GalleryItem`, `HeroImageItem`, `HighlightItem` — all snake_case, matching DB columns exactly.
+- `database.types.ts` updated with full `rooms` + `room_faqs` table definitions (Insert type makes nullable fields optional; `slug`/`name` required at insert).
+
+**Queries + mapper** (`src/lib/rooms/`)
+- `queries.ts`: `getRooms()` (anon, `is_active=true`, ordered), `getRoomBySlug(slug)` (anon), `getRoomFaqs(roomId)` (anon, ordered by display_order), `getAllRoomSlugs()` (admin client, bypasses RLS for `generateStaticParams`).
+- `mapper.ts`: `dbRoomToRoom(DbRoom, DbRoomFaq[])` → legacy `Room` type. `extractParagraphs()` converts Tiptap jsonb doc back to `string[]` for `RoomDetailPage`. `safeGallery/safeHighlights/safeHeroImage` guard nullable jsonb fields.
+
+**API routes (10 total)**
+- `GET/POST /api/admin/rooms` — list (admin, all rooms) + create (auto-slug from name, next sort_order)
+- `GET/PATCH/DELETE /api/admin/rooms/[id]` — single room; PATCH checks slug uniqueness, revalidates `/stay` + `/stay/{slug}`; DELETE cascades FAQs via FK
+- `POST /api/admin/rooms/reorder` — batch sort_order update
+- `POST /api/admin/rooms/[id]/faqs` — add FAQ (auto display_order)
+- `POST /api/admin/rooms/[id]/faqs/reorder` — batch FAQ order update
+- `PATCH/DELETE /api/admin/faqs/[id]` — edit/delete single FAQ
+- `/api/admin/upload` — extended with optional `folder` param (rooms pass `rooms/{slug}`)
+
+**Admin UI**
+- `/admin/rooms` — server component table; `RoomListClient` handles HTML5 drag-to-reorder (POST reorder on drop); thumbnail from hero_image → gallery[0] fallback; name, slug, price, active badge
+- `/admin/rooms/new` — name-only form → POST → redirect to edit page
+- `/admin/rooms/[id]/edit` — `RoomEditor` (600+ line `'use client'` component)
+  - 9 collapsible `<details>` sections: Basics, Pricing & Specs, Long Description (Tiptap), Amenities (tag input + pill list), Highlights (up/down reorder), Hero Image (single upload + alt), Gallery (drag-to-reorder + upload + alt text), FAQs (direct API per action), SEO
+  - Auto-save: 30s debounce + immediate save on `onBlur`
+  - Slug change: inline warning (no browser confirm)
+  - Status toggle: immediate PATCH on click
+  - Gallery + hero: immediate save on upload/delete/reorder
+
+**Public pages refactored**
+- `/stay` — `export const revalidate = 60`; `getRooms()` → `dbRoomToRoom(r, [])` for each room; try/catch falls back to `[]`
+- `/stay/[slug]` — `export const revalidate = 60`; `generateStaticParams` uses `getAllRoomSlugs()` with try/catch; `generateMetadata` reads `seo_title`/`seo_description` from DB; main render uses `getRoomBySlug` + `getRoomFaqs` → `dbRoomToRoom` → passes `Room` to existing components unchanged
+
+**Admin sidebar** — "Rooms" moved from disabled items to live nav items
+
+**`rooms.ts`** — deprecation comment added at top; retained for fallback reference until ~2026-05-03
+
+### Schema-discovery story
+
+The kickoff brief said the Supabase project was clean aside from 1 table. It wasn't — a prior booking-engine handoff had pre-seeded 16 tables. Discovered when the initial migration SQL produced NO-OP output. User ran `SELECT column_name FROM information_schema.columns WHERE table_name = 'rooms'` to surface the real shape, then ran a revised ALTER TABLE.
+
+The pre-existing columns (`base_price_per_night`, `max_occupancy`, `gst_rate`, `peak_multiplier`, `min_nights`, `is_active`, `sort_order`, `images`) are load-bearing for Phase 7 booking engine. They were preserved untouched. See CLAUDE.md §24 for the authoritative gotcha doc.
+
+### Key decisions
+
+- **Extend, don't replace**: ALTER over the existing `rooms` table. All booking-engine columns preserved. The mapper translates between the two naming conventions.
+- **Mapper pattern**: `dbRoomToRoom()` converts DB → legacy `Room` type. All existing public components work without changes.
+- **FAQ as separate table** (not jsonb column): enables per-FAQ edit/delete/reorder API calls without re-sending the whole room payload.
+- **Drag-to-reorder for rooms, up/down buttons for FAQs**: FAQs sit inside a room card already — a second drag context would conflict. Up/down is simpler and sufficient.
+- **`body as unknown as RoomUpdate` cast**: Supabase typed client uses `RejectExcessProperties` which rejects `Record<string, unknown>` objects even when the fields are valid. The double cast is the correct escape hatch — used in all 3 PATCH routes.
+- **Dynamic import in seed script**: `rooms.ts` reads `NEXT_PUBLIC_R2_BASE` at module init time. Import must happen inside the async `seed()` function, after `dotenv.config()` runs.
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors
+- `pnpm build` ✅ 57 routes, compiled cleanly
+
+---
+
+## Next: Phase 6 — Policy pages, 404, Thank You, sitemap, robots, redirects

@@ -852,6 +852,15 @@ Skippable if blocked: Razorpay live (stays sandbox until KYC), admin panel can s
 - Seed: `pnpm tsx scripts/seed-launch-post.ts` (upsert-safe, re-runnable).
 - Setup doc: `SUPABASE_SETUP.md` — SQL, RLS policies, auth config, type-gen command.
 
+**Phase 5B complete** (2026-04-26): Room CMS shipped.
+- Schema discovery: Supabase had 16 tables pre-existing from a booking-engine handoff, not 1 as CLAUDE.md implied. The `rooms` table already existed with booking-engine columns. Migration was an `ALTER TABLE` (11 new CMS columns added); booking-engine columns untouched. See §24 for the full gotcha.
+- New table: `room_faqs` (id, room_id, question, answer, display_order, created_at, updated_at). FK → rooms with cascade delete.
+- Admin: room list with drag-to-reorder, new room form, full edit page (9 collapsible sections: Basics, Pricing & Specs, Tiptap long description, Amenities, Highlights, Hero Image, Gallery, FAQs, SEO). 10 API routes under `/api/admin/rooms/` and `/api/admin/faqs/`.
+- Public: `/stay` and `/stay/[slug]` switched from static `rooms.ts` import to Supabase fetch with ISR 60s.
+- Mapper layer: `src/lib/rooms/mapper.ts` — `dbRoomToRoom(DbRoom, DbRoomFaq[])` converts DB snake_case shape to legacy `Room` type. All existing public components (`RoomDetailPage`, `hotelRoom` schema, `MobileStickyBar`) work unchanged.
+- `rooms.ts` retained with deprecation comment. Do not delete until ~2026-05-03 (1 week post-deploy).
+- `is_active` is the live field — not `status`. `true` = visible on public site, `false` = draft.
+
 ---
 
 ## 20 — Working With Me (Claude Code)
@@ -908,6 +917,63 @@ Failures and near-misses from the rebuild. Read before touching slugs, images, o
 
 ### 23.1 Phase 3B — Glamping Tent slug/filename mismatch
 
+---
+
+## 24 — Phase 5B Schema Discovery: Booking-Engine Columns on `rooms` Table
+
+> **Read before Phase 7 (booking engine) or any future migration touching `rooms`.**
+
+### What happened
+
+The Phase 5B kickoff assumed the Supabase `rooms` table did not exist yet. It did. The project had a prior booking-engine handoff that pre-seeded 16 tables including `rooms` with these columns already present:
+
+```
+base_price_per_night  max_occupancy  max_occupancy_children
+gst_rate              peak_multiplier  min_nights
+is_active             sort_order       images
+```
+
+The Phase 5B migration ran `CREATE TABLE IF NOT EXISTS rooms (...)` — a NO-OP. The fix was an `ALTER TABLE` adding the 11 new CMS columns while leaving the booking-engine columns intact.
+
+### Critical rule for Phase 7 (booking engine)
+
+**DO NOT rename or drop any of the following columns** — the booking engine will read them directly:
+
+| Column | Used by |
+|---|---|
+| `base_price_per_night` | Availability queries, price calculation |
+| `max_occupancy` | Guest count validation |
+| `max_occupancy_children` | Guest count validation |
+| `gst_rate` | GST slab selection (12% vs 18%) |
+| `peak_multiplier` | Peak-season pricing |
+| `min_nights` | Booking minimum-stay enforcement |
+| `is_active` | Filters inactive rooms from booking flow |
+| `sort_order` | Room display order in booking step 1 |
+| `images` | Legacy jsonb; superseded by `gallery` + `hero_image` in 5B — keep for backward compat until booking engine is live |
+
+### Field name mapping (TS ↔ DB)
+
+The legacy `Room` type in `src/lib/content/rooms.ts` uses camelCase. The DB uses snake_case. The mapper at `src/lib/rooms/mapper.ts` is the translation layer:
+
+| Legacy TS field | DB column |
+|---|---|
+| `pricePerNight` | `base_price_per_night` |
+| `occupancy.adults` | `max_occupancy` |
+| `occupancy.children` | `max_occupancy_children` |
+| `sortOrder` (unused in legacy type) | `sort_order` |
+
+The booking engine must go through the mapper or query the DB directly — never import from `rooms.ts`.
+
+### `is_active` vs `status`
+
+The Phase 5B kickoff spec called the field `status: "draft" | "published"`. The actual DB column is `is_active: boolean`. They are equivalent:
+- `is_active = true` → published (visible on site and in booking flow)
+- `is_active = false` → draft (hidden everywhere)
+
+Do not add a separate `status` column.
+
+---
+
 **What happened:** Initial R2 image upload used singular filenames (`glamping-tent-480.webp`, `glamping-tent-800.webp`) while the canonical slug in §5 is plural (`glamping-tents`). The `next build` passed because Next.js Image does not validate remote URLs at compile time, and dev mode served images from relative paths that bypassed `remotePatterns`. Production images 404'd silently.
 
 **Resolution:** R2 files renamed to plural form (`glamping-tents-480.webp`, etc.) to match the §5 slug exactly.
@@ -916,4 +982,4 @@ Failures and near-misses from the rebuild. Read before touching slugs, images, o
 
 ---
 
-*Last updated: 2026-04-25 — Version 1.1 — Architectural decisions locked by Mousam Kourav and Claude (browser session)*
+*Last updated: 2026-04-26 — Version 1.2 — Phase 5B complete; §24 added (booking-engine schema gotcha)*

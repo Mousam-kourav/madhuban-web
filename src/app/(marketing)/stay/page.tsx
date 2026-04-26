@@ -134,10 +134,10 @@ export default async function StayPage() {
                 WhatsApp Us
               </a>
               <Link
-                href="/booking"
+                href="/enquire"
                 className="inline-flex h-12 min-w-[180px] items-center justify-center rounded-lg border border-earth-brown px-6 font-body text-sm font-medium text-earth-brown transition-colors duration-200 hover:bg-earth-brown hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
               >
-                Book Now
+                Plan Your Retreat
               </Link>
             </div>
           </div>

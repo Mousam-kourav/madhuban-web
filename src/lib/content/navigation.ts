@@ -29,6 +29,7 @@ export const FOOTER_EXPLORE: readonly NavItem[] = [
 ];
 
 export const FOOTER_VISIT: readonly NavItem[] = [
+  { label: 'Plan Your Retreat', href: '/enquire' },
   { label: 'Day Outing', href: '/day-outing' },
   { label: 'Aranyashala', href: '/aranyashala' },
   { label: 'Souvenir Shop', href: '/souvenir-shop' },

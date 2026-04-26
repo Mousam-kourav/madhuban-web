@@ -13,7 +13,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // SEO-preserving 301 redirects — populated at launch per CLAUDE.md §7.6
+      // Blog canonical — /blog/* → /blogs/*
+      { source: '/blog', destination: '/blogs', permanent: true },
+      { source: '/blog/:slug', destination: '/blogs/:slug', permanent: true },
+      // SEO-preserving 301s at launch per CLAUDE.md §7.6
       // { source: '/stay/pool-side-room', destination: '/stay/pool-side-villa', permanent: true },
     ];
   },

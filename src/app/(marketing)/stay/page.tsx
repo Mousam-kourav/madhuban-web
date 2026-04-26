@@ -1,7 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { ROOMS } from '@/lib/content/rooms';
+import { getRooms } from '@/lib/rooms/queries';
+import { dbRoomToRoom } from '@/lib/rooms/mapper';
+import type { Room } from '@/lib/content/rooms';
 import { buildMetadata } from '@/lib/seo';
 import { Seo } from '@/components/ui/seo';
 import { breadcrumbListFromPath } from '@/lib/schema/breadcrumb-list';
@@ -11,6 +13,8 @@ import { Heading } from '@/components/ui/heading';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
 
+export const revalidate = 60;
+
 export const metadata: Metadata = buildMetadata({
   title: 'Stay With Us',
   description:
@@ -18,7 +22,15 @@ export const metadata: Metadata = buildMetadata({
   path: '/stay',
 });
 
-export default function StayPage() {
+export default async function StayPage() {
+  let rooms: Room[] = [];
+  try {
+    const dbRooms = await getRooms();
+    rooms = dbRooms.map((r) => dbRoomToRoom(r, []));
+  } catch {
+    rooms = [];
+  }
+
   return (
     <>
       <Seo schemas={[breadcrumbListFromPath('/stay')]} />
@@ -45,7 +57,7 @@ export default function StayPage() {
       <Section className="bg-cream pt-0" label="All accommodations">
         <Container>
           <ul role="list" className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {ROOMS.map((room, index) => (
+            {rooms.map((room, index) => (
               <li key={room.slug}>
                 <article aria-labelledby={`room-title-${room.slug}`}>
                   <Card className="overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-md">

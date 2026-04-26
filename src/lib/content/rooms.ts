@@ -1,3 +1,7 @@
+// DEPRECATED Phase 5B: Source of truth moved to Supabase rooms + room_faqs tables.
+// This file is retained for emergency fallback and reference for 1 week post-deploy.
+// Do not import from app code — public pages now use @/lib/rooms/queries + @/lib/rooms/mapper.
+
 // NEXT_PUBLIC_R2_BASE must be set in .env.local.
 // Leaving it blank produces relative /home/rooms/... paths → 404s in dev, build still passes.
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { BookingWidget } from './booking-widget';
 import {
   Tent,
   BedDouble,
@@ -23,7 +24,6 @@ import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
 import { Heading } from '@/components/ui/heading';
 import { cn } from '@/lib/utils';
-import { formatPrice } from '@/lib/utils';
 import type { Room } from '@/lib/content/rooms';
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -107,29 +107,13 @@ export function RoomDetailPage({ room }: { room: Room }) {
               </div>
             </div>
 
-            {/* RIGHT: booking card */}
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <p className="font-display text-3xl font-medium text-earth-brown">
-                &#8377;{formatPrice(room.pricePerNight)}
-              </p>
-              <p className="mt-1 font-body text-xs text-muted-foreground">
-                per night, GST inclusive
-              </p>
-              <Link
-                href={`/booking?room=${room.slug}`}
-                className="mt-4 inline-flex h-12 w-full items-center justify-center rounded-lg bg-earth-brown font-body text-sm font-medium text-ivory transition-colors duration-200 hover:bg-earth-brown/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
-              >
-                Check Availability
-              </Link>
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block text-center font-body text-xs text-earth-brown underline-offset-4 hover:underline"
-              >
-                Or chat on WhatsApp
-              </a>
-            </div>
+            {/* RIGHT: booking widget */}
+            <BookingWidget
+              slug={room.slug}
+              pricePerNight={room.pricePerNight}
+              maxAdults={room.occupancy.adults}
+              maxChildren={room.occupancy.children}
+            />
           </div>
         </Container>
       </Section>
@@ -265,7 +249,7 @@ export function RoomDetailPage({ room }: { room: Room }) {
             </p>
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
-                href={`/booking?room=${room.slug}`}
+                href={`/book/${room.slug}`}
                 className="inline-flex h-12 min-w-[180px] items-center justify-center rounded-lg bg-ivory px-6 font-body text-sm font-medium text-forest-green transition-colors duration-200 hover:bg-ivory/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ivory focus-visible:ring-offset-2"
               >
                 Check Availability

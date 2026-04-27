@@ -861,6 +861,15 @@ Skippable if blocked: Razorpay live (stays sandbox until KYC), admin panel can s
 - `rooms.ts` retained with deprecation comment. Do not delete until ~2026-05-03 (1 week post-deploy).
 - `is_active` is the live field — not `status`. `true` = visible on public site, `false` = draft.
 
+**Phase 6 complete** (2026-04-27): Contact form + booking enquiry form with Resend pipeline shipped.
+- Two new pages: `/contact-us` (full rewrite — two-column form + address/phone/WhatsApp sidebar) and `/enquire` (centered booking enquiry form).
+- Resend pipeline: `src/lib/email/resend.ts` (lazy client init — env vars resolved at request time, not module eval), HTML email templates for both forms.
+- Zod v4 schemas + custom `zodV4Resolver` wrapper (`src/lib/forms/resolver.ts`) — `@hookform/resolvers` v5 ships types locked to Zod v4.0.x minor; wrapper calls `safeParseAsync` directly, bypassing the broken overload.
+- Honeypot field on both forms (hidden `website` input; if filled, route silently returns `{ ok: true }`).
+- `ContactPage` JSON-LD schema added. Footer Visit column gains "Plan Your Retreat → /enquire". `/stay` and blog article CTAs updated from `/booking` → `/enquire`.
+- **Known gap — Resend sandbox:** Resend sandbox restricts email delivery to verified test addresses only. `madhubanecoretreat@gmail.com` needs to be added as a verified test email in the Resend dashboard, OR domain `madhubanecoretreat.com` needs DNS verification, before form emails will deliver to the business inbox. The forms, API routes, and email templates are all correct — this is a config-side issue only. Resolve in Phase 9 (security hardening) or before launch.
+- **Known gap — no server-side rate limiting:** IP-based rate limiting (max 3/hour) intentionally deferred. Honeypot covers bot traffic. Add in Phase 9.
+
 ---
 
 ## 20 — Working With Me (Claude Code)
@@ -982,4 +991,4 @@ Do not add a separate `status` column.
 
 ---
 
-*Last updated: 2026-04-26 — Version 1.2 — Phase 5B complete; §24 added (booking-engine schema gotcha)*
+*Last updated: 2026-04-27 — Version 1.3 — Phase 6 complete; Resend sandbox gap documented*

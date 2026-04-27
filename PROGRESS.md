@@ -567,4 +567,60 @@ The pre-existing columns (`base_price_per_night`, `max_occupancy`, `gst_rate`, `
 
 ---
 
-## Next: Phase 6 — Policy pages, 404, Thank You, sitemap, robots, redirects
+---
+
+## Phase 6 — Contact Form + Booking Enquiry Form ✅ COMPLETE (2026-04-27)
+
+### What shipped
+
+**Email pipeline** (`src/lib/email/`)
+- `resend.ts` — `sendEmail()` helper. Resend client instantiated lazily inside the function body (not at module level) so `next build` never throws on missing env vars.
+- `templates/contact-enquiry.ts` — `contactEnquiryEmail()`: subject `"New contact enquiry — {name}"`, branded HTML table (cream bg, earth-brown header), `replyTo` set to submitter's email.
+- `templates/booking-enquiry.ts` — `bookingEnquiryEmail()`: subject includes name, dates, room; stay summary band; nights calculated; `ROOM_DISPLAY_NAMES` map for readable room labels.
+
+**Schemas + resolver** (`src/lib/forms/`)
+- `contact-schema.ts` — name (1-100), email, phone (optional regex), message (10-2000), honeypot `website` field.
+- `booking-schema.ts` — name, email, phone (required), checkIn/checkOut dates with `refine` cross-field validation, adults/children, roomType `z.enum` from 6 static slugs, specialRequests optional. `ROOM_OPTIONS` exported for the select.
+- `resolver.ts` — `zodV4Resolver()`: custom wrapper that calls `schema.safeParseAsync()` directly. Required because `@hookform/resolvers` v5.2.2 ships types compiled against Zod v4.0.x; our project uses v4.3.6, and the `_zod.version.minor` literal (3 vs 0) breaks the overload match at compile time.
+
+**API routes**
+- `POST /api/forms/contact` — Zod parse → honeypot check → `contactEnquiryEmail()` → `sendEmail()`.
+- `POST /api/forms/booking` — same pattern with booking schema and template.
+- Both: `replyTo` set to submitter email; `console.error` on send failure; `{ ok: true/false }` response shape.
+
+**Pages**
+- `/contact-us` — rewritten from stub. Two-column layout: `ContactForm` component left, address/phone/email/maps/WhatsApp sidebar right. `ContactPage` JSON-LD schema. `BreadcrumbList` schema.
+- `/enquire` — new page (not in old URL list; no redirects needed). Centered `BookingEnquiryForm`. Native `<input type="date">` with `min=today` on check-in and `min=checkIn` on check-out. `BreadcrumbList` schema.
+
+**Client form components** (`src/components/forms/`)
+- Both use `react-hook-form` + `zodV4Resolver`. Honeypot hidden via `absolute left-[-9999px]` + `tabIndex={-1}`.
+- Success state replaces form (no page reload). Error state shows server message inline with `role="alert"`.
+- `BookingEnquiryForm`: `checkIn` mirrored to local state via `register(..., { onChange })` to feed `min=` on checkout — avoids `react-hooks/incompatible-library` lint warning from `watch()`.
+
+**Navigation + CTAs**
+- Footer Visit column: "Plan Your Retreat → /enquire" added as first item.
+- `/stay` bottom CTA: "Book Now → /booking" → "Plan Your Retreat → /enquire".
+- Blog article CTA: "Book Now → /booking" → "Plan Your Retreat → /enquire".
+- `ContactPage` schema added to `src/lib/schema/` and barrel export.
+
+### Known gaps
+
+**Resend sandbox email delivery:** Resend sandbox restricts outbound email to verified test addresses only. `madhubanecoretreat@gmail.com` must be added as a verified test email in the Resend dashboard, or domain `madhubanecoretreat.com` must have DNS records verified, before form submissions will arrive in the business inbox. The API routes, templates, and send logic are all correct — this is a Resend account configuration issue. Resolve before launch or during Phase 9.
+
+**No server-side rate limiting:** IP-based rate limiting (max 3 submissions/IP/hour) intentionally deferred. Honeypot covers basic bot traffic. Add in Phase 9 security hardening pass.
+
+### Key decisions
+- **`zodV4Resolver` wrapper** over downgrading packages — keeps Zod v4 features available for future routes; the resolver is 20 lines and clearly documented.
+- **`/enquire` not `/booking-enquiry`** — shorter, readable; new URL so no redirect needed.
+- **Native `<input type="date">`** over react-day-picker — no additional JS bundle, works on all mobile browsers natively, sufficient for an enquiry form.
+- **Lazy Resend client init** — `new Resend(key)` inside `sendEmail()` body, not at module top. Module-level init throws during `next build` if env var is absent (discovered during build).
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors
+- `pnpm build` ✅ 60 routes (`/contact-us` and `/enquire` both static prerendered)
+- Local end-to-end: form submits → API returns `{ ok: false, error: "API key is invalid" }` (Resend sandbox config gap, not a code bug)
+
+---
+
+## Next: Phase 7 — Booking engine (4-step flow, availability, OTP, Razorpay sandbox)

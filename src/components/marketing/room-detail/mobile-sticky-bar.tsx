@@ -44,7 +44,7 @@ export function MobileStickyBar({ pricePerNight, slug }: MobileStickyBarProps) {
         <span className="font-normal opacity-75">/night</span>
       </p>
       <Link
-        href={`/booking?room=${slug}`}
+        href={`/book/${slug}`}
         tabIndex={visible ? 0 : -1}
         className="inline-flex h-10 items-center justify-center rounded-lg bg-ivory px-5 font-body text-sm font-medium text-earth-brown transition-colors duration-200 hover:bg-ivory/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ivory focus-visible:ring-offset-2"
       >

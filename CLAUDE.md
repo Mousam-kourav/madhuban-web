@@ -991,4 +991,130 @@ Do not add a separate `status` column.
 
 ---
 
-*Last updated: 2026-04-27 — Version 1.3 — Phase 6 complete; Resend sandbox gap documented*
+---
+
+## 25 — Phase 7 Session 1: Booking Engine Schema Notes
+
+> **Read before touching `bookings`, `guests`, or any booking API route.**
+
+### What shipped (Session 1)
+
+Customer booking flow from room detail page through to a placeholder payment screen:
+
+- `src/lib/booking/` — `types.ts`, `schemas.ts` (Zod), `availability.ts`, `pricing.ts`, `reference.ts`
+- `src/lib/gst.ts` — GST rate + breakdown utilities (12%/18% slab, back-calculation)
+- `src/app/(booking)/book/[slug]/` — checkout form (dates + guest count), review (price summary), payment (placeholder)
+- `src/app/api/booking/` — `check-availability/`, `calculate-price/`, `create/`
+- `src/components/marketing/room-detail/booking-widget.tsx` — inline widget on room detail pages
+
+### Schema-adaptation story (same pattern as Phase 5B)
+
+The `bookings` table already existed from the Phase 0 booking-engine handoff. All code was written against the **actual DB column names**:
+
+| Column | Notes |
+|---|---|
+| `booking_ref` | Human-readable reference (`MBR-YYYYMMDD-XXXX`) |
+| `checkin` / `checkout` | Date columns (not `check_in` / `check_out`) |
+| `num_adults` / `num_children` | Guest counts (not `adults` / `children`) |
+| `room_id` / `guest_id` | FKs to `rooms` / `guests` |
+| `status` | `PENDING_PAYMENT` → `CONFIRMED` → etc. |
+| `total_amount` | GST-inclusive total |
+
+**Do NOT rename these columns** — the booking engine reads them directly.
+
+### Derived fields — computed at runtime, NOT stored
+
+| Field | Derived from |
+|---|---|
+| `nights` | `checkout - checkin` in days |
+| `advance_amount` | `total_amount × 0.5` (50% policy) |
+| `balance_due` | `total_amount − advance_amount` |
+| `gst_rate` | `gstRate(base_price_per_night)` from `lib/gst.ts` |
+
+Do not add DB columns for these — compute at call site.
+
+### `guests` table — `mobile`, not `phone`
+
+The column is `mobile`. Locked from Phase 0 handoff. Do not rename, do not alias.
+
+---
+
+## 26 — Phase 7 Session 2: Payments, Emails, Admin (Sessions 1+2 Complete)
+
+> **Read before touching payment routes, email templates, admin booking/coupon management, or the `coupons` table.**
+
+### What shipped (Session 2)
+
+**Razorpay integration**
+- `src/lib/payments/razorpay.ts` — server-only client: `createRazorpayOrder`, `verifyPaymentSignature` (HMAC SHA256 `orderId|paymentId`), `verifyWebhookSignature` (raw body + `RAZORPAY_WEBHOOK_SECRET`)
+- `POST /api/booking/create-order` — validates booking is `PENDING_PAYMENT` and < 60 min old; creates Razorpay order for 50% advance; inserts pending `payments` row
+- `POST /api/booking/verify-payment` — HMAC verification; flips booking to `CONFIRMED`, payment to `captured`; sends guest + admin emails; idempotent on double-call
+- `POST /api/webhooks/razorpay` — backup `payment.captured` handler; idempotent (checks `payments.status = 'captured'` first); must use `req.text()` not `req.json()` for raw body signature check
+- `src/app/(booking)/book/[slug]/payment/payment-client.tsx` — Razorpay checkout.js via `next/script` `strategy="afterInteractive"`; `hasFetched` ref guards against StrictMode double-mount
+- `src/app/(booking)/book/confirmation/page.tsx` — confirmation page: booking ref, stay details, advance paid, balance due at check-in, WhatsApp CTA
+
+**Email templates** (`src/lib/email/templates/`)
+- `booking-confirmation-guest.ts` / `booking-confirmation-admin.ts`
+- `booking-cancelled-guest.ts` / `booking-cancelled-admin.ts`
+- All use `sendEmail()` from Phase 6. Email failures do NOT roll back payment confirmation.
+
+**Admin booking management**
+- `GET/PATCH /api/admin/bookings` + `/[id]` — list with `?status` filter; detail with guest + room joins; PATCH actions: `CHECKED_IN`, `CHECKED_OUT`, `BALANCE_PAID`, `NO_SHOW`, `INTERNAL_NOTE`, `CANCELLED`
+- `CANCELLED` action sends cancellation emails + marks refund amount on payment row (actual refund is manual via Razorpay dashboard)
+- Every state transition writes to `audit_log` (`entity_type: 'booking'`)
+- `/admin/bookings` list + `/admin/bookings/[id]` detail + `BookingActions` + `InternalNoteForm` components
+
+**Admin coupon CRUD**
+- `GET/POST /api/admin/coupons` + `GET/PATCH/DELETE /api/admin/coupons/[id]`
+- Zod validation; soft delete (sets `is_active=false`, preserves FK integrity on historical bookings)
+- `/admin/coupons` list + new + edit pages; `CouponToggle` client component
+- `scripts/seed-test-coupon.ts` — upsert-safe FOREST20 seed (20% off, min ₹5,000)
+
+**Sidebar**: Bookings and Coupons nav items now live (moved from `DISABLED_ITEMS`)
+
+### DB schema additions required (run in Supabase SQL editor)
+
+```sql
+ALTER TABLE payments
+  ADD COLUMN IF NOT EXISTS payment_type text DEFAULT 'advance',
+  ADD COLUMN IF NOT EXISTS refund_amount numeric DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS refunded_at timestamptz;
+```
+
+### Schema mismatches caught and fixed (Session 2)
+
+These were discovered from DB check constraint violations on production; all fixed before merge:
+
+| Bug | Wrong value | Correct value | File |
+|---|---|---|---|
+| `bookings.source` check constraint | `'online'` | `'website'` | `src/app/api/booking/create/route.ts` |
+| `coupons.discount_type` check constraint | `'percent'` | `'percentage'` | `coupon-form.tsx`, both coupon API routes, `pricing.ts`, seed script |
+
+The `source` fix was cherry-picked onto main (`a2446ff`) after PR #17 had already merged — the fix commit (`191ddc2`) was made after the PR merge and needed manual recovery.
+
+### Env vars added (Session 2)
+
+| Var | Purpose |
+|---|---|
+| `RAZORPAY_KEY_ID` | Server-side Razorpay key (never exposed to client) |
+| `RAZORPAY_KEY_SECRET` | HMAC signing key for payment verification |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Same key ID, exposed to client for checkout.js — must be set separately even though value equals `RAZORPAY_KEY_ID` |
+| `RAZORPAY_WEBHOOK_SECRET` | Webhook signature verification secret (from Razorpay dashboard) |
+
+### Supabase FK join pattern (no typed Relationships)
+
+`database.types.ts` has `Relationships: []` for all tables. Supabase FK joins (`guests!guest_id(...)`, `rooms!room_id(...)`) work at runtime but TypeScript infers `SelectQueryError`. Pattern throughout codebase:
+
+```typescript
+const guest = booking.guests as unknown as { name: string; email: string; mobile: string | null } | null;
+```
+
+Cast through `unknown` first — the direct cast fails because the types don't overlap. Will resolve when `supabase gen types typescript` is run with populated Relationships.
+
+### Pending verification (blocked by Razorpay domain review)
+
+1. **Razorpay payment capture** — Razorpay requires domain registration review (24h). To verify post-approval: book on production → pay with test card `4111 1111 1111 1111` / OTP `1234` → confirm booking flips to `CONFIRMED`, `payments` row inserted, `audit_log` entry created.
+2. **Confirmation emails** — Resend sandbox restriction (same Phase 6 gap). Fix in Phase 9.
+3. **Admin booking management** — built but not smoke-tested with real booking data. Verify post-Razorpay-approval (read-only list + simple status transitions, low risk).
+
+*Last updated: 2026-04-28 — Version 1.4 — Phase 7 Sessions 1+2 complete; §25 restored (lost in PR #17 merge), §26 added (payments + admin)*

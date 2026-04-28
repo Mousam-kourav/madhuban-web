@@ -623,4 +623,98 @@ The pre-existing columns (`base_price_per_night`, `max_occupancy`, `gst_rate`, `
 
 ---
 
-## Next: Phase 7 — Booking engine (4-step flow, availability, OTP, Razorpay sandbox)
+---
+
+## Phase 7 Session 1 — Booking Engine (Customer Flow) ✅ COMPLETE (2026-04-28)
+
+### What shipped
+
+**Booking lib** (`src/lib/booking/`)
+- `types.ts`, `schemas.ts` (Zod), `availability.ts`, `pricing.ts`, `reference.ts`
+- `src/lib/gst.ts` — `gstRate()` (12%/18% slab) + `priceBreakdown()` back-calc
+
+**API routes** (`src/app/api/booking/`)
+- `check-availability/` — validates dates + room slug; returns `{ available, message? }`
+- `calculate-price/` — returns full `PriceBreakdown` (derived fields, not DB-persisted)
+- `create/` — upserts `guests` row, inserts `bookings` row at `PENDING_PAYMENT`; returns `booking_ref`
+
+**Booking flow** (`src/app/(booking)/book/[slug]/`)
+- Step 1 (`page.tsx` + `checkout-form.tsx`) — date range + guest count, live availability, price preview
+- Step 2 (`review/`) — full price breakdown, cancellation policy, "Proceed to Payment" CTA
+- Step 3 (`payment/`) — placeholder at Session 1 end; Razorpay wired in Session 2
+
+**Room detail integration** — `BookingWidget` on `/stay/[slug]`; mobile sticky bar CTA updated
+
+**Supabase types** — `database.types.ts` updated with `bookings` + `guests` table definitions
+
+### Schema-adaptation story
+`bookings` and `guests` tables existed from Phase 0 handoff. All code written against actual DB column names (see CLAUDE.md §25). `guests.mobile` is the locked column name (not `phone`).
+
+### Key decisions
+- Derived fields (`nights`, `advance_amount`, `balance_due`, `gst_rate`) computed at runtime in `pricing.ts`, never stored as columns
+- Flow at `/book/[slug]` (room-specific), not `/booking` spec path
+- `sessionStorage` key `booking_draft` carries draft between steps without round-trips
+- 50% advance hard-coded in `pricing.ts`
+
+### Verification
+- `pnpm typecheck` ✅ · `pnpm build` ✅ (19 files, 1880 insertions)
+
+---
+
+## Phase 7 Session 2 — Payments + Emails + Admin ✅ COMPLETE (2026-04-28)
+
+### What shipped
+
+**Razorpay payment layer**
+- `src/lib/payments/razorpay.ts` — `createRazorpayOrder`, `verifyPaymentSignature`, `verifyWebhookSignature`
+- `POST /api/booking/create-order` — creates Razorpay order for 50% advance; inserts pending `payments` row
+- `POST /api/booking/verify-payment` — HMAC verification; confirms booking + payment; sends emails; idempotent
+- `POST /api/webhooks/razorpay` — backup `payment.captured` handler; raw body via `req.text()`; idempotent
+- `payment-client.tsx` — real Razorpay checkout.js integration (Script `afterInteractive`; `hasFetched` ref guards StrictMode)
+- `src/app/(booking)/book/confirmation/` — confirmation page: ref, stay details, advance paid, balance due, WhatsApp CTA
+
+**Email templates** — `booking-confirmation-{guest,admin}`, `booking-cancelled-{guest,admin}`; email failures do NOT roll back payment
+
+**Admin booking management**
+- `GET/PATCH /api/admin/bookings/[id]` — actions: CHECKED_IN, CHECKED_OUT, BALANCE_PAID, NO_SHOW, INTERNAL_NOTE, CANCELLED
+- CANCELLED sends cancellation emails + marks refund amount; actual refund manual via Razorpay dashboard
+- All state transitions write to `audit_log`
+- `/admin/bookings` list + `/admin/bookings/[id]` detail pages
+
+**Admin coupon CRUD** — full CRUD API + list/new/edit pages; soft delete; `CouponToggle` component
+
+**Sidebar** — Bookings + Coupons nav items now live
+
+**Seed** — `scripts/seed-test-coupon.ts` upserts FOREST20 (20% off, min ₹5,000)
+
+### DB migration required
+```sql
+ALTER TABLE payments
+  ADD COLUMN IF NOT EXISTS payment_type text DEFAULT 'advance',
+  ADD COLUMN IF NOT EXISTS refund_amount numeric DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS refunded_at timestamptz;
+```
+
+### Schema mismatches fixed
+| Bug | Wrong | Correct |
+|---|---|---|
+| `bookings.source` DB constraint | `'online'` | `'website'` |
+| `coupons.discount_type` DB constraint | `'percent'` | `'percentage'` |
+
+The `source` fix was cherry-picked onto main (`a2446ff`) after PR #17 had already merged — required manual recovery.
+
+### New env vars
+`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `NEXT_PUBLIC_RAZORPAY_KEY_ID` (separate var, same value as KEY_ID — required for client), `RAZORPAY_WEBHOOK_SECRET`
+
+### Verification
+- `pnpm typecheck` ✅ · `pnpm lint` ✅ · `pnpm build` ✅ (71 routes)
+- FOREST20 coupon seeded to production DB ✅
+
+### Pending (blocked by Razorpay domain review, ~24h)
+1. Full payment capture flow — test card `4111 1111 1111 1111` / OTP `1234` on production
+2. Confirmation emails — Resend sandbox restriction (Phase 9 fix)
+3. Admin booking management — smoke-test with real booking data post-Razorpay-approval
+
+---
+
+## Next: Phase 8 — PDF Voucher / Phase 9 — Security + Production Hardening

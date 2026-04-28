@@ -148,10 +148,10 @@ export default async function BlogDetailPage({ params }: Props) {
             those seeking silence, sustainability, and soul-deep rest.
           </p>
           <Link
-            href="/booking"
+            href="/enquire"
             className="inline-block px-8 py-4 rounded-xl bg-[var(--color-gold-accent)] text-[var(--color-charcoal)] font-body font-semibold text-sm tracking-wide hover:opacity-90 transition-opacity"
           >
-            Book Now
+            Plan Your Retreat
           </Link>
         </div>
       </section>

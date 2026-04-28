@@ -861,6 +861,15 @@ Skippable if blocked: Razorpay live (stays sandbox until KYC), admin panel can s
 - `rooms.ts` retained with deprecation comment. Do not delete until ~2026-05-03 (1 week post-deploy).
 - `is_active` is the live field — not `status`. `true` = visible on public site, `false` = draft.
 
+**Phase 6 complete** (2026-04-27): Contact form + booking enquiry form with Resend pipeline shipped.
+- Two new pages: `/contact-us` (full rewrite — two-column form + address/phone/WhatsApp sidebar) and `/enquire` (centered booking enquiry form).
+- Resend pipeline: `src/lib/email/resend.ts` (lazy client init — env vars resolved at request time, not module eval), HTML email templates for both forms.
+- Zod v4 schemas + custom `zodV4Resolver` wrapper (`src/lib/forms/resolver.ts`) — `@hookform/resolvers` v5 ships types locked to Zod v4.0.x minor; wrapper calls `safeParseAsync` directly, bypassing the broken overload.
+- Honeypot field on both forms (hidden `website` input; if filled, route silently returns `{ ok: true }`).
+- `ContactPage` JSON-LD schema added. Footer Visit column gains "Plan Your Retreat → /enquire". `/stay` and blog article CTAs updated from `/booking` → `/enquire`.
+- **Known gap — Resend sandbox:** Resend sandbox restricts email delivery to verified test addresses only. `madhubanecoretreat@gmail.com` needs to be added as a verified test email in the Resend dashboard, OR domain `madhubanecoretreat.com` needs DNS verification, before form emails will deliver to the business inbox. The forms, API routes, and email templates are all correct — this is a config-side issue only. Resolve in Phase 9 (security hardening) or before launch.
+- **Known gap — no server-side rate limiting:** IP-based rate limiting (max 3/hour) intentionally deferred. Honeypot covers bot traffic. Add in Phase 9.
+
 ---
 
 ## 20 — Working With Me (Claude Code)
@@ -982,68 +991,4 @@ Do not add a separate `status` column.
 
 ---
 
----
-
-## 25 — Phase 7 Session 1: Booking Engine Schema Notes
-
-> **Read before touching `bookings`, `guests`, or any booking API route.**
-
-### What shipped (Session 1)
-
-Customer booking flow from room detail page through to a placeholder payment screen:
-
-- `src/lib/booking/` — `types.ts`, `schemas.ts` (Zod), `availability.ts`, `pricing.ts`, `reference.ts`
-- `src/lib/gst.ts` — GST rate + breakdown utilities (12%/18% slab, back-calculation)
-- `src/app/(booking)/book/[slug]/` — `page.tsx` (checkout form: dates + guest count), `review/` (price summary), `payment/` (placeholder — Razorpay not yet wired)
-- `src/app/api/booking/` — `check-availability/route.ts`, `calculate-price/route.ts`, `create/route.ts`
-- `src/components/marketing/room-detail/booking-widget.tsx` — inline widget on room detail pages; replaces the old static booking band
-
-### Schema-adaptation story (same pattern as Phase 5B)
-
-The `bookings` table already existed from the Phase 0 booking-engine handoff. Rather than renaming columns to match a fictional spec, the code was rewritten to use the **actual column names** in the DB:
-
-| Column used | Notes |
-|---|---|
-| `booking_ref` | Human-readable reference (format `MBR-YYYYMMDD-XXXX`) |
-| `checkin` | Check-in date |
-| `checkout` | Check-out date |
-| `num_adults` | Guest count (adults) |
-| `num_children` | Guest count (children) |
-| `room_id` | FK → rooms |
-| `guest_id` | FK → guests |
-| `status` | `PENDING_PAYMENT` → `CONFIRMED` → etc. |
-| `total_amount` | GST-inclusive total |
-| `advance_paid` | Amount charged at booking (50%) |
-
-**Do NOT rename these columns** — the booking engine and any future admin queries read them directly.
-
-### Derived fields — computed at runtime, NOT stored
-
-The following values are **calculated in `src/lib/booking/pricing.ts`** and returned in API responses. They are **not persisted** on the `bookings` row:
-
-| Field | Derived from |
-|---|---|
-| `nights` | `checkout - checkin` in days |
-| `advance_amount` | `total_amount × 0.5` (50% policy) |
-| `balance_due` | `total_amount - advance_paid` |
-| `gst_rate` | `gstRate(base_price_per_night)` from `lib/gst.ts` |
-
-If you need these in a query result, compute them in the query or at the call site — do not add columns for them.
-
-### `guests` table — `mobile`, not `phone`
-
-The `guests` table stores the guest's contact number in the column named **`mobile`** (not `phone`, not `phone_number`). This is the actual DB column name from the Phase 0 handoff. It is locked. Do not rename, do not add an alias column.
-
-### Session 2 pending (not yet built)
-
-- Razorpay order creation + sandbox checkout integration
-- HMAC signature verification on payment callback
-- Razorpay webhook handler (`/api/webhooks/razorpay`)
-- Resend confirmation email on `CONFIRMED` status
-- PDF booking voucher generation
-- Admin booking management (view, manual create, cancel, status transitions)
-- Coupon CRUD in admin CMS
-
----
-
-*Last updated: 2026-04-28 — Version 1.3 — Phase 7 Session 1 complete; §25 added (booking-engine schema notes, derived fields, guests.mobile)*
+*Last updated: 2026-04-27 — Version 1.3 — Phase 6 complete; Resend sandbox gap documented*

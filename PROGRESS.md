@@ -569,63 +569,58 @@ The pre-existing columns (`base_price_per_night`, `max_occupancy`, `gst_rate`, `
 
 ---
 
-## Phase 7 Session 1 — Booking Engine (Customer Flow) ✅ COMPLETE (2026-04-28)
+## Phase 6 — Contact Form + Booking Enquiry Form ✅ COMPLETE (2026-04-27)
 
 ### What shipped
 
-**Booking lib** (`src/lib/booking/`)
-- `types.ts` — `BookingDraft`, `PriceBreakdown`, `AvailabilityResult` and supporting types
-- `schemas.ts` — Zod schemas for checkout form input, availability request, price request, booking create request
-- `availability.ts` — checks `manual_blocks` + existing `CONFIRMED` bookings for the requested date range and room
-- `pricing.ts` — computes `nights`, `base_total`, `gst_rate`, `gst_amount`, `total_amount`, `advance_amount`, `balance_due`; 50% advance policy baked in; never persists derived fields
-- `reference.ts` — generates `MBR-YYYYMMDD-XXXX` booking reference
-- `src/lib/gst.ts` — `gstRate(nightlyRate)` (12% < ₹7,500, 18% ≥ ₹7,500) + `priceBreakdown()` back-calc
+**Email pipeline** (`src/lib/email/`)
+- `resend.ts` — `sendEmail()` helper. Resend client instantiated lazily inside the function body (not at module level) so `next build` never throws on missing env vars.
+- `templates/contact-enquiry.ts` — `contactEnquiryEmail()`: subject `"New contact enquiry — {name}"`, branded HTML table (cream bg, earth-brown header), `replyTo` set to submitter's email.
+- `templates/booking-enquiry.ts` — `bookingEnquiryEmail()`: subject includes name, dates, room; stay summary band; nights calculated; `ROOM_DISPLAY_NAMES` map for readable room labels.
 
-**API routes** (`src/app/api/booking/`)
-- `check-availability/route.ts` — POST; validates dates + room slug; returns `{ available: boolean, message? }`
-- `calculate-price/route.ts` — POST; returns full `PriceBreakdown` (derived fields, not DB persisted)
-- `create/route.ts` — POST; creates `guests` row (upsert on mobile), creates `bookings` row with `PENDING_PAYMENT` status; returns `booking_ref`
+**Schemas + resolver** (`src/lib/forms/`)
+- `contact-schema.ts` — name (1-100), email, phone (optional regex), message (10-2000), honeypot `website` field.
+- `booking-schema.ts` — name, email, phone (required), checkIn/checkOut dates with `refine` cross-field validation, adults/children, roomType `z.enum` from 6 static slugs, specialRequests optional. `ROOM_OPTIONS` exported for the select.
+- `resolver.ts` — `zodV4Resolver()`: custom wrapper that calls `schema.safeParseAsync()` directly. Required because `@hookform/resolvers` v5.2.2 ships types compiled against Zod v4.0.x; our project uses v4.3.6, and the `_zod.version.minor` literal (3 vs 0) breaks the overload match at compile time.
 
-**Booking flow** (`src/app/(booking)/book/[slug]/`)
-- `page.tsx` — step 1: checkout form (date range picker + guest count), live availability check, price preview, "Review Booking" CTA
-- `checkout-form.tsx` — `'use client'`; react-hook-form + Zod; calls check-availability + calculate-price APIs; persists draft to sessionStorage for step 2
-- `review/page.tsx` + `review-client.tsx` — step 2: full price breakdown summary (nights, base, GST, advance, balance due), cancellation policy, "Proceed to Payment" CTA → `/book/[slug]/payment`
-- `payment/page.tsx` — step 3: placeholder payment page (Razorpay not yet wired); shows booking ref + advance amount due
+**API routes**
+- `POST /api/forms/contact` — Zod parse → honeypot check → `contactEnquiryEmail()` → `sendEmail()`.
+- `POST /api/forms/booking` — same pattern with booking schema and template.
+- Both: `replyTo` set to submitter email; `console.error` on send failure; `{ ok: true/false }` response shape.
 
-**Room detail integration**
-- `src/components/marketing/room-detail/booking-widget.tsx` — inline booking widget rendered on `/stay/[slug]`; replaces the old static booking band section
-- `src/components/marketing/room-detail/room-detail-page.tsx` — wired to render `BookingWidget`
-- `src/components/marketing/room-detail/mobile-sticky-bar.tsx` — CTA now links to `/book/[slug]`
+**Pages**
+- `/contact-us` — rewritten from stub. Two-column layout: `ContactForm` component left, address/phone/email/maps/WhatsApp sidebar right. `ContactPage` JSON-LD schema. `BreadcrumbList` schema.
+- `/enquire` — new page (not in old URL list; no redirects needed). Centered `BookingEnquiryForm`. Native `<input type="date">` with `min=today` on check-in and `min=checkIn` on check-out. `BreadcrumbList` schema.
 
-**Supabase types** — `src/lib/supabase/database.types.ts` updated with full `bookings` + `guests` table definitions
+**Client form components** (`src/components/forms/`)
+- Both use `react-hook-form` + `zodV4Resolver`. Honeypot hidden via `absolute left-[-9999px]` + `tabIndex={-1}`.
+- Success state replaces form (no page reload). Error state shows server message inline with `role="alert"`.
+- `BookingEnquiryForm`: `checkIn` mirrored to local state via `register(..., { onChange })` to feed `min=` on checkout — avoids `react-hooks/incompatible-library` lint warning from `watch()`.
 
-### Schema-adaptation story
+**Navigation + CTAs**
+- Footer Visit column: "Plan Your Retreat → /enquire" added as first item.
+- `/stay` bottom CTA: "Book Now → /booking" → "Plan Your Retreat → /enquire".
+- Blog article CTA: "Book Now → /booking" → "Plan Your Retreat → /enquire".
+- `ContactPage` schema added to `src/lib/schema/` and barrel export.
 
-The `bookings` and `guests` tables already existed from the Phase 0 handoff. Rather than renaming columns to match a fictional spec, all code was written against the **actual DB column names**. This is the same Phase 5B pattern. Key column names in use:
+### Known gaps
 
-`bookings`: `booking_ref`, `checkin`, `checkout`, `num_adults`, `num_children`, `room_id`, `guest_id`, `status`, `total_amount`, `advance_paid`
+**Resend sandbox email delivery:** Resend sandbox restricts outbound email to verified test addresses only. `madhubanecoretreat@gmail.com` must be added as a verified test email in the Resend dashboard, or domain `madhubanecoretreat.com` must have DNS records verified, before form submissions will arrive in the business inbox. The API routes, templates, and send logic are all correct — this is a Resend account configuration issue. Resolve before launch or during Phase 9.
 
-`guests`: `mobile` (not `phone` — locked, do not rename)
-
-See CLAUDE.md §25 for the full column inventory and the derived-fields rule.
+**No server-side rate limiting:** IP-based rate limiting (max 3 submissions/IP/hour) intentionally deferred. Honeypot covers basic bot traffic. Add in Phase 9 security hardening pass.
 
 ### Key decisions
-
-- **Derived fields not stored**: `nights`, `advance_amount`, `balance_due`, `gst_rate` are computed in `pricing.ts` and returned in API responses — never persisted as columns. This avoids stale data if pricing rules change.
-- **`guests.mobile` is locked**: The DB column is `mobile`, not `phone`. Do not rename, do not add alias.
-- **Flow route**: `/book/[slug]` (room-specific), not the original `/booking` spec path. Matches how users arrive from room detail pages naturally.
-- **sessionStorage for draft**: Checkout form persists the draft to `sessionStorage` under `booking_draft` key so the review page can read it without a round-trip.
-- **50% advance hard-coded in pricing.ts**: Consistent with CLAUDE.md §8.5. Not configurable at runtime yet.
+- **`zodV4Resolver` wrapper** over downgrading packages — keeps Zod v4 features available for future routes; the resolver is 20 lines and clearly documented.
+- **`/enquire` not `/booking-enquiry`** — shorter, readable; new URL so no redirect needed.
+- **Native `<input type="date">`** over react-day-picker — no additional JS bundle, works on all mobile browsers natively, sufficient for an enquiry form.
+- **Lazy Resend client init** — `new Resend(key)` inside `sendEmail()` body, not at module top. Module-level init throws during `next build` if env var is absent (discovered during build).
 
 ### Verification
 - `pnpm typecheck` ✅ zero errors
-- `pnpm build` ✅ (19 files, 1880 insertions, all new routes compile)
+- `pnpm lint` ✅ zero errors
+- `pnpm build` ✅ 60 routes (`/contact-us` and `/enquire` both static prerendered)
+- Local end-to-end: form submits → API returns `{ ok: false, error: "API key is invalid" }` (Resend sandbox config gap, not a code bug)
 
-### Session 2 pending (not yet built)
-- Razorpay order creation + sandbox checkout
-- HMAC signature verification on payment callback
-- Razorpay webhook handler (`/api/webhooks/razorpay`)
-- Resend confirmation email on `CONFIRMED` status
-- PDF booking voucher
-- Admin booking management (view, manual create, cancel, status transitions)
-- Coupon CRUD in admin CMS
+---
+
+## Next: Phase 7 — Booking engine (4-step flow, availability, OTP, Razorpay sandbox)

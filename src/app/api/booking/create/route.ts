@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
         special_requests: specialRequests ?? null,
         status: "PENDING_PAYMENT",
         payment_status: "pending",
-        source: "online",
+        source: "website",
       })
       .select("id, booking_ref")
       .single();

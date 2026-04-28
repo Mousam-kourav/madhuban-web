@@ -10,7 +10,7 @@ export async function generateBookingReference(): Promise<string> {
   const { count } = await supabase
     .from("bookings")
     .select("*", { count: "exact", head: true })
-    .like("reference_number", `${prefix}%`);
+    .like("booking_ref", `${prefix}%`);
 
   const seq = String((count ?? 0) + 1).padStart(4, "0");
   return `${prefix}${seq}`;

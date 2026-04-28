@@ -37,26 +37,20 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
   const minNights = room.min_nights ?? 1;
   if (nights < minNights) throw new Error(`Minimum stay is ${minNights} night${minNights > 1 ? "s" : ""}`);
 
-  // Apply pricing rules (take highest multiplier that applies)
+  // Apply pricing rules — take the highest multiplier that applies to the date range.
+  // pricing_rules has: rule_type, date_from, date_to, multiplier (no is_active/priority columns).
   const { data: rules } = await supabase
     .from("pricing_rules")
-    .select("*")
-    .or(`room_id.eq.${room.id},room_id.is.null`)
-    .eq("is_active", true)
-    .order("priority", { ascending: false });
+    .select("rule_type, date_from, date_to, multiplier")
+    .or(`room_id.eq.${room.id},room_id.is.null`);
 
   let multiplier = 1;
   for (const rule of rules ?? []) {
-    let applies = false;
-    if (rule.rule_type === "seasonal" && rule.start_date && rule.end_date) {
-      applies = checkIn < rule.end_date && checkOut > rule.start_date;
-    } else if (rule.rule_type === "longstay" && rule.min_nights != null) {
-      applies = nights >= rule.min_nights;
-    } else if (rule.rule_type === "event" && rule.start_date && rule.end_date) {
-      applies = checkIn < rule.end_date && checkOut > rule.start_date;
-    }
-    if (applies && rule.multiplier > multiplier) {
-      multiplier = rule.multiplier;
+    if (rule.date_from && rule.date_to) {
+      const applies = checkIn < rule.date_to && checkOut > rule.date_from;
+      if (applies && rule.multiplier > multiplier) {
+        multiplier = rule.multiplier;
+      }
     }
   }
 
@@ -81,13 +75,13 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
 
     if (coupon) {
       const today = new Date().toISOString().slice(0, 10);
-      const notExpired = !coupon.valid_until || coupon.valid_until >= today;
+      // DB columns: valid_to (not valid_until), usage_limit (not max_uses), min_booking_value (not min_amount)
+      const notExpired = !coupon.valid_to || coupon.valid_to >= today;
       const notBeforeStart = !coupon.valid_from || coupon.valid_from <= today;
-      const notExhausted = coupon.max_uses == null || coupon.used_count < coupon.max_uses;
-      const meetsMinNights = nights >= coupon.min_nights;
-      const meetsMinAmount = baseNightlyTotal >= Number(coupon.min_amount);
+      const notExhausted = coupon.usage_limit == null || coupon.used_count < coupon.usage_limit;
+      const meetsMinAmount = baseNightlyTotal >= Number(coupon.min_booking_value);
 
-      if (notExpired && notBeforeStart && notExhausted && meetsMinNights && meetsMinAmount) {
+      if (notExpired && notBeforeStart && notExhausted && meetsMinAmount) {
         if (coupon.discount_type === "percent") {
           discountAmount = +(baseNightlyTotal * Number(coupon.discount_value) / 100).toFixed(2);
         } else {

@@ -23,11 +23,11 @@ export async function checkAvailability({
   // Check confirmed/in-house bookings that overlap requested range
   const { data: conflictingBookings, error: bookingError } = await supabase
     .from("bookings")
-    .select("id, reference_number, check_in, check_out, status")
+    .select("id, booking_ref, checkin, checkout, status")
     .eq("room_id", roomId)
     .in("status", ["CONFIRMED", "CHECKED_IN"])
-    .lt("check_in", checkOut)
-    .gt("check_out", checkIn)
+    .lt("checkin", checkOut)
+    .gt("checkout", checkIn)
     .limit(1);
 
   if (bookingError) throw new Error(bookingError.message);
@@ -42,10 +42,10 @@ export async function checkAvailability({
   // Check manual blocks
   const { data: blocks, error: blockError } = await supabase
     .from("manual_blocks")
-    .select("id, start_date, end_date, reason")
+    .select("id, date_from, date_to, reason")
     .eq("room_id", roomId)
-    .lt("start_date", checkOut)
-    .gt("end_date", checkIn)
+    .lt("date_from", checkOut)
+    .gt("date_to", checkIn)
     .limit(1);
 
   if (blockError) throw new Error(blockError.message);

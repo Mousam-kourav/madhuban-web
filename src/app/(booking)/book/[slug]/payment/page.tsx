@@ -20,10 +20,10 @@ export default async function PaymentPage({ params, searchParams }: Props) {
       const supabase = createAdminClient();
       const { data } = await supabase
         .from("bookings")
-        .select("reference_number")
+        .select("booking_ref")
         .eq("id", id)
         .single();
-      referenceNumber = data?.reference_number ?? null;
+      referenceNumber = data?.booking_ref ?? null;
     } catch {
       // non-fatal — show generic message
     }

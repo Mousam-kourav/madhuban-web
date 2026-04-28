@@ -56,48 +56,62 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: availability.reason }, { status: 409 });
     }
 
-    const referenceNumber = await generateBookingReference();
-
-    // Resolve coupon ID if coupon was applied
+    const bookingRef = await generateBookingReference();
     const supabase = createAdminClient();
-    let couponId: string | null = null;
-    if (pricing.couponCode) {
-      const { data: coupon } = await supabase
-        .from("coupons")
+
+    // Find existing guest by email or insert new one.
+    // guests table: name, mobile (not phone), email
+    const { data: existingGuest } = await supabase
+      .from("guests")
+      .select("id")
+      .eq("email", guestEmail.trim().toLowerCase())
+      .maybeSingle();
+
+    let guestId: string;
+    if (existingGuest) {
+      guestId = existingGuest.id;
+    } else {
+      const { data: newGuest, error: guestError } = await supabase
+        .from("guests")
+        .insert({
+          name: guestName.trim(),
+          email: guestEmail.trim().toLowerCase(),
+          mobile: guestPhone.trim(),
+        })
         .select("id")
-        .eq("code", pricing.couponCode)
         .single();
-      couponId = coupon?.id ?? null;
+      if (guestError || !newGuest) {
+        console.error("[booking/create] guest insert:", guestError);
+        return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
+      }
+      guestId = newGuest.id;
     }
 
+    // Insert booking using actual column names.
+    // Not stored: nights (checkout - checkin), price_per_night (base_amount / nights),
+    // gst_rate (on rooms), advance_amount / balance_due (derived as total * 0.5),
+    // razorpay_* (on payments table).
     const { data: booking, error } = await supabase
       .from("bookings")
       .insert({
-        reference_number: referenceNumber,
+        booking_ref: bookingRef,
         room_id: pricing.roomId,
-        check_in: checkIn,
-        check_out: checkOut,
-        nights: pricing.nights,
-        adults,
-        children,
-        guest_name: guestName,
-        guest_email: guestEmail,
-        guest_phone: guestPhone,
-        price_per_night: pricing.pricePerNight,
+        guest_id: guestId,
+        checkin: checkIn,
+        checkout: checkOut,
+        num_adults: adults,
+        num_children: children,
         base_amount: pricing.subtotalBeforeGst,
-        gst_rate: pricing.gstRate,
         gst_amount: pricing.gstAmount,
         discount_amount: pricing.discountAmount,
-        coupon_id: couponId,
-        coupon_code: pricing.couponCode,
+        coupon_code: pricing.couponCode ?? null,
         total_amount: pricing.totalAmount,
-        advance_amount: pricing.advanceAmount,
-        balance_due: pricing.balanceDue,
         special_requests: specialRequests ?? null,
         status: "PENDING_PAYMENT",
+        payment_status: "pending",
         source: "online",
       })
-      .select("id, reference_number")
+      .select("id, booking_ref")
       .single();
 
     if (error) {
@@ -106,23 +120,23 @@ export async function POST(req: NextRequest) {
     }
 
     // Increment coupon used_count if applied
-    if (couponId) {
+    if (pricing.couponCode) {
       const { data: couponRow } = await supabase
         .from("coupons")
-        .select("used_count")
-        .eq("id", couponId)
+        .select("id, used_count")
+        .eq("code", pricing.couponCode)
         .single();
       if (couponRow) {
         await supabase
           .from("coupons")
           .update({ used_count: (couponRow.used_count ?? 0) + 1 })
-          .eq("id", couponId);
+          .eq("id", couponRow.id);
       }
     }
 
     return NextResponse.json({
       bookingId: booking.id,
-      referenceNumber: booking.reference_number,
+      referenceNumber: booking.booking_ref,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create booking";

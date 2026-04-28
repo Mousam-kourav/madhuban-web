@@ -146,7 +146,12 @@ type BookingRow = {
   updated_at: string;
 };
 
-// payments: booking_id, razorpay_order_id, razorpay_payment_id, amount, status, method, captured_at
+// payments: booking_id, razorpay_order_id, razorpay_payment_id, amount, status, method, captured_at,
+// payment_type (advance|balance), refund_amount, refunded_at
+// Note: payment_type/refund_amount/refunded_at require: ALTER TABLE payments
+//   ADD COLUMN IF NOT EXISTS payment_type text DEFAULT 'advance',
+//   ADD COLUMN IF NOT EXISTS refund_amount numeric DEFAULT 0,
+//   ADD COLUMN IF NOT EXISTS refunded_at timestamptz;
 type PaymentRow = {
   id: string;
   booking_id: string;
@@ -154,8 +159,11 @@ type PaymentRow = {
   razorpay_payment_id: string | null;
   amount: number;
   status: string;
+  payment_type: string;
   method: string | null;
   captured_at: string | null;
+  refund_amount: number;
+  refunded_at: string | null;
   created_at: string;
 };
 
@@ -317,8 +325,11 @@ export type Database = {
           created_at?: string;
           razorpay_order_id?: string | null;
           razorpay_payment_id?: string | null;
+          payment_type?: string;
           method?: string | null;
           captured_at?: string | null;
+          refund_amount?: number;
+          refunded_at?: string | null;
         };
         Update: Partial<PaymentRow>;
         Relationships: [];

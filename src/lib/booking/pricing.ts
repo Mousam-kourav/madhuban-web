@@ -82,7 +82,7 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
       const meetsMinAmount = baseNightlyTotal >= Number(coupon.min_booking_value);
 
       if (notExpired && notBeforeStart && notExhausted && meetsMinAmount) {
-        if (coupon.discount_type === "percent") {
+        if (coupon.discount_type === "percentage") {
           discountAmount = +(baseNightlyTotal * Number(coupon.discount_value) / 100).toFixed(2);
         } else {
           discountAmount = Math.min(Number(coupon.discount_value), baseNightlyTotal);

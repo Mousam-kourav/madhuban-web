@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -8,6 +9,7 @@ import {
   FileText,
   Bed,
   Calendar,
+  Tag,
   Settings,
   HelpCircle,
   LogOut,
@@ -20,11 +22,11 @@ const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/admin" },
   { icon: FileText, label: "Blog Posts", href: "/admin/posts" },
   { icon: Bed, label: "Rooms", href: "/admin/rooms" },
+  { icon: Calendar, label: "Bookings", href: "/admin/bookings" },
+  { icon: Tag, label: "Coupons", href: "/admin/coupons" },
 ];
 
-const DISABLED_ITEMS = [
-  { icon: Calendar, label: "Reservations", note: "Coming in Phase 7" },
-];
+const DISABLED_ITEMS: { icon: React.ElementType; label: string; note: string }[] = [];
 
 export function AdminSidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);

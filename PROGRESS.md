@@ -567,4 +567,65 @@ The pre-existing columns (`base_price_per_night`, `max_occupancy`, `gst_rate`, `
 
 ---
 
-## Next: Phase 6 — Policy pages, 404, Thank You, sitemap, robots, redirects
+---
+
+## Phase 7 Session 1 — Booking Engine (Customer Flow) ✅ COMPLETE (2026-04-28)
+
+### What shipped
+
+**Booking lib** (`src/lib/booking/`)
+- `types.ts` — `BookingDraft`, `PriceBreakdown`, `AvailabilityResult` and supporting types
+- `schemas.ts` — Zod schemas for checkout form input, availability request, price request, booking create request
+- `availability.ts` — checks `manual_blocks` + existing `CONFIRMED` bookings for the requested date range and room
+- `pricing.ts` — computes `nights`, `base_total`, `gst_rate`, `gst_amount`, `total_amount`, `advance_amount`, `balance_due`; 50% advance policy baked in; never persists derived fields
+- `reference.ts` — generates `MBR-YYYYMMDD-XXXX` booking reference
+- `src/lib/gst.ts` — `gstRate(nightlyRate)` (12% < ₹7,500, 18% ≥ ₹7,500) + `priceBreakdown()` back-calc
+
+**API routes** (`src/app/api/booking/`)
+- `check-availability/route.ts` — POST; validates dates + room slug; returns `{ available: boolean, message? }`
+- `calculate-price/route.ts` — POST; returns full `PriceBreakdown` (derived fields, not DB persisted)
+- `create/route.ts` — POST; creates `guests` row (upsert on mobile), creates `bookings` row with `PENDING_PAYMENT` status; returns `booking_ref`
+
+**Booking flow** (`src/app/(booking)/book/[slug]/`)
+- `page.tsx` — step 1: checkout form (date range picker + guest count), live availability check, price preview, "Review Booking" CTA
+- `checkout-form.tsx` — `'use client'`; react-hook-form + Zod; calls check-availability + calculate-price APIs; persists draft to sessionStorage for step 2
+- `review/page.tsx` + `review-client.tsx` — step 2: full price breakdown summary (nights, base, GST, advance, balance due), cancellation policy, "Proceed to Payment" CTA → `/book/[slug]/payment`
+- `payment/page.tsx` — step 3: placeholder payment page (Razorpay not yet wired); shows booking ref + advance amount due
+
+**Room detail integration**
+- `src/components/marketing/room-detail/booking-widget.tsx` — inline booking widget rendered on `/stay/[slug]`; replaces the old static booking band section
+- `src/components/marketing/room-detail/room-detail-page.tsx` — wired to render `BookingWidget`
+- `src/components/marketing/room-detail/mobile-sticky-bar.tsx` — CTA now links to `/book/[slug]`
+
+**Supabase types** — `src/lib/supabase/database.types.ts` updated with full `bookings` + `guests` table definitions
+
+### Schema-adaptation story
+
+The `bookings` and `guests` tables already existed from the Phase 0 handoff. Rather than renaming columns to match a fictional spec, all code was written against the **actual DB column names**. This is the same Phase 5B pattern. Key column names in use:
+
+`bookings`: `booking_ref`, `checkin`, `checkout`, `num_adults`, `num_children`, `room_id`, `guest_id`, `status`, `total_amount`, `advance_paid`
+
+`guests`: `mobile` (not `phone` — locked, do not rename)
+
+See CLAUDE.md §25 for the full column inventory and the derived-fields rule.
+
+### Key decisions
+
+- **Derived fields not stored**: `nights`, `advance_amount`, `balance_due`, `gst_rate` are computed in `pricing.ts` and returned in API responses — never persisted as columns. This avoids stale data if pricing rules change.
+- **`guests.mobile` is locked**: The DB column is `mobile`, not `phone`. Do not rename, do not add alias.
+- **Flow route**: `/book/[slug]` (room-specific), not the original `/booking` spec path. Matches how users arrive from room detail pages naturally.
+- **sessionStorage for draft**: Checkout form persists the draft to `sessionStorage` under `booking_draft` key so the review page can read it without a round-trip.
+- **50% advance hard-coded in pricing.ts**: Consistent with CLAUDE.md §8.5. Not configurable at runtime yet.
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm build` ✅ (19 files, 1880 insertions, all new routes compile)
+
+### Session 2 pending (not yet built)
+- Razorpay order creation + sandbox checkout
+- HMAC signature verification on payment callback
+- Razorpay webhook handler (`/api/webhooks/razorpay`)
+- Resend confirmation email on `CONFIRMED` status
+- PDF booking voucher
+- Admin booking management (view, manual create, cancel, status transitions)
+- Coupon CRUD in admin CMS

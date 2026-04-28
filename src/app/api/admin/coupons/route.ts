@@ -15,7 +15,7 @@ async function assertAdmin() {
 
 const couponSchema = z.object({
   code: z.string().min(2).max(30).transform((v) => v.trim().toUpperCase()),
-  discount_type: z.enum(["percent", "flat"]),
+  discount_type: z.enum(["percentage", "flat"]),
   discount_value: z.number().positive(),
   min_booking_value: z.number().min(0).default(0),
   valid_from: z.string().nullable().optional(),

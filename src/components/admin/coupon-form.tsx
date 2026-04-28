@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export interface CouponFormValues {
   code: string;
-  discount_type: "percent" | "flat";
+  discount_type: "percentage" | "flat";
   discount_value: string;
   min_booking_value: string;
   valid_from: string;
@@ -27,7 +27,7 @@ export function CouponForm({ initial, couponId, mode }: Props) {
   const router = useRouter();
   const [values, setValues] = useState<CouponFormValues>({
     code: initial?.code ?? "",
-    discount_type: initial?.discount_type ?? "percent",
+    discount_type: initial?.discount_type ?? "percentage",
     discount_value: initial?.discount_value ?? "",
     min_booking_value: initial?.min_booking_value ?? "0",
     valid_from: initial?.valid_from ?? "",
@@ -107,25 +107,25 @@ export function CouponForm({ initial, couponId, mode }: Props) {
           <label className={LABEL}>Discount Type *</label>
           <select
             value={values.discount_type}
-            onChange={(e) => set("discount_type", e.target.value as "percent" | "flat")}
+            onChange={(e) => set("discount_type", e.target.value as "percentage" | "flat")}
             className={INPUT}
           >
-            <option value="percent">Percentage (%)</option>
+            <option value="percentage">Percentage (%)</option>
             <option value="flat">Flat Amount (₹)</option>
           </select>
         </div>
 
         <div>
           <label className={LABEL}>
-            Discount Value * {values.discount_type === "percent" ? "(%)" : "(₹)"}
+            Discount Value * {values.discount_type === "percentage" ? "(%)" : "(₹)"}
           </label>
           <input
             type="number"
             min="0"
-            max={values.discount_type === "percent" ? "100" : undefined}
+            max={values.discount_type === "percentage" ? "100" : undefined}
             value={values.discount_value}
             onChange={(e) => set("discount_value", e.target.value)}
-            placeholder={values.discount_type === "percent" ? "20" : "500"}
+            placeholder={values.discount_type === "percentage" ? "20" : "500"}
             className={INPUT}
             required
           />

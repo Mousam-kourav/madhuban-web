@@ -69,7 +69,7 @@ export default async function CouponsPage() {
                       {c.code}
                     </td>
                     <td className="px-4 py-3 text-charcoal">
-                      {c.discount_type === "percent"
+                      {c.discount_type === "percentage"
                         ? `${c.discount_value}%`
                         : `₹${Number(c.discount_value).toLocaleString("en-IN")}`}
                     </td>

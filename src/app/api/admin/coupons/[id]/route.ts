@@ -15,7 +15,7 @@ async function assertAdmin() {
 
 const updateSchema = z.object({
   code: z.string().min(2).max(30).transform((v) => v.trim().toUpperCase()).optional(),
-  discount_type: z.enum(["percent", "flat"]).optional(),
+  discount_type: z.enum(["percentage", "flat"]).optional(),
   discount_value: z.number().positive().optional(),
   min_booking_value: z.number().min(0).optional(),
   valid_from: z.string().nullable().optional(),

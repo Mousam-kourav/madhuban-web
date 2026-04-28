@@ -21,7 +21,7 @@ export default async function EditCouponPage({ params }: { params: Promise<{ id:
 
   const initial: CouponFormValues = {
     code: coupon.code,
-    discount_type: coupon.discount_type as "percent" | "flat",
+    discount_type: coupon.discount_type as "percentage" | "flat",
     discount_value: String(coupon.discount_value),
     min_booking_value: String(coupon.min_booking_value ?? 0),
     valid_from: coupon.valid_from ? coupon.valid_from.slice(0, 10) : "",

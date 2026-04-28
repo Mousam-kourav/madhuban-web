@@ -69,6 +69,120 @@ type RoomFaqRow = {
   updated_at: string;
 };
 
+// guests table: id, name, mobile, email, id_type, id_number, gstin, address, created_at
+type GuestRow = {
+  id: string;
+  name: string;
+  mobile: string | null;
+  email: string;
+  id_type: string | null;
+  id_number: string | null;
+  gstin: string | null;
+  address: string | null;
+  created_at: string;
+};
+
+// coupons: valid_to (not valid_until), usage_limit (not max_uses), min_booking_value (not min_amount/min_nights)
+type CouponRow = {
+  id: string;
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  min_booking_value: number;
+  valid_from: string | null;
+  valid_to: string | null;
+  usage_limit: number | null;
+  used_count: number;
+  is_active: boolean;
+  created_at: string;
+};
+
+// pricing_rules: date_from/date_to (not start_date/end_date); no is_active, priority, name, min_nights
+type PricingRuleRow = {
+  id: string;
+  room_id: string | null;
+  rule_type: string;
+  date_from: string | null;
+  date_to: string | null;
+  price_override: number | null;
+  multiplier: number;
+  created_at: string;
+};
+
+// manual_blocks: date_from/date_to (not start_date/end_date)
+type ManualBlockRow = {
+  id: string;
+  room_id: string;
+  date_from: string;
+  date_to: string;
+  reason: string | null;
+  created_by: string | null;
+  created_at: string;
+};
+
+// bookings: booking_ref (not reference_number), checkin/checkout (not check_in/check_out),
+// num_adults/num_children (not adults/children), guest_id FK (not guest_name/email/phone),
+// payment_status; no nights/price_per_night/gst_rate/coupon_id/advance_amount/balance_due/razorpay_*
+type BookingRow = {
+  id: string;
+  booking_ref: string;
+  room_id: string;
+  guest_id: string;
+  checkin: string;
+  checkout: string;
+  num_adults: number;
+  num_children: number;
+  status: string;
+  source: string;
+  payment_status: string;
+  base_amount: number;
+  gst_amount: number;
+  total_amount: number;
+  special_requests: string | null;
+  internal_notes: string | null;
+  coupon_code: string | null;
+  discount_amount: number;
+  created_at: string;
+  updated_at: string;
+};
+
+// payments: booking_id, razorpay_order_id, razorpay_payment_id, amount, status, method, captured_at
+type PaymentRow = {
+  id: string;
+  booking_id: string;
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
+  amount: number;
+  status: string;
+  method: string | null;
+  captured_at: string | null;
+  created_at: string;
+};
+
+// invoices: booking_id, invoice_number, issued_at, base_amount, gst_amount, total_amount, pdf_url
+type InvoiceRow = {
+  id: string;
+  booking_id: string;
+  invoice_number: string;
+  issued_at: string;
+  base_amount: number;
+  gst_amount: number;
+  total_amount: number;
+  pdf_url: string | null;
+  created_at: string;
+};
+
+// audit_log: admin_user_id (not user_id), entity_type/entity_id (not entity/entity_id), details (not before/after_json)
+type AuditLogRow = {
+  id: string;
+  admin_user_id: string;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  details: Json | null;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -82,11 +196,9 @@ export type Database = {
       rooms: {
         Row: RoomRow;
         Insert: {
-          // Required (no DB default, NOT NULL in DB)
           slug: string;
           name: string;
           base_price_per_night?: number;
-          // Optional — have DB defaults or are nullable
           id?: string;
           created_at?: string;
           updated_at?: string;
@@ -128,6 +240,110 @@ export type Database = {
           display_order?: number;
         };
         Update: Partial<RoomFaqRow>;
+        Relationships: [];
+      };
+      guests: {
+        Row: GuestRow;
+        Insert: {
+          email: string;
+          name: string;
+          id?: string;
+          created_at?: string;
+          mobile?: string | null;
+          id_type?: string | null;
+          id_number?: string | null;
+          gstin?: string | null;
+          address?: string | null;
+        };
+        Update: Partial<GuestRow>;
+        Relationships: [];
+      };
+      coupons: {
+        Row: CouponRow;
+        Insert: Omit<CouponRow, "id" | "created_at" | "used_count"> &
+          Partial<Pick<CouponRow, "id" | "created_at" | "used_count">>;
+        Update: Partial<CouponRow>;
+        Relationships: [];
+      };
+      pricing_rules: {
+        Row: PricingRuleRow;
+        Insert: Omit<PricingRuleRow, "id" | "created_at"> &
+          Partial<Pick<PricingRuleRow, "id" | "created_at">>;
+        Update: Partial<PricingRuleRow>;
+        Relationships: [];
+      };
+      manual_blocks: {
+        Row: ManualBlockRow;
+        Insert: Omit<ManualBlockRow, "id" | "created_at"> &
+          Partial<Pick<ManualBlockRow, "id" | "created_at">>;
+        Update: Partial<ManualBlockRow>;
+        Relationships: [];
+      };
+      bookings: {
+        Row: BookingRow;
+        Insert: {
+          booking_ref: string;
+          room_id: string;
+          guest_id: string;
+          checkin: string;
+          checkout: string;
+          num_adults: number;
+          num_children: number;
+          base_amount: number;
+          gst_amount: number;
+          total_amount: number;
+          status: string;
+          source: string;
+          payment_status: string;
+          // Optional / nullable
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+          discount_amount?: number;
+          coupon_code?: string | null;
+          special_requests?: string | null;
+          internal_notes?: string | null;
+        };
+        Update: Partial<BookingRow>;
+        Relationships: [];
+      };
+      payments: {
+        Row: PaymentRow;
+        Insert: {
+          booking_id: string;
+          amount: number;
+          status: string;
+          id?: string;
+          created_at?: string;
+          razorpay_order_id?: string | null;
+          razorpay_payment_id?: string | null;
+          method?: string | null;
+          captured_at?: string | null;
+        };
+        Update: Partial<PaymentRow>;
+        Relationships: [];
+      };
+      invoices: {
+        Row: InvoiceRow;
+        Insert: {
+          booking_id: string;
+          invoice_number: string;
+          issued_at: string;
+          base_amount: number;
+          gst_amount: number;
+          total_amount: number;
+          id?: string;
+          created_at?: string;
+          pdf_url?: string | null;
+        };
+        Update: Partial<InvoiceRow>;
+        Relationships: [];
+      };
+      audit_log: {
+        Row: AuditLogRow;
+        Insert: Omit<AuditLogRow, "id" | "created_at"> &
+          Partial<Pick<AuditLogRow, "id" | "created_at">>;
+        Update: never;
         Relationships: [];
       };
     };

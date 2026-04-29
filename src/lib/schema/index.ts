@@ -7,3 +7,4 @@ export * from './breadcrumb-list';
 export * from './speakable';
 export * from './item-list';
 export * from './contact-page';
+export * from './tourist-attraction';

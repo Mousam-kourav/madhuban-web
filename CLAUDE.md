@@ -1118,3 +1118,32 @@ Cast through `unknown` first — the direct cast fails because the types don't o
 3. **Admin booking management** — built but not smoke-tested with real booking data. Verify post-Razorpay-approval (read-only list + simple status transitions, low risk).
 
 *Last updated: 2026-04-28 — Version 1.4 — Phase 7 Sessions 1+2 complete; §25 restored (lost in PR #17 merge), §26 added (payments + admin)*
+
+---
+
+## 27 — Phase 8: Experiences Pages
+
+> **Read before touching `/experiences`, the `experiences.ts` content file, or the `ExperienceDetailPage` component.**
+
+### What shipped (2026-04-29)
+
+- `src/lib/content/experiences.ts` — Extended `Experience` type; all 3 experiences fully populated with `tagline`, `longDescription[]`, `whatToExpect[]`, `idealForList[]`, `gallery[]`, `faqs[]`, `seoTitle`, `seoDescription`.
+- `src/lib/schema/tourist-attraction.ts` — `touristAttraction()` returns `[TouristAttraction, TouristTrip, FAQPage]`.
+- `src/components/marketing/experience-detail/index.tsx` — One server-component template for all 3 detail pages.
+- `src/app/(marketing)/experiences/page.tsx` — Index: CollectionPage + ItemList + FAQPage JSON-LD.
+- `src/app/(marketing)/experiences/[slug]/page.tsx` — SSG with `generateStaticParams` (3 slugs).
+
+### FAQ duplication rule
+
+`touristAttraction()` includes `faqPage()` in its return array. The `<Faq>` UI component also emits `faqPage()` JSON-LD internally. **Do not use `<Faq>` on experience detail pages** — use native `<details>/<summary>` instead to avoid duplicate `FAQPage` JSON-LD.
+
+### Gallery images — pending upload
+
+Gallery images are pre-wired to `${NEXT_PUBLIC_R2_BASE}/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}`. Source files exist on the old R2 bucket at:
+- `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/forest-walk/` (3 images)
+- `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/birds-watch/` (4 images)
+- `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/` (5 images)
+
+Upload to new bucket before launch. The banner hero image also needs uploading at `experiences/banner/hero-{800,1280}.{webp,jpg}`.
+
+*Last updated: 2026-04-29 — Version 1.5 — Phase 8 complete; §27 added (experiences pages)*

@@ -1121,29 +1121,42 @@ Cast through `unknown` first — the direct cast fails because the types don't o
 
 ---
 
-## 27 — Phase 8: Experiences Pages
+## 27 — Phase 8: Experiences Pages ✅ Complete (2026-04-29)
 
 > **Read before touching `/experiences`, the `experiences.ts` content file, or the `ExperienceDetailPage` component.**
 
-### What shipped (2026-04-29)
+### What shipped
 
-- `src/lib/content/experiences.ts` — Extended `Experience` type; all 3 experiences fully populated with `tagline`, `longDescription[]`, `whatToExpect[]`, `idealForList[]`, `gallery[]`, `faqs[]`, `seoTitle`, `seoDescription`.
+**Pages**
+- `/experiences` — full index page: hero, answer block (AEO), 3-card grid (`<article>` per card), 6-FAQ accordion (native `<details>`), forest-green CTA. JSON-LD: `CollectionPage` + `ItemList` + `FAQPage` + `BreadcrumbList`.
+- `/experiences/[slug]` — one server-component template (`ExperienceDetailPage`) powering all 3 detail pages via `generateStaticParams`. JSON-LD: `TouristAttraction` + `TouristTrip` + `FAQPage` + `BreadcrumbList`.
+
+**Key files**
+- `src/lib/content/experiences.ts` — Extended `Experience` type with `tagline`, `longDescription[]`, `whatToExpect[]`, `idealForList[]`, `gallery[]`, `faqs[]`, `seoTitle`, `seoDescription`. All 3 experiences fully populated with verbatim live-site copy (§10.3).
 - `src/lib/schema/tourist-attraction.ts` — `touristAttraction()` returns `[TouristAttraction, TouristTrip, FAQPage]`.
-- `src/components/marketing/experience-detail/index.tsx` — One server-component template for all 3 detail pages.
-- `src/app/(marketing)/experiences/page.tsx` — Index: CollectionPage + ItemList + FAQPage JSON-LD.
-- `src/app/(marketing)/experiences/[slug]/page.tsx` — SSG with `generateStaticParams` (3 slugs).
+- `src/components/marketing/experience-detail/index.tsx` — 7-section server-component template.
+- `src/app/(marketing)/experiences/page.tsx` and `[slug]/page.tsx`.
+
+### Data source decision
+
+Content is hardcoded in `src/lib/content/experiences.ts` (3 curated experiences). The `experiences` DB table (17 stale rows from Phase 0 exploration) is intentionally ignored — no migration performed. Build admin CMS for experiences in a future phase if dynamic management is needed.
+
+### Image strategy
+
+Hero image on detail pages uses `experience.image.webp.desktop` — the same `/home/experiences/${slug}-1280.webp` paths already on R2 from Phase 3 homepage cards. No new images uploaded. Gallery shows 1 image per experience (same homepage card image via `homepageImageAsGallery()`). Gallery aspect ratio is `16/7` (wide landscape) when only 1 image is present.
 
 ### FAQ duplication rule
 
 `touristAttraction()` includes `faqPage()` in its return array. The `<Faq>` UI component also emits `faqPage()` JSON-LD internally. **Do not use `<Faq>` on experience detail pages** — use native `<details>/<summary>` instead to avoid duplicate `FAQPage` JSON-LD.
 
-### Gallery images — pending upload
+### PR merge note — fix commit dropped
 
-Gallery images are pre-wired to `${NEXT_PUBLIC_R2_BASE}/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}`. Source files exist on the old R2 bucket at:
-- `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/forest-walk/` (3 images)
-- `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/birds-watch/` (4 images)
-- `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/` (5 images)
+PR #18 was merged on GitHub with only the first commit. The fix commit (hero image fallback + FAQ contrast) was squashed out. Those fixes were re-applied directly to main in the cleanup commit immediately after merge. If you see `const hero = experience.gallery[0]` or `text-muted` on FAQ answers in a future git blame, that's the dropped commit — the current code on main is correct.
 
-Upload to new bucket before launch. The banner hero image also needs uploading at `experiences/banner/hero-{800,1280}.{webp,jpg}`.
+### Known gaps (deferred)
+
+- No admin CMS for experiences — content changes require editing `experiences.ts` directly.
+- Gallery shows 1 image per experience until dedicated photos are uploaded to R2 (`/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}`). Source images on old R2 bucket at `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/`.
+- Index page hero (`experiences/banner/hero-{800,1280}.{webp,jpg}`) not yet uploaded to new R2 — image will 404 until migrated.
 
 *Last updated: 2026-04-29 — Version 1.5 — Phase 8 complete; §27 added (experiences pages)*

@@ -72,17 +72,18 @@ function experienceImage(slug: string, alt: string): ExperienceImage {
   };
 }
 
-function galleryImage(folder: string, filename: string, alt: string): ExperienceGalleryImage {
+// Uses the same homepage card image (already on R2) as a placeholder until
+// dedicated experience gallery images are uploaded.
+function homepageImageAsGallery(slug: string, alt: string): ExperienceGalleryImage {
   return {
     alt,
-    // TODO: upload files to ${R2_BASE}/experiences/${folder}/${filename}-{800,1280}.{webp,jpg}
     webp: {
-      mobile:  `${R2_BASE}/experiences/${folder}/${filename}-800.webp`,
-      desktop: `${R2_BASE}/experiences/${folder}/${filename}-1280.webp`,
+      mobile:  `${R2_BASE}/home/experiences/${slug}-800.webp`,
+      desktop: `${R2_BASE}/home/experiences/${slug}-1280.webp`,
     },
     jpg: {
-      mobile:  `${R2_BASE}/experiences/${folder}/${filename}-800.jpg`,
-      desktop: `${R2_BASE}/experiences/${folder}/${filename}-1280.jpg`,
+      mobile:  `${R2_BASE}/home/experiences/${slug}-800.jpg`,
+      desktop: `${R2_BASE}/home/experiences/${slug}-1280.jpg`,
     },
   };
 }
@@ -120,12 +121,8 @@ export const EXPERIENCES: readonly Experience[] = [
       'Travelers seeking offbeat experiences near Bhopal',
     ],
     gallery: [
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/forest-walk/Nature & Forest From Madhuban Eco Retreat - 1.avif
-      galleryImage('forest-walks-and-nature-trails', 'gallery-1', 'Forest and nature view from Madhuban Eco Retreat'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/forest-walk/nature-visit-ratapani-madhuban-eco-retreat-bhopal-2.avif
-      galleryImage('forest-walks-and-nature-trails', 'gallery-2', 'Nature visit in Ratapani forest near Madhuban Eco Retreat Bhopal'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/forest-walk/Ratapani Forest Walk With Madhuban Eco Retreat Team.avif
-      galleryImage('forest-walks-and-nature-trails', 'gallery-3', 'Ratapani forest walk with Madhuban Eco Retreat naturalist team'),
+      // Placeholder: homepage card image (already on R2). Replace with dedicated gallery images once uploaded.
+      homepageImageAsGallery('forest-walks-and-nature-trails', 'Guests on a guided forest walk through the teak woodland at Madhuban Eco Retreat'),
     ],
     faqs: [
       {
@@ -188,14 +185,8 @@ export const EXPERIENCES: readonly Experience[] = [
       'Anyone exploring eco-tourism near Bhopal',
     ],
     gallery: [
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/birds-watch/best-wildlife-view.jpg
-      galleryImage('bird-watching-and-wilderness', 'gallery-1', 'Best wildlife view in Ratapani forest near Madhuban Eco Retreat'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/birds-watch/bird-watching-with-guides.jpg
-      galleryImage('bird-watching-and-wilderness', 'gallery-2', 'Bird watching session with expert guides at Madhuban Eco Retreat'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/birds-watch/bird2.jpg
-      galleryImage('bird-watching-and-wilderness', 'gallery-3', 'Bird in the forest near Ratapani Wildlife Sanctuary'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/birds-watch/bird3.jpg
-      galleryImage('bird-watching-and-wilderness', 'gallery-4', 'Colourful bird species spotted during morning birding walk'),
+      // Placeholder: homepage card image (already on R2). Replace with dedicated gallery images once uploaded.
+      homepageImageAsGallery('bird-watching-and-wilderness', 'A paradise flycatcher perched on a branch in the forests near Ratapani Wildlife Sanctuary'),
     ],
     faqs: [
       {
@@ -259,16 +250,8 @@ export const EXPERIENCES: readonly Experience[] = [
       'Guests wanting a peaceful eco-resort recreation experience in Ratapani',
     ],
     gallery: [
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/Adventure_Activities_3_At_madhuban-eco-retreat.jpg
-      galleryImage('recreational-facilities', 'gallery-1', 'Adventure activities at Madhuban Eco Retreat'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/adventure-hurdles-madhuban-eco-retreat-bhopal.jpg
-      galleryImage('recreational-facilities', 'gallery-2', 'Adventure hurdles activity at Madhuban Eco Retreat Bhopal'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/balance-adventure-madhuban-eco-retreat-bhopal.jpg
-      galleryImage('recreational-facilities', 'gallery-3', 'Balance adventure course at Madhuban Eco Retreat Bhopal'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/obstacle-course-madhuban-eco-retreat-bhopal.jpg
-      galleryImage('recreational-facilities', 'gallery-4', 'Obstacle course activity at Madhuban Eco Retreat Bhopal'),
-      // Source: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/activities/rope-adventure-madhuban-eco-retreat-bhopal.jpg
-      galleryImage('recreational-facilities', 'gallery-5', 'Rope adventure activity at Madhuban Eco Retreat Bhopal'),
+      // Placeholder: homepage card image (already on R2). Replace with dedicated gallery images once uploaded.
+      homepageImageAsGallery('recreational-facilities', 'Open-air hammock area and seating at the Madhuban Eco Retreat recreational grounds'),
     ],
     faqs: [
       {

@@ -722,40 +722,40 @@ The `source` fix was cherry-picked onto main (`a2446ff`) after PR #17 had alread
 ### What shipped
 
 **Content** (`src/lib/content/experiences.ts`)
-- Extended `Experience` type with `tagline`, `longDescription` (3 paragraphs verbatim from live site), `whatToExpect`, `idealForList` (arrays), `gallery` (ExperienceGalleryImage[] with R2 paths), `faqs` (ExperienceFaq[]), `seoTitle`, `seoDescription`.
-- All 3 experiences fully populated: forest-walks (3 gallery imgs, 6 FAQs), bird-watching (4 gallery imgs, 6 FAQs), recreational (5 gallery imgs, 6 FAQs).
-- Gallery images pre-wired to `${R2_BASE}/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}` with TODO comments noting source files on old R2 bucket.
+- Extended `Experience` type with `tagline`, `longDescription[]`, `whatToExpect[]`, `idealForList[]`, `gallery[]`, `faqs[]`, `seoTitle`, `seoDescription`.
+- All 3 experiences fully populated with verbatim live-site copy (CLAUDE.md §10.3).
+- Data source: hardcoded in `experiences.ts`. DB `experiences` table (17 stale rows from Phase 0) intentionally ignored — not migrated.
+- Gallery: `homepageImageAsGallery()` helper reuses existing `/home/experiences/${slug}-{800,1280}.webp` R2 paths (Phase 3 homepage cards). 1 image per experience until dedicated gallery photos are uploaded.
 
 **Schema** (`src/lib/schema/tourist-attraction.ts`)
-- `touristAttraction({ name, description, path, heroImageUrl, touristTypes, faqs })` → returns 3 schemas: `TouristAttraction` + `TouristTrip` + `FAQPage`.
-- Barrel export updated.
+- `touristAttraction()` → `[TouristAttraction, TouristTrip, FAQPage]`. Barrel export updated.
 
 **Shared detail component** (`src/components/marketing/experience-detail/index.tsx`)
-- Pure server component. 7 sections: Hero (image overlay, title, tagline, scroll CTA), Answer Block (AEO, `data-speakable`), Long Description (3 paras), What to Expect + Ideal For (2-col lists with icon markers), Gallery (CSS grid, first img wider at lg), FAQs (native `<details>` — JSON-LD handled at page level, not duplicated), CTA (forest-green, ivory + WhatsApp buttons).
-- `<details>` FAQ chosen over `<Faq>` component because `touristAttraction()` already includes `faqPage()` in its returned schemas — using `<Faq>` would emit a duplicate `FAQPage` JSON-LD.
+- Server component. 7 sections: Hero (uses `experience.image.webp.desktop` — the R2 homepage card image), Answer Block (AEO), Long Description, What to Expect + Ideal For, Gallery (1-image: `aspect-[16/7]` wide layout), FAQs (native `<details>`, not `<Faq>` — avoids duplicate `FAQPage` JSON-LD), forest-green CTA.
 
-**Experiences index** (`src/app/(marketing)/experiences/page.tsx`)
-- Hero (banner image, full-viewport), breadcrumb, answer block, 3-experience card grid (`<article>` per card, aspect-[4/3] image, line-clamp-4 desc, ChevronRight CTA link), 6-FAQ section (native details), forest-green CTA.
-- JSON-LD: `CollectionPage` + `ItemList` (3 experiences) + `FAQPage` (6 items) + `BreadcrumbList`.
-
-**Detail pages** (`src/app/(marketing)/experiences/[slug]/page.tsx`)
-- `generateStaticParams`: 3 slugs from `EXPERIENCES` array.
-- `generateMetadata`: per-experience seoTitle/seoDescription, OG image from gallery[0].
-- Renders `<Seo>` (touristAttraction schemas + breadcrumb) + breadcrumb nav + `ExperienceDetailPage`.
+**Pages**
+- `/experiences` — index: `CollectionPage` + `ItemList` + `FAQPage` + `BreadcrumbList` JSON-LD.
+- `/experiences/[slug]` — SSG, 3 pre-rendered pages. `TouristAttraction` + `TouristTrip` + `FAQPage` + `BreadcrumbList` JSON-LD.
 
 ### Route count
-74 routes total (was 71 after Phase 7). 3 new SSG routes pre-rendered at build time.
+74 routes (was 71 after Phase 7). 3 new SSG routes.
 
-### Known open items
-- Experience gallery images need to be uploaded to `${R2_BASE}/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}`. Source files are on old R2 bucket (`pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/`). Will 404 until migrated.
-- Hero banner image for index page (`experiences/banner/hero-{800,1280}.{webp,jpg}`) also needs uploading.
-- Homepage `experiences-grid.tsx` cards use old `home/experiences/{slug}-{480,800}.webp` paths — separate set of images, also need uploading.
+### PR merge incident
+PR #18 was merged on GitHub before the fix commit was included — only the first commit (`55689c9`) landed in main. The fix commit (`2ffa5c5`: hero image + FAQ contrast) was dropped. Both fixes were re-applied directly to main in the cleanup commit (`docs: phase 8 complete log`).
+
+### Decisions
+- `experience.image.webp.desktop` (not `gallery[0]`) used as hero — it's the known-good R2 path from Phase 3.
+- FAQ answer color: `text-muted` (`#8B8578`) → `text-charcoal/70` — matches room detail page pattern, passes contrast.
+- No admin CMS for experiences. Content edits go through `experiences.ts` directly.
+
+### Known gaps
+- Gallery shows 1 image per experience (placeholder). Upload dedicated images to `${R2_BASE}/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}` to expand.
+- Index page hero (`experiences/banner/hero-{800,1280}.{webp,jpg}`) not yet on new R2 — will 404 until uploaded.
 
 ### Verification
-- `pnpm typecheck` ✅ zero errors
-- `pnpm lint` ✅ zero errors (2 pre-existing warnings in unrelated script)
-- `pnpm build` ✅ 74 routes; `/experiences` static; `/experiences/[slug]` SSG (3 pages)
+- `pnpm typecheck` ✅ · `pnpm lint` ✅ · `pnpm build` ✅ 74 routes
+- Merged PR #18 · Verified on production
 
 ---
 
-## Next: Phase 9 — Dining, Day Outing, Nearby Attractions, Gallery detail pages / or PDF Voucher + Security Hardening
+## Next: Phase 9 — Dining, Day Outing, Nearby Attractions, Gallery pages / or PDF Voucher + Security Hardening

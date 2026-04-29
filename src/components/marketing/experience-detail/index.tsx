@@ -6,7 +6,6 @@ import { Heading } from '@/components/ui/heading';
 import type { Experience } from '@/lib/content/experiences';
 
 export function ExperienceDetailPage({ experience }: { experience: Experience }) {
-  const hero = experience.gallery[0];
   const whatsappText = encodeURIComponent(
     `Hi, I'm interested in the ${experience.name} experience at Madhuban Eco Retreat.`,
   );
@@ -18,19 +17,15 @@ export function ExperienceDetailPage({ experience }: { experience: Experience })
         aria-label={`${experience.name} hero`}
         className="relative h-[75svh] min-h-[400px] overflow-hidden md:h-[80svh]"
       >
-        {hero ? (
-          <Image
-            src={hero.webp.desktop}
-            alt={hero.alt}
-            fill
-            priority
-            fetchPriority="high"
-            sizes="100vw"
-            className="object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-earth-brown/30" />
-        )}
+        <Image
+          src={experience.image.webp.desktop}
+          alt={experience.image.alt}
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          className="object-cover"
+        />
         <div
           className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60"
           aria-hidden="true"
@@ -133,9 +128,11 @@ export function ExperienceDetailPage({ experience }: { experience: Experience })
             <div
               className={[
                 'mt-10 grid gap-3',
-                experience.gallery.length >= 4
+                experience.gallery.length === 1
+                  ? 'grid-cols-1'
+                  : experience.gallery.length >= 4
                   ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                  : 'grid-cols-1 md:grid-cols-3',
+                  : 'grid-cols-2 md:grid-cols-3',
               ].join(' ')}
             >
               {experience.gallery.map((img, i) => (
@@ -143,7 +140,9 @@ export function ExperienceDetailPage({ experience }: { experience: Experience })
                   key={i}
                   className={[
                     'relative overflow-hidden rounded-[12px]',
-                    i === 0 && experience.gallery.length >= 4
+                    experience.gallery.length === 1
+                      ? 'aspect-[16/7]'
+                      : i === 0 && experience.gallery.length >= 4
                       ? 'col-span-2 aspect-[4/3]'
                       : 'aspect-[3/2]',
                   ].join(' ')}
@@ -178,7 +177,7 @@ export function ExperienceDetailPage({ experience }: { experience: Experience })
                   />
                 </summary>
                 <div
-                  className="px-5 pb-4 font-body text-[15px] leading-relaxed text-muted"
+                  className="px-5 pb-4 font-body text-[15px] leading-relaxed text-charcoal/70"
                   data-speakable="true"
                 >
                   {faq.answer}

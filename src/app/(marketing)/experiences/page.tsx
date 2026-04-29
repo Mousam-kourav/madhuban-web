@@ -226,7 +226,7 @@ export default function ExperiencesPage() {
                   />
                 </summary>
                 <div
-                  className="px-5 pb-4 font-body text-[15px] leading-relaxed text-muted"
+                  className="px-5 pb-4 font-body text-[15px] leading-relaxed text-charcoal/70"
                   data-speakable="true"
                 >
                   {faq.answer}

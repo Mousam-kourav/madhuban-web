@@ -1157,6 +1157,48 @@ PR #18 was merged on GitHub with only the first commit. The fix commit (hero ima
 
 - No admin CMS for experiences — content changes require editing `experiences.ts` directly.
 - Gallery shows 1 image per experience until dedicated photos are uploaded to R2 (`/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}`). Source images on old R2 bucket at `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/`.
-- Index page hero (`experiences/banner/hero-{800,1280}.{webp,jpg}`) not yet uploaded to new R2 — image will 404 until migrated.
+- **⚠️ BLOCKING for launch — Experience banner image:** Index page hero (`experiences/banner/hero-{800,1280}.{webp,jpg}`) not yet uploaded to new R2. Phase 9b applied a temporary fallback using the forest-walks card image. Must upload the proper banner before launch. Source: `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/banner/`. Target: `pub-988c0a6b938742458b908a7a49295f61.r2.dev/experiences/banner/hero-{800,1280}.{webp,jpg}`.
 
 *Last updated: 2026-04-29 — Version 1.5 — Phase 8 complete; §27 added (experiences pages)*
+
+---
+
+## 28 — Phase 9b: Critical Email Delivery Gap
+
+> **⚠️ READ BEFORE LAUNCH — EVERY FORM ON THE SITE SILENTLY FAILS TO DELIVER EMAIL**
+
+### Status
+
+Resend env vars (`RESEND_API_KEY`, `RESEND_FROM_EMAIL`) are set in Vercel. The email send code in `src/lib/email/resend.ts` is correct and functional. API routes for contact form, booking enquiry, and booking confirmation all call `sendEmail()` successfully — **but Resend's sandbox mode blocks delivery to unverified addresses.**
+
+### What this means
+
+Every form submission on the live site currently results in:
+- ✅ Lead data processed (API returns 200)
+- ❌ Email **NOT delivered** to `madhubanresort@somaiya.com` or any business inbox
+
+This affects: `/api/forms/contact`, `/api/forms/booking`, `/api/booking/verify-payment` (booking confirmation emails), `/api/admin/bookings/[id]` (cancellation emails).
+
+### Actions required before any real user submits a form
+
+**Option A (fastest — minutes):** In the Resend dashboard, go to Emails → Contacts → Add a test address. Add `madhubanecoretreat@gmail.com` as a verified test address. This allows delivery to that specific address only (sandbox still blocks others).
+
+**Option B (recommended for launch):** Verify the domain `madhubanecoretreat.com` in the Resend dashboard (Domains → Add domain). Add the 3 DNS records Resend provides (SPF, DKIM, DMARC). Once verified, all emails send from `bookings@madhubanecoretreat.com` without restriction.
+
+### Until resolved
+
+Tag every form submission with a warning in the admin UI or add a Vercel banner reminding the team that emails are not delivering. Do not advertise the contact form to real users until Option B is complete.
+
+---
+
+## 29 — Phase 9b: OG Default Image
+
+Set `NEXT_PUBLIC_OG_DEFAULT_IMAGE` in Vercel env vars (Production + Preview + Development) to:
+
+```
+https://pub-988c0a6b938742458b908a7a49295f61.r2.dev/home/hero/hero-aerial-sunset-1280.webp
+```
+
+This aerial sunset hero image (1920×1080, webp) is already on R2 and serves as the default Open Graph image for all pages that don't specify an explicit `ogImage`. Without this env var set, those pages will show a broken image in social sharing previews.
+
+*Last updated: 2026-05-01 — Version 1.6 — Phase 9b complete; §28 (email gap) + §29 (OG image) added*

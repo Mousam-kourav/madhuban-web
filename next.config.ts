@@ -16,8 +16,10 @@ const nextConfig: NextConfig = {
       // Blog canonical — /blog/* → /blogs/*
       { source: '/blog', destination: '/blogs', permanent: true },
       { source: '/blog/:slug', destination: '/blogs/:slug', permanent: true },
-      // SEO-preserving 301s at launch per CLAUDE.md §7.6
-      // { source: '/stay/pool-side-room', destination: '/stay/pool-side-villa', permanent: true },
+      // SEO-preserving 301s per CLAUDE.md §7.6
+      { source: '/stay/pool-side-room', destination: '/stay/pool-side-villa', permanent: true },
+      // /booking blank page fix — send header CTA to room listing (308 permanent)
+      { source: '/booking', destination: '/stay', permanent: true },
     ];
   },
 };

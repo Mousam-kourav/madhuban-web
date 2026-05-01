@@ -51,11 +51,13 @@ const INDEX_FAQS = [
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
-// Hero banner — Cultural tribal dance from OLD-REFERENCE banner folder
-// TODO: upload to ${R2_BASE}/experiences/banner/hero-{800,1280}.{webp,jpg}
+// TODO (Phase 9b — BLOCKING for launch): Upload dedicated experiences index banner to R2.
+// Expected path: ${R2_BASE}/experiences/banner/hero-{800,1280}.{webp,jpg}
+// Source on old R2: pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/banner/
+// Temporary fallback: using forest-walks card image (landscape-friendly) until banner is uploaded.
 const HERO_IMAGE = {
-  src: `${R2_BASE}/experiences/banner/hero-1280.webp`,
-  alt: 'Cultural tribal dance performance at Madhuban Eco Retreat — Experience Life at Nature\'s Rhythm',
+  src: `${R2_BASE}/home/experiences/forest-walks-and-nature-trails-1280.webp`,
+  alt: 'Guided forest walk through teak woodland at Madhuban Eco Retreat near Ratapani Tiger Reserve',
 };
 
 const collectionPageSchema: Record<string, unknown> = {

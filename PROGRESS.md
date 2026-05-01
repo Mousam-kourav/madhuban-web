@@ -758,4 +758,68 @@ PR #18 was merged on GitHub before the fix commit was included — only the firs
 
 ---
 
-## Next: Phase 9 — Dining, Day Outing, Nearby Attractions, Gallery pages / or PDF Voucher + Security Hardening
+---
+
+## Phase 9b — Critical Fixes (Audit Findings 1–9, 22) ✅ COMPLETE (2026-05-01)
+
+### What shipped
+
+**1. /booking blank page fixed**
+- Added 308 permanent redirect `/booking` → `/stay` in `next.config.ts`.
+- Deleted `src/app/(booking)/booking/page.tsx` (blank stub — redirect handles it).
+- Also uncommented the long-deferred `/stay/pool-side-room` → `/stay/pool-side-villa` redirect.
+
+**2. Four policy pages built** (fetched content from old site)
+- `/privacy-policy` — `src/app/(marketing)/(policies)/privacy-policy/page.tsx` — 9 sections; all content fetched from old site successfully.
+- `/terms-and-condition` — 10 sections; all content fetched from old site successfully.
+- `/cookies-and-consent-policy` — 8 sections; all content fetched from old site successfully.
+- `/disclaimer` — 9 sections; all content fetched from old site successfully.
+- All 4 pages: `buildMetadata()`, `WebPage` JSON-LD, `BreadcrumbList` JSON-LD, `<Container>` + `<Section>` + brand typography, `PolicySection` local helper for consistent styling.
+
+**3. 404 page fixed**
+- `src/app/not-found.tsx` — proper 404 with brand design: decorative large-text "404" watermark, italic display h1, friendly copy, links to Home + /stay + /experiences + /contact-us.
+
+**4. sitemap.ts populated**
+- `src/app/sitemap.ts` — dynamic: 17 static routes + Supabase room slugs + Supabase blog post slugs + 3 experience slugs. Correct lastModified, changeFrequency, priority tiers. try/catch falls back to static routes if Supabase unavailable at build time.
+
+**5. robots.ts fixed**
+- Changed disallow from `/booking/payment` → `["/admin", "/api", "/book/*/payment", "/book/confirmation"]`. Now correctly disallows the real payment and confirmation pages.
+
+**6. OG default image**
+- `src/lib/seo.ts` updated: `DEFAULT_OG_IMAGE` reads from `NEXT_PUBLIC_OG_DEFAULT_IMAGE` env var first, falls back to `/og-default.jpg`. Set this env var in Vercel to `${NEXT_PUBLIC_R2_BASE}/home/hero/hero-aerial-sunset-1280.webp`. See CLAUDE.md §29.
+
+**7. Experience banner hero fallback**
+- `src/app/(marketing)/experiences/page.tsx` — changed hero from 404-ing `/experiences/banner/hero-1280.webp` to existing R2 image `/home/experiences/forest-walks-and-nature-trails-1280.webp`. Clear TODO in code + CLAUDE.md §27 "BLOCKING for launch" marker.
+
+**8. Resend configuration gap documented**
+- No code changed. Added CLAUDE.md §28 "Phase 9b: Critical Email Delivery Gap" — bold warning, root cause, two resolution paths (Option A: add test address, Option B: DNS-verify domain), and instructions for what to do until resolved.
+
+**9. Legacy booking stubs deleted**
+- Deleted: `src/app/(booking)/booking/guest/page.tsx`, `payment/page.tsx`, `summary/page.tsx`, `confirmed/[id]/page.tsx`. Grepped for imports — none found.
+
+### Policy pages — source URLs and fetch results
+
+| Page | URL fetched | Result |
+|---|---|---|
+| Privacy Policy | `madhubanecoretreat.com/privacy-policy` | ✅ 9 sections fetched |
+| Terms & Conditions | `madhubanecoretreat.com/terms-and-condition` | ✅ 10 sections fetched |
+| Cookies & Consent | `madhubanecoretreat.com/cookies-and-consent-policy` | ✅ 8 sections fetched |
+| Disclaimer | `madhubanecoretreat.com/disclaimer` | ✅ 9 sections fetched |
+
+All 4 old-site URLs returned full content. No 404s. No placeholder content needed.
+
+### Decisions made
+
+- `/booking` → `/stay` redirect uses `permanent: true` (308 in Next.js redirects). Users pick a room first, then use the per-room booking widget. Aligns with how the actual flow works.
+- OG image: env var approach (`NEXT_PUBLIC_OG_DEFAULT_IMAGE`) over a proxy route — simpler, no additional API route, zero latency overhead.
+- Experience hero fallback: `forest-walks-and-nature-trails-1280.webp` chosen as most landscape-oriented of the 3 available homepage experience card images.
+- Policy `PolicySection` helper is a local function (not exported to components/) — used only in policy pages, not a shared pattern warranting its own component.
+
+### Verification
+- `pnpm typecheck` ✅
+- `pnpm lint` ✅
+- `pnpm build` ✅
+
+---
+
+## Next: Phase 9c — Content pages (Dining, Day Outing, Nearby Attractions, Gallery, About Us) + remaining audit items

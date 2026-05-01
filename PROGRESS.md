@@ -822,4 +822,54 @@ All 4 old-site URLs returned full content. No 404s. No placeholder content neede
 
 ---
 
-## Next: Phase 9c — Content pages (Dining, Day Outing, Nearby Attractions, Gallery, About Us) + remaining audit items
+## Phase 9c-1 — About Us + Contact Us Redesign ✅ COMPLETE (2026-05-01)
+
+### What shipped
+
+**Image migration** (`scripts/migrate-about-contact-images.ts`)
+- Downloads 5 images from old R2 bucket (`pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/about/`)
+- Resizes to 800px and 1280px WebP via sharp, uploads to new R2 with `Cache-Control: immutable`
+- R2_ACCOUNT_ID normalised at runtime (env var contained full URL, not account hash)
+- 10 new files uploaded:
+  - `home/about/hero-{800,1280}.webp` — outdoor adventure image (most landscape-oriented)
+  - `home/about/story-{800,1280}.webp` — mud house (heritage/craft story)
+  - `home/about/eco-{800,1280}.webp` — restaurant/dining (eco/sustainability section)
+  - `home/about/founder-{800,1280}.webp` — safari jeep image (vision & mission section)
+  - `home/contact/hero-{800,1280}.webp` — pool side image (welcoming, architectural)
+
+**`/about-us`** — full rebuild from `return null`
+- 8 sections: Hero (75svh, `priority` + gradient overlay), breadcrumb, answer block (AEO, `data-speakable`), story (2-col: text + mud house image), eco philosophy (2-col: restaurant image + bullet list), vision & mission (2-col: text + safari image), core values (5-card grid), FAQs (5 native `<details>`, first open), forest-green CTA (mirrors experiences/page.tsx pattern)
+- JSON-LD: `AboutPage` schema (inline `Record<string, unknown>`) + `BreadcrumbList` from `breadcrumbListFromPath`
+- Metadata via `buildMetadata({ title: 'About Us', ... })`
+- Server component. No `'use client'`.
+
+**`/contact-us`** — polished (not rebuilt)
+- Added: hero image section (50svh, `priority`, gradient overlay, h1 in hero), breadcrumb strip, intro paragraph (AEO), digital-detox CTA section (`bg-forest-green`)
+- Retained: `ContactForm` component unchanged, `contactPage()` JSON-LD, `BreadcrumbList`, full address sidebar with phone/email/maps/WhatsApp, `BUSINESS` import
+- Removed: unused `Heading` import (caught by ESLint)
+- `BUSINESS.whatsapp` → `BUSINESS.phone.replace(/\D/g, '')` — normalised (old code used `.whatsapp` which does not exist on the type)
+
+**Source docs** (`docs/source/`)
+- `old-site-about-us.md` — raw fetched content from old site
+- `old-site-contact-us.md` — raw fetched content from old site
+
+### Key decisions
+
+- Hero image for `/about-us`: outdoor adventure image (most landscape-oriented of the 5 available; evokes activity, nature, and energy)
+- Story image: mud house (most on-brand for heritage/craft story)
+- Eco section: restaurant image (farm-to-table angle matches eco philosophy copy)
+- Vision/Mission image: safari jeep (matches the "travel that gives back" concept)
+- Contact hero: pool side image (welcoming, architectural, suggests luxury within nature)
+- No "founder" section added — old site does not name a founder/founder photo; safari jeep used for Vision & Mission section instead
+- FAQPage JSON-LD omitted from `/about-us` — old site had no FAQs; `<details>` FAQs added as UX but FAQPage schema intentionally skipped to avoid Google "thin content" flag on a page that is about the resort, not Q&A-structured
+- Contact form flow completely unchanged — only the surrounding page layout was updated
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero errors (2 pre-existing warnings in `scripts/get-guests-schema.ts` — unrelated)
+- `pnpm build` ✅ 70 routes; `/about-us` and `/contact-us` both `○ (Static)` prerendered
+- Branch: `feat/phase-9c-1-about-contact` pushed to remote
+
+---
+
+## Next: Phase 9c-2 — Dining, Day Outing, Nearby Attractions, Gallery pages + remaining audit items

@@ -18,8 +18,7 @@ const nextConfig: NextConfig = {
       { source: '/blog/:slug', destination: '/blogs/:slug', permanent: true },
       // SEO-preserving 301s per CLAUDE.md §7.6
       { source: '/stay/pool-side-room', destination: '/stay/pool-side-villa', permanent: true },
-      // /booking blank page fix — send header CTA to room listing (308 permanent)
-      { source: '/booking', destination: '/stay', permanent: true },
+      // /booking is now a conversion landing page — redirect removed (Phase 9c-2)
     ];
   },
 };

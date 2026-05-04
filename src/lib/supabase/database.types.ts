@@ -180,6 +180,26 @@ type InvoiceRow = {
   created_at: string;
 };
 
+export type SouvenirRow = {
+  id: string;
+  slug: string;
+  name: string;
+  category: string;
+  short_description: string | null;
+  long_description: string | null;
+  price: number | null;
+  show_price: boolean;
+  cover_image: string | null;
+  detail_image_2: string | null;
+  detail_image_3: string | null;
+  artisan_credit: string | null;
+  is_active: boolean;
+  deleted_at: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 // audit_log: admin_user_id (not user_id), entity_type/entity_id (not entity/entity_id), details (not before/after_json)
 type AuditLogRow = {
   id: string;
@@ -348,6 +368,30 @@ export type Database = {
           pdf_url?: string | null;
         };
         Update: Partial<InvoiceRow>;
+        Relationships: [];
+      };
+      souvenirs: {
+        Row: SouvenirRow;
+        Insert: {
+          name: string;
+          slug: string;
+          category: string;
+          id?: string;
+          short_description?: string | null;
+          long_description?: string | null;
+          price?: number | null;
+          show_price?: boolean;
+          cover_image?: string | null;
+          detail_image_2?: string | null;
+          detail_image_3?: string | null;
+          artisan_credit?: string | null;
+          is_active?: boolean;
+          deleted_at?: string | null;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<SouvenirRow>;
         Relationships: [];
       };
       audit_log: {

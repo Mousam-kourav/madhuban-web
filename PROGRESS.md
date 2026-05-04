@@ -873,3 +873,59 @@ All 4 old-site URLs returned full content. No 404s. No placeholder content neede
 ---
 
 ## Next: Phase 9c-2 — Dining, Day Outing, Nearby Attractions, Gallery pages + remaining audit items
+
+---
+
+## Phase 9d-1 — /day-outing page ✅ COMPLETE (2026-05-04)
+
+### What shipped
+
+**4 files — branch `feat/phase-9d-1-day-outing`**
+
+- `src/lib/content/day-outing.ts` — structured `DAY_OUTING` const with all section data: hero, video, intro, package inclusions, whyChooseUs, idealFor, importantInfo, easyAccess, contact, trustItems. R2 URLs built via `NEXT_PUBLIC_R2_BASE`. %20-encoded URLs for 2 images with spaces in filename.
+- `src/components/marketing/day-outing/day-outing-video.tsx` — `'use client'`; `<video>` with `autoPlay muted loop playsInline preload="metadata"`; mute toggle button (Volume2/VolumeX icons); vertical 9:16 layout (max-w-sm desktop).
+- `src/components/marketing/day-outing/day-outing-wa-form.tsx` — `'use client'`; 4 fields: Full Name, WhatsApp (+91 prefix), Number of Guests (1–50 select), Preferred Date (min=today); on submit opens `wa.me/919770558419?text=...` with pre-filled message.
+- `src/app/(marketing)/day-outing/page.tsx` — Server Component. 10 sections: Hero → Breadcrumb → Intro+Video → Package → Why Choose Us → Who Should Choose This → Important Info → Easy Access → WhatsApp Form (id="contact") → Trust Strip → Final CTA.
+
+### SEO (verbatim-preserved for ranking continuity)
+- `titleOverride`: "Resorts Near Bhopal for Day Outing | Madhuban Eco Retreat"
+- `description`: "Looking for resorts near Bhopal for day outing? Enjoy breakfast, lunch, pool access, nature walk & activities at Madhuban Eco Retreat."
+- 5 keywords from spec
+- Canonical: `/day-outing`
+- OG image: day-outing hero (1280px)
+
+### JSON-LD schemas
+- `LodgingBusiness` (from `lodgingBusiness()` helper)
+- `Product` + `Offer` (₹1,300 day outing package, INR, InStock)
+- `VideoObject` (name, description, thumbnailUrl, contentUrl, uploadDate)
+- `BreadcrumbList` (Home > Day Outing)
+
+### R2 URLs used
+| Section | R2 path |
+|---|---|
+| Hero (desktop) | `/home/day-outing/day-outing-hero-image-1280px.webp` |
+| Hero (mobile sizes attr) | `/home/day-outing/day-outing-hero-image-800px.webp` (listed in data; next/image uses sizes) |
+| Video | `/home/day-outing/day-outing-madhuban.mp4` |
+| Video poster | `/home/day-outing/day-outing-hero-image-1280px.webp` |
+| Package section image | `/home/day-outing/Complete-Day-Outing-Inclusions-image-1-1200px.webp` |
+| Who Should Choose image | `/home/day-outing/Complete%20Day%20Outing%20Inclusions%20image%202%201200%20px.webp` |
+
+### %20 filename issue
+The 2 "Complete Day Outing Inclusions image 2" files use %20 URL-encoding in `src`. `next/image` passed `pnpm build` without error (static prerender succeeded). **However**, actual image delivery in production depends on whether the R2 CDN preserves the %20 encoding or decodes to spaces — monitor at Vercel preview URL. If these images 404, rename them in R2 to use hyphens (e.g. `Complete-Day-Outing-Inclusions-image-2-1200px.webp`) and update the 2 lines in `day-outing.ts`.
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero new errors (2 pre-existing warnings in `scripts/get-guests-schema.ts`)
+- `pnpm build` ✅ 71 routes; `/day-outing` is `○ (Static)` prerendered
+- Branch pushed: `feat/phase-9d-1-day-outing`
+
+### Unilateral decisions
+- Used `ICON_MAP` pattern (icon name as string in data, resolved at render) — same pattern as room-detail ICON_MAP in Phase 4A; keeps `day-outing.ts` free of React imports.
+- `Trees` icon used (per spec) — confirmed available in `lucide-react@^1.8.0`; no fallback needed.
+- Important Information rendered as 5-card grid (not table) — cleaner on mobile; matches brand card style.
+- Who Should Choose This: image on right, cards on left (2-col) with `lg:sticky lg:top-8` for desktop scroll effect.
+- Trust Strip appears both inside the form section (as bullet list) and as a standalone strip below it — matches old-site pattern of reinforcing trust signals near form.
+- No FAQPage JSON-LD — spec explicitly says "Skip FAQPage (no FAQs in this page version)".
+
+### Next
+Wait for user to open PR + Vercel preview URL. Then: Phase 9d-2 (Dining/Nearby Attractions/Gallery) or audit items.

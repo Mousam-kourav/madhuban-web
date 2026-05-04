@@ -994,3 +994,62 @@ Note: `learning` and `about` R2 images (uploaded but spec has no explicit sectio
 
 ### Next
 Wait for user to open PR + Vercel preview URL. Then: Dining / Nearby Attractions / Gallery pages.
+
+---
+
+## Phase 9d-3 — /dining page ✅ COMPLETE (2026-05-04)
+
+### What shipped
+
+**3 files — branch `feat/phase-9d-3-dining`**
+
+- `src/lib/content/dining.ts` — Extended existing file (kept `DINING_PREVIEW` for homepage); added `DINING` const with full `DiningData` type covering all 10 sections: hero, philosophy pillars, openAir, bushDining, alfresco, comparison table, menu/dishes, philosophyStory, faqs.
+- `src/components/marketing/dining/dining-wa-form.tsx` — `'use client'`; 4 fields: Name, WhatsApp (+91 prefix), Experience (select: Bush / Alfresco / Not Sure), Preferred Date (min=tomorrow). On submit opens `wa.me/919770558419` with pre-filled message including all 4 fields.
+- `src/app/(marketing)/dining/page.tsx` — Server Component. 10 sections per spec + forest-green CTA strip.
+
+### SEO
+- `titleOverride`: "Dining at Madhuban | Pure Veg Restaurant Near Bhopal | Forest Dining Experience"
+- `description`: verbatim from spec (160 chars, includes location + primary keywords)
+- 8 keywords from spec
+- Canonical: `/dining`
+- OG image: dining hero (1280px)
+
+### JSON-LD schemas
+- `FoodEstablishment` (servesCuisine: Vegetarian/Indian/Madhya Pradeshi, priceRange ₹₹, acceptsReservations true, smokingAllowed false, openingHours 7–22 daily, hasMenu with 5 MenuItems)
+- `FAQPage` (all 6 FAQs)
+- `BreadcrumbList` (Home > Dining)
+
+### R2 image paths used per section
+
+| Section | R2 path |
+|---|---|
+| Hero | `/dining/hero-1280.webp` + `hero-800.webp` |
+| Section 3 Open Air | `/dining/open-air-1280.webp` + `open-air-800.webp` |
+| Section 4 Bush Dining | `/dining/bush-dining-1280.webp` + `bush-dining-800.webp` |
+| Section 5 Alfresco | `/dining/alfresco-1280.webp` + `alfresco-800.webp` |
+| Section 8 Philosophy Story | `/dining/philosophy-1280.webp` + `philosophy-800.webp` |
+| Dish: Pulao | `/dining/dish-pulao.webp` |
+| Dish: Paneer Makhani | `/dining/dish-paneer-makhani.webp` |
+| Dish: Litti Chokha | `/dining/dish-litti-chokha.webp` |
+| Dish: Hara Bhara | `/dining/dish-hara-bhara.webp` |
+| Dish: Table Setup | `/dining/dish-table-setup.webp` |
+
+Note: `/dining/facilities-{1280,800}.webp` uploaded per spec but not used (spec had no dedicated facilities section).
+
+### Comparison table mobile handling
+- Desktop: proper `<table>` with `bg-earth-brown` header row, alternating `bg-white`/`bg-cream` rows.
+- Mobile (`md:hidden`): 3 stacked cards, each headed with experience name in earth-brown, `<dl>` label-value pairs — no horizontal scroll.
+
+### Unilateral decisions
+- `Wine` lucide icon used for "No Alcohol Served" pillar (closest available to convey alcohol context without a literal glass; `BanIcon` not available in lucide 1.8).
+- Facilities image uploaded by user to R2 but spec had no explicit facilities section — not used. Can be added to philosophyStory section if needed.
+- `FoodEstablishment` schema used (not `Restaurant`) — more semantically accurate for an eco retreat restaurant that is not a standalone establishment.
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero new errors (2 pre-existing warnings in `scripts/get-guests-schema.ts`)
+- `pnpm build` ✅ 71 routes; `/dining` is `○ (Static)` prerendered
+- Branch pushed: `feat/phase-9d-3-dining`
+
+### Next
+Wait for user to open PR + Vercel preview URL.

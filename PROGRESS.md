@@ -928,4 +928,69 @@ The 2 "Complete Day Outing Inclusions image 2" files use %20 URL-encoding in `sr
 - No FAQPage JSON-LD — spec explicitly says "Skip FAQPage (no FAQs in this page version)".
 
 ### Next
-Wait for user to open PR + Vercel preview URL. Then: Phase 9d-2 (Dining/Nearby Attractions/Gallery) or audit items.
+Wait for user to open PR + Vercel preview URL.
+
+---
+
+## Phase 9d-2 — /aranyashala page ✅ COMPLETE (2026-05-04)
+
+### What shipped
+
+**3 files — branch `feat/phase-9d-2-aranyashala`**
+
+- `src/lib/content/aranyashala.ts` — structured `ARANYASHALA` const with all section data: hero, missionQuote, missionPillars, modules (forestWildlife / lifeSkill / heritage), natureTrail (19 stops), camping, resourcePersons (5), testimonials (featured + 4 others), courses (3 tiers), faqs (4 questions), cta. R2 URLs built via `NEXT_PUBLIC_R2_BASE`.
+- `src/components/marketing/aranyashala/aranyashala-wa-form.tsx` — `'use client'`; 4 fields: Group Contact Name, WhatsApp (+91 prefix), Group Type (select), Approximate Group Size (number 5–200). On submit opens `wa.me/919770558419` with pre-filled WhatsApp message.
+- `src/app/(marketing)/aranyashala/page.tsx` — Server Component. 13 sections per spec.
+
+### SEO (verbatim-preserved per spec)
+- `titleOverride`: "Aranyashala | Nature School Camp Near Bhopal | Madhuban Eco Retreat"
+- `description`: "Aranyashala — Madhuban's nature school program. Multi-day naturalist courses for schools & colleges. Forest learning, life skills, heritage awareness near Ratapani."
+- 7 keywords from spec
+- Canonical: `/aranyashala`
+- OG image: aranyashala hero (1280px)
+
+### JSON-LD schemas
+- `Course` schema (one per naturalist tier — Young, Amateur, Professional)
+- `EducationalOrganization` (Aranyashala as the program)
+- `Place` (Madhuban location)
+- `FAQPage` (using all 4 FAQs)
+- `BreadcrumbList` (Home > Aranyashala)
+
+### R2 image paths used per section
+
+| Section | R2 path |
+|---|---|
+| Hero | `/aranyashala/hero-1280.webp` + `hero-800.webp` |
+| Sect 3 Forest & Wildlife | `/aranyashala/wildlife-1280.webp` + `wildlife-800.webp` |
+| Sect 5 Life Skills | `/aranyashala/life-skills-1280.webp` + `life-skills-800.webp` |
+| Sect 6 Heritage | `/aranyashala/heritage-1280.webp` + `heritage-800.webp` |
+| Sect 7 Camping | `/aranyashala/camping-1280.webp` + `camping-800.webp` |
+| Sect 8 Expert portraits | `/aranyashala/expert-{1-5}.webp` (neutral silhouette placeholders) |
+| Sect 9 Featured testimonial | `/aranyashala/testimonial-1.webp` |
+| Sect 9 Small testimonials | `/aranyashala/testimonial-{2-5}.webp` |
+
+Note: `learning` and `about` R2 images (uploaded but spec has no explicit section for them) not used in initial build — available as drop-in replacements when needed.
+
+### Unilateral decisions (documented per spec requirement)
+
+**Naturalist Course inclusions (inferred per tier):**
+
+- **Young Naturalist (1–2 Days · 1 Night):** Guided Madhuban Nature Trail (19 stops) · Introduction to bird watching · Basic camp pitching experience · Farm-to-fork meals included · Campfire evening in bamboo grove
+- **Amateur Naturalist (3 Days · 2 Nights):** All Young Naturalist activities · Jungle safari & pugmark identification · Tribal village tour & folk dance program · UNESCO Bhimbetka heritage site visit · Treasure hunt & team-building activities · Quiz + completion certificate
+- **Professional Naturalist (5 Days · 4 Nights):** All Amateur Naturalist activities · Advanced wildlife identification sessions · Herpetology session with Mr. Mitra · Rope climbing & cycling adventure trails · Environmental policy seminar · Formal completion certificate with distinction
+
+**Other decisions:**
+- "Amateur Naturalist" marked as "Popular" with a badge (middle tier is typically the most chosen).
+- Testimonial wall: pure CSS grid, no JS — `md:grid-cols-12` parent, featured `md:col-span-7`, 4 small cards in `md:col-span-5` with inner `sm:grid-cols-2` — editorial, not carousel.
+- Trail stop icons: 19 distinct lucide icons, each matched thematically to the stop name. `TRAIL_ICONS` and `ACTIVITY_ICONS` maps used (same pattern as day-outing `ICON_MAP`).
+- Module layout: section 3 (text-left, image-right), section 5 (image-left, text-right), section 6 (image-left, text-right) — alternating for visual rhythm.
+- `Section` component used for all sections with `label` (ARIA) + `id` on contact form section; direct `<section>` used for hero and final CTA (different padding/height needs).
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero new errors (2 pre-existing warnings in `scripts/get-guests-schema.ts`)
+- `pnpm build` ✅ 71 routes; `/aranyashala` is `○ (Static)` prerendered
+- Branch pushed: `feat/phase-9d-2-aranyashala`
+
+### Next
+Wait for user to open PR + Vercel preview URL. Then: Dining / Nearby Attractions / Gallery pages.

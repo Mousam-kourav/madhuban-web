@@ -22,24 +22,19 @@ export async function getActiveSouvenirs(opts?: {
     query = query.eq('category', opts.category);
   }
 
+  if (opts?.q?.trim()) {
+    // ilike OR across name + short_description — one DB round-trip, no client filtering.
+    // Fast enough for expected catalogue size (<500 rows). The GIN full-text index
+    // (migration 0009) would need a textSearch() call against a generated column;
+    // ilike is the simpler and equally-correct approach at this scale.
+    const term = `%${opts.q.trim()}%`;
+    query = query.or(`name.ilike.${term},short_description.ilike.${term}`);
+  }
+
   const { data, error } = await query;
   if (error || !data) return [];
 
-  const rows = data as DbSouvenir[];
-  let result = rows.map(dbSouvenirToSouvenir);
-
-  // Client-side text filter when full-text index not available in anon client
-  if (opts?.q) {
-    const q = opts.q.toLowerCase();
-    result = result.filter(
-      (s) =>
-        s.name.toLowerCase().includes(q) ||
-        (s.shortDescription?.toLowerCase().includes(q) ?? false) ||
-        (s.longDescription?.toLowerCase().includes(q) ?? false),
-    );
-  }
-
-  return result;
+  return (data as DbSouvenir[]).map(dbSouvenirToSouvenir);
 }
 
 export async function getSouvenirBySlug(slug: string): Promise<Souvenir | null> {

@@ -109,6 +109,7 @@ export function SouvenirForm({ initial }: Props) {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [uploading, setUploading] = useState<UploadSlot | null>(null);
 
   const fileRef1 = useRef<HTMLInputElement>(null);
@@ -189,6 +190,12 @@ export function SouvenirForm({ initial }: Props) {
         setError(json.error ?? 'Save failed');
         return;
       }
+      if (isEdit) {
+        setSuccessMessage('Saved successfully');
+        setSaving(false);
+        setTimeout(() => router.push('/admin/souvenirs'), 2000);
+        return;
+      }
       router.push('/admin/souvenirs');
     } catch {
       setError('Save failed — check network');
@@ -202,6 +209,14 @@ export function SouvenirForm({ initial }: Props) {
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
+      {successMessage && (
+        <div
+          className="rounded-xl border border-[var(--color-forest-green)]/30 bg-[var(--color-forest-green)]/5 px-4 py-3 font-body text-sm text-[var(--color-forest-green)]"
+          role="status"
+        >
+          {successMessage}
+        </div>
+      )}
       {error && (
         <div
           className="rounded-xl border border-[var(--color-error)]/30 bg-[var(--color-error)]/5 px-4 py-3 font-body text-sm text-[var(--color-error)]"
@@ -245,7 +260,7 @@ export function SouvenirForm({ initial }: Props) {
             required
           />
           {isEdit && (
-            <p className="mt-1 font-body text-xs text-[var(--color-muted)]">
+            <p className="mt-1 font-body text-xs text-charcoal/70">
               Note: changing slug after images are uploaded won&#39;t move image files. Re-upload if needed.
             </p>
           )}
@@ -275,7 +290,7 @@ export function SouvenirForm({ initial }: Props) {
       {/* Short description */}
       <div>
         <label htmlFor="sv-short" className={labelCls}>
-          Short Description <span className="normal-case text-[var(--color-muted)]">(shown on cards, ~120 chars)</span>
+          Short Description <span className="normal-case text-charcoal/70">(shown on cards, ~120 chars)</span>
         </label>
         <textarea
           id="sv-short"
@@ -294,7 +309,7 @@ export function SouvenirForm({ initial }: Props) {
       {/* Long description */}
       <div>
         <label htmlFor="sv-long" className={labelCls}>
-          Long Description <span className="normal-case text-[var(--color-muted)]">(shown on detail page)</span>
+          Long Description <span className="normal-case text-charcoal/70">(shown on detail page)</span>
         </label>
         <textarea
           id="sv-long"
@@ -310,7 +325,7 @@ export function SouvenirForm({ initial }: Props) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="sv-price" className={labelCls}>
-            Price (INR) <span className="normal-case text-[var(--color-muted)]">— leave blank if not set</span>
+            Price (INR) <span className="normal-case text-charcoal/70">— leave blank if not set</span>
           </label>
           <input
             id="sv-price"
@@ -325,7 +340,7 @@ export function SouvenirForm({ initial }: Props) {
         <div className="flex flex-col justify-end gap-1">
           <label className={labelCls}>
             Show Price?
-            <span className="ml-1 normal-case font-normal text-[var(--color-muted)]">
+            <span className="ml-1 normal-case font-normal text-charcoal/70">
               Off = display &quot;Ask for price&quot;
             </span>
           </label>
@@ -334,13 +349,13 @@ export function SouvenirForm({ initial }: Props) {
             role="switch"
             aria-checked={showPrice}
             onClick={() => setShowPrice((p) => !p)}
-            className={`relative h-6 w-11 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
+            className={`relative h-6 w-11 overflow-hidden rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
               showPrice ? 'bg-[var(--color-earth-brown)]' : 'bg-[var(--color-border)]'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                showPrice ? 'translate-x-5' : 'translate-x-0.5'
+              className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                showPrice ? 'translate-x-5' : 'translate-x-0'
               }`}
             />
           </button>
@@ -389,7 +404,7 @@ export function SouvenirForm({ initial }: Props) {
       {/* Artisan credit */}
       <div>
         <label htmlFor="sv-artisan" className={labelCls}>
-          Artisan Credit <span className="normal-case text-[var(--color-muted)]">(optional)</span>
+          Artisan Credit <span className="normal-case text-charcoal/70">(optional)</span>
         </label>
         <input
           id="sv-artisan"
@@ -410,13 +425,13 @@ export function SouvenirForm({ initial }: Props) {
             role="switch"
             aria-checked={isActive}
             onClick={() => setIsActive((a) => !a)}
-            className={`relative h-6 w-11 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
+            className={`relative h-6 w-11 overflow-hidden rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
               isActive ? 'bg-[var(--color-earth-brown)]' : 'bg-[var(--color-border)]'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                isActive ? 'translate-x-5' : 'translate-x-0.5'
+              className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                isActive ? 'translate-x-5' : 'translate-x-0'
               }`}
             />
           </button>
@@ -448,7 +463,7 @@ export function SouvenirForm({ initial }: Props) {
         </button>
         <a
           href="/admin/souvenirs"
-          className="font-body text-sm text-[var(--color-muted)] hover:text-[var(--color-charcoal)]"
+          className="font-body text-sm text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)]"
         >
           Cancel
         </a>

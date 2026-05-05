@@ -418,7 +418,7 @@ export function RoomEditor({ room, initialFaqs }: Props) {
       <header className="sticky top-0 z-20 flex items-center gap-4 px-6 py-3 bg-white border-b border-[var(--color-border)]">
         <a
           href="/admin/rooms"
-          className="flex items-center gap-1.5 text-[var(--color-muted)] hover:text-[var(--color-charcoal)] transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="font-body text-sm">Rooms</span>
@@ -431,9 +431,9 @@ export function RoomEditor({ room, initialFaqs }: Props) {
         <div className="flex-1" />
 
         {saving ? (
-          <span className="font-body text-xs italic text-[var(--color-muted)]">Saving…</span>
+          <span className="font-body text-xs italic text-[var(--color-earth-brown)]">Saving…</span>
         ) : lastSaved ? (
-          <span className="font-body text-xs italic text-[var(--color-muted)]">{formatSaveTime(lastSaved)}</span>
+          <span className="font-body text-xs italic text-charcoal/60">{formatSaveTime(lastSaved)}</span>
         ) : null}
 
         {saveError && (
@@ -444,7 +444,7 @@ export function RoomEditor({ room, initialFaqs }: Props) {
           href={`/stay/${room.slug}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-body text-xs text-[var(--color-muted)] hover:text-[var(--color-charcoal)] transition-colors"
+          className="font-body text-xs text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)] transition-colors"
         >
           View public ↗
         </a>

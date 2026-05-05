@@ -7,7 +7,7 @@ export default function NewSouvenirPage() {
     <div>
       <Link
         href="/admin/souvenirs"
-        className="mb-6 inline-flex items-center gap-1 font-body text-sm text-[var(--color-muted)] hover:text-[var(--color-charcoal)]"
+        className="mb-6 inline-flex items-center gap-1 font-body text-sm text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)]"
       >
         <ChevronLeft className="h-4 w-4" />
         Back to Souvenir Shop

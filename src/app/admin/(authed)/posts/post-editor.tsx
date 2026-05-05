@@ -231,7 +231,7 @@ export function PostEditor({ post }: Props) {
       <header className="sticky top-0 z-20 flex items-center gap-4 px-6 py-3 bg-white border-b border-[var(--color-border)]">
         <a
           href="/admin/posts"
-          className="flex items-center gap-1.5 text-[var(--color-muted)] hover:text-[var(--color-charcoal)] transition-colors"
+          className="flex items-center gap-1.5 text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span className="font-body text-sm">Blog Manager</span>
@@ -249,11 +249,11 @@ export function PostEditor({ post }: Props) {
         <div className="flex-1" />
 
         {saving ? (
-          <span className="font-body text-xs italic text-[var(--color-muted)]">
+          <span className="font-body text-xs italic text-[var(--color-earth-brown)]">
             Saving…
           </span>
         ) : lastSaved ? (
-          <span className="font-body text-xs italic text-[var(--color-muted)]">
+          <span className="font-body text-xs italic text-charcoal/60">
             {formatSaveTime(lastSaved)}
           </span>
         ) : null}
@@ -269,7 +269,7 @@ export function PostEditor({ post }: Props) {
             href={`/blog/${slug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 font-body text-sm text-[var(--color-muted)] hover:text-[var(--color-charcoal)] transition-colors"
+            className="flex items-center gap-1 font-body text-sm text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)] transition-colors"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             Preview

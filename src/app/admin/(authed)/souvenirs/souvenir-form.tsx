@@ -109,6 +109,7 @@ export function SouvenirForm({ initial }: Props) {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [uploading, setUploading] = useState<UploadSlot | null>(null);
 
   const fileRef1 = useRef<HTMLInputElement>(null);
@@ -189,6 +190,12 @@ export function SouvenirForm({ initial }: Props) {
         setError(json.error ?? 'Save failed');
         return;
       }
+      if (isEdit) {
+        setSuccessMessage('Saved successfully');
+        setSaving(false);
+        setTimeout(() => router.push('/admin/souvenirs'), 2000);
+        return;
+      }
       router.push('/admin/souvenirs');
     } catch {
       setError('Save failed — check network');
@@ -202,6 +209,14 @@ export function SouvenirForm({ initial }: Props) {
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
+      {successMessage && (
+        <div
+          className="rounded-xl border border-[var(--color-forest-green)]/30 bg-[var(--color-forest-green)]/5 px-4 py-3 font-body text-sm text-[var(--color-forest-green)]"
+          role="status"
+        >
+          {successMessage}
+        </div>
+      )}
       {error && (
         <div
           className="rounded-xl border border-[var(--color-error)]/30 bg-[var(--color-error)]/5 px-4 py-3 font-body text-sm text-[var(--color-error)]"

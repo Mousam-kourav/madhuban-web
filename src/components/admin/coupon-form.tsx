@@ -37,6 +37,7 @@ export function CouponForm({ initial, couponId, mode }: Props) {
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const set = (key: keyof CouponFormValues, value: string | boolean) =>
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -76,6 +77,16 @@ export function CouponForm({ initial, couponId, mode }: Props) {
         return;
       }
 
+      if (mode === "edit") {
+        setSuccessMessage("Saved successfully");
+        setSaving(false);
+        setTimeout(() => {
+          router.push("/admin/coupons");
+          router.refresh();
+        }, 2000);
+        return;
+      }
+
       router.push("/admin/coupons");
       router.refresh();
     } catch {
@@ -86,6 +97,11 @@ export function CouponForm({ initial, couponId, mode }: Props) {
 
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-6">
+      {successMessage && (
+        <p className="rounded-lg border border-[var(--color-forest-green)]/30 bg-[var(--color-forest-green)]/5 px-4 py-3 font-body text-sm text-[var(--color-forest-green)]" role="status">
+          {successMessage}
+        </p>
+      )}
       {error && (
         <p className="rounded-lg bg-red-50 px-4 py-3 font-body text-sm text-red-600">{error}</p>
       )}

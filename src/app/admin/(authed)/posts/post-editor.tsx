@@ -249,11 +249,11 @@ export function PostEditor({ post }: Props) {
         <div className="flex-1" />
 
         {saving ? (
-          <span className="font-body text-xs italic text-[var(--color-muted)]">
+          <span className="font-body text-xs italic text-[var(--color-earth-brown)]">
             Saving…
           </span>
         ) : lastSaved ? (
-          <span className="font-body text-xs italic text-[var(--color-muted)]">
+          <span className="font-body text-xs italic text-charcoal/60">
             {formatSaveTime(lastSaved)}
           </span>
         ) : null}

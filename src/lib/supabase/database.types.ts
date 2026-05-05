@@ -124,6 +124,7 @@ type ManualBlockRow = {
 // bookings: booking_ref (not reference_number), checkin/checkout (not check_in/check_out),
 // num_adults/num_children (not adults/children), guest_id FK (not guest_name/email/phone),
 // payment_status; no nights/price_per_night/gst_rate/coupon_id/advance_amount/balance_due/razorpay_*
+// Migration 0011: added staff_notes jsonb, cancellation_reason text, cancelled_at timestamptz
 type BookingRow = {
   id: string;
   booking_ref: string;
@@ -141,6 +142,9 @@ type BookingRow = {
   total_amount: number;
   special_requests: string | null;
   internal_notes: string | null;
+  staff_notes: Json;
+  cancellation_reason: string | null;
+  cancelled_at: string | null;
   coupon_code: string | null;
   discount_amount: number;
   created_at: string;
@@ -149,10 +153,7 @@ type BookingRow = {
 
 // payments: booking_id, razorpay_order_id, razorpay_payment_id, amount, status, method, captured_at,
 // payment_type (advance|balance), refund_amount, refunded_at
-// Note: payment_type/refund_amount/refunded_at require: ALTER TABLE payments
-//   ADD COLUMN IF NOT EXISTS payment_type text DEFAULT 'advance',
-//   ADD COLUMN IF NOT EXISTS refund_amount numeric DEFAULT 0,
-//   ADD COLUMN IF NOT EXISTS refunded_at timestamptz;
+// Migration 0011: added reference_number text, notes text
 type PaymentRow = {
   id: string;
   booking_id: string;
@@ -162,6 +163,8 @@ type PaymentRow = {
   status: string;
   payment_type: string;
   method: string | null;
+  reference_number: string | null;
+  notes: string | null;
   captured_at: string | null;
   refund_amount: number;
   refunded_at: string | null;
@@ -333,6 +336,9 @@ export type Database = {
           coupon_code?: string | null;
           special_requests?: string | null;
           internal_notes?: string | null;
+          staff_notes?: unknown;
+          cancellation_reason?: string | null;
+          cancelled_at?: string | null;
         };
         Update: Partial<BookingRow>;
         Relationships: [];
@@ -349,6 +355,8 @@ export type Database = {
           razorpay_payment_id?: string | null;
           payment_type?: string;
           method?: string | null;
+          reference_number?: string | null;
+          notes?: string | null;
           captured_at?: string | null;
           refund_amount?: number;
           refunded_at?: string | null;

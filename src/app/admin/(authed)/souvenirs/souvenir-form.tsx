@@ -448,7 +448,7 @@ export function SouvenirForm({ initial }: Props) {
         </button>
         <a
           href="/admin/souvenirs"
-          className="font-body text-sm text-[var(--color-muted)] hover:text-[var(--color-charcoal)]"
+          className="font-body text-sm text-[var(--color-earth-brown)] hover:text-[var(--color-charcoal)]"
         >
           Cancel
         </a>

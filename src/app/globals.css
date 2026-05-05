@@ -65,6 +65,38 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* ── Admin design system tokens ──────────────────────────────────────────── */
+@theme {
+  /* Sidebar — dark forest-green shell */
+  --color-admin-sidebar-bg: #1F2D1F;
+  --color-admin-sidebar-fg: #E8E4DC;
+  --color-admin-sidebar-fg-muted: #A8A099;
+  --color-admin-sidebar-active-bg: #2D3B2D;
+  --color-admin-sidebar-active-fg: #FAF7F2;
+
+  /* Canvas + cards */
+  --color-admin-canvas-bg: #FAF7F2;
+  --color-admin-card-bg: #FFFFFF;
+  --color-admin-card-border: #E8E1D8;
+
+  /* Status badge palette */
+  --color-admin-status-confirmed-bg: #DCEFDC;
+  --color-admin-status-confirmed-fg: #2D5A2D;
+  --color-admin-status-pending-bg: #FFF3D6;
+  --color-admin-status-pending-fg: #8B6914;
+  --color-admin-status-cancelled-bg: #F5DCDC;
+  --color-admin-status-cancelled-fg: #8B2D2D;
+  --color-admin-status-info-bg: #DCE6F5;
+  --color-admin-status-info-fg: #2D4A8B;
+  --color-admin-status-neutral-bg: #ECE8E0;
+  --color-admin-status-neutral-fg: #5A5247;
+}
+
+:root {
+  --admin-sidebar-border: rgba(255, 255, 255, 0.08);
+  --admin-card-shadow: 0 1px 3px rgba(42, 42, 42, 0.04), 0 1px 2px rgba(42, 42, 42, 0.06);
+}
+
 /* ── Hero section height ─────────────────────────────────────────────────── */
 .hero-height {
   height: 80svh;

@@ -334,13 +334,13 @@ export function SouvenirForm({ initial }: Props) {
             role="switch"
             aria-checked={showPrice}
             onClick={() => setShowPrice((p) => !p)}
-            className={`relative h-6 w-11 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
+            className={`relative h-6 w-11 overflow-hidden rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
               showPrice ? 'bg-[var(--color-earth-brown)]' : 'bg-[var(--color-border)]'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                showPrice ? 'translate-x-5' : 'translate-x-0.5'
+              className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                showPrice ? 'translate-x-5' : 'translate-x-0'
               }`}
             />
           </button>
@@ -410,13 +410,13 @@ export function SouvenirForm({ initial }: Props) {
             role="switch"
             aria-checked={isActive}
             onClick={() => setIsActive((a) => !a)}
-            className={`relative h-6 w-11 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
+            className={`relative h-6 w-11 overflow-hidden rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-earth-brown)] ${
               isActive ? 'bg-[var(--color-earth-brown)]' : 'bg-[var(--color-border)]'
             }`}
           >
             <span
-              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                isActive ? 'translate-x-5' : 'translate-x-0.5'
+              className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                isActive ? 'translate-x-5' : 'translate-x-0'
               }`}
             />
           </button>

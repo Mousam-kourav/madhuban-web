@@ -23,18 +23,19 @@ function slugify(text: string) {
 type UploadSlot = 1 | 2 | 3;
 
 const labelCls =
-  'mb-1 block font-body text-xs font-semibold uppercase tracking-wider text-[var(--color-muted)]';
+  'mb-1 block font-body text-xs font-semibold uppercase tracking-wider text-charcoal';
 
 interface ImageUploadSlotProps {
   value: string;
   label: string;
   isUploading: boolean;
+  disabled?: boolean;
   fileRef: RefObject<HTMLInputElement | null>;
   onClear: () => void;
   onFileChange: (f: File) => void;
 }
 
-function ImageUploadSlot({ value, label, isUploading, fileRef, onClear, onFileChange }: ImageUploadSlotProps) {
+function ImageUploadSlot({ value, label, isUploading, disabled, fileRef, onClear, onFileChange }: ImageUploadSlotProps) {
   return (
     <div>
       <p className={labelCls}>{label}</p>
@@ -61,8 +62,8 @@ function ImageUploadSlot({ value, label, isUploading, fileRef, onClear, onFileCh
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
-          disabled={isUploading}
-          className="flex h-20 w-32 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-earth-brown)]/50 hover:text-[var(--color-earth-brown)] transition-colors"
+          disabled={isUploading || disabled}
+          className="flex h-20 w-32 flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-earth-brown)]/50 hover:text-[var(--color-earth-brown)] transition-colors disabled:pointer-events-none disabled:opacity-40"
         >
           {isUploading ? (
             <Loader2 className="h-5 w-5 animate-spin" />
@@ -223,6 +224,7 @@ export function SouvenirForm({ initial }: Props) {
             value={name}
             onChange={(e) => handleNameChange(e.target.value)}
             placeholder="e.g. Gond Painting — Small"
+            autoFocus={!isEdit}
             required
           />
         </div>
@@ -348,11 +350,17 @@ export function SouvenirForm({ initial }: Props) {
       {/* Images */}
       <div>
         <p className={labelCls}>Images</p>
+        {!name.trim() && (
+          <p className="mb-3 font-body text-xs italic text-[var(--color-earth-brown)]">
+            Enter a product name above to enable image upload.
+          </p>
+        )}
         <div className="flex flex-wrap gap-4">
           <ImageUploadSlot
             value={coverImage}
             label="Cover *"
             isUploading={uploading === 1}
+            disabled={!name.trim()}
             fileRef={fileRef1}
             onClear={() => setCoverImage('')}
             onFileChange={(f) => void uploadImage(1, f)}
@@ -361,6 +369,7 @@ export function SouvenirForm({ initial }: Props) {
             value={detailImage2}
             label="Image 2"
             isUploading={uploading === 2}
+            disabled={!name.trim()}
             fileRef={fileRef2}
             onClear={() => setDetailImage2('')}
             onFileChange={(f) => void uploadImage(2, f)}
@@ -369,6 +378,7 @@ export function SouvenirForm({ initial }: Props) {
             value={detailImage3}
             label="Image 3"
             isUploading={uploading === 3}
+            disabled={!name.trim()}
             fileRef={fileRef3}
             onClear={() => setDetailImage3('')}
             onFileChange={(f) => void uploadImage(3, f)}

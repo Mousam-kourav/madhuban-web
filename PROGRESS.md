@@ -1053,3 +1053,66 @@ Note: `/dining/facilities-{1280,800}.webp` uploaded per spec but not used (spec 
 
 ### Next
 Wait for user to open PR + Vercel preview URL.
+
+---
+
+## Phase 9d-4 — Souvenir Shop (2025-05-04)
+
+### Summary
+Full two-surface mini e-commerce shop: public storefront + admin CMS. No checkout — WhatsApp inquiry.
+
+### Files added / modified
+**Database & lib**
+- `docs/migrations/0009-souvenirs.sql` — CREATE TABLE with RLS, 4 indexes (GIN full-text, category+active, sort, slug), soft delete, public read policy
+- `src/lib/souvenirs/categories.ts` — 7 fixed categories as const (`apparel`, `books`, `handicrafts`, `food-spices`, `wellness`, `accessories`, `general`)
+- `src/lib/souvenirs/types.ts` — `Souvenir`, `SouvenirInput`, `DbSouvenir` types
+- `src/lib/souvenirs/mapper.ts` — `dbSouvenirToSouvenir()`, `souvenirInputToDb()`, `toCategory()` helpers
+- `src/lib/souvenirs/queries.ts` — `getActiveSouvenirs`, `getSouvenirBySlug`, `getRelatedSouvenirs`, `getAllActiveSlugs`, `adminGetAllSouvenirs`
+- `src/lib/supabase/database.types.ts` — added `SouvenirRow` (exported), added `souvenirs` table to `Database`
+
+**Admin API**
+- `src/app/api/admin/souvenirs/route.ts` — GET (list) / POST (create) with slug uniqueness + audit_log
+- `src/app/api/admin/souvenirs/[id]/route.ts` — GET / PATCH (fieldMap update) / DELETE (soft delete) with audit_log
+- `src/app/api/admin/souvenirs/reorder/route.ts` — POST `[{id, sort_order}]` parallel updates
+
+**Admin UI**
+- `src/app/admin/(authed)/souvenirs/page.tsx` — server wrapper, calls `adminGetAllSouvenirs`
+- `src/app/admin/(authed)/souvenirs/new/page.tsx` — server wrapper → `<SouvenirForm />`
+- `src/app/admin/(authed)/souvenirs/[id]/edit/page.tsx` — server wrapper, fetches by id → `<SouvenirForm initial={...} />`
+- `src/app/admin/(authed)/souvenirs/souvenir-form.tsx` — name→slug auto-gen, 3 R2 image slots, showPrice toggle, isActive toggle, audit writes; `ImageUploadSlot` extracted to module scope (ESLint `react-hooks/static-components`)
+- `src/app/admin/(authed)/souvenirs/souvenir-list-client.tsx` — client search + category filter, drag-to-reorder, inline active toggle, soft delete confirm
+- `src/app/admin/(authed)/admin-sidebar.tsx` — added `ShoppingBag` / Souvenir Shop nav item
+
+**Public storefront**
+- `src/app/(marketing)/souvenir-shop/page.tsx` — brand-panel hero, sticky filter+search, SSR product grid, CollectionPage JSON-LD
+- `src/app/(marketing)/souvenir-shop/filter-bar.tsx` — `'use client'`, instant onChange search, 8 category pills, URL state via `router.replace`
+- `src/app/(marketing)/souvenir-shop/[slug]/page.tsx` — ISR revalidate 60s, `generateStaticParams`, Product JSON-LD with optional offers, 4-level breadcrumb, related products
+- `src/app/(marketing)/souvenir-shop/[slug]/image-gallery.tsx` — `'use client'`, thumbnail-swap gallery
+
+### Env var added
+- `.env.local`: `ADMIN_EMAIL=madhubanecoretreat@gmail.com`
+- Must also be set in Vercel → Settings → Environment Variables (Production + Preview scopes)
+
+### TypeScript fixes applied
+- `BreadcrumbItem` uses `path` not `href` — fixed in `[slug]/page.tsx`
+- `SouvenirRow` exported from `database.types.ts` for use in `[id]/route.ts`
+- `audit_log.details` typed as `Json` — cast via `as unknown as Json` in souvenir API routes
+- `.update(update)` cast via `as unknown as Partial<SouvenirRow>`
+
+### Unilateral decisions
+- Reused `/api/admin/upload` (with `folder` param) rather than creating a souvenir-specific upload route
+- Client-side `q` filtering in `getActiveSouvenirs()` until GIN index is available post-migration
+- `generateStaticParams` wrapped in try/catch — returns `[]` if DB unavailable at build time (e.g., CI without Supabase)
+
+### Verification
+- `pnpm typecheck` ✅ zero errors
+- `pnpm lint` ✅ zero new errors (2 pre-existing warnings in `scripts/get-guests-schema.ts`)
+- `pnpm build` ✅ 75 routes; `/souvenir-shop` is `ƒ (Dynamic)`, `/souvenir-shop/[slug]` is `● (SSG)` with revalidate 60
+
+### Pre-merge actions for user
+1. Run migration in Supabase SQL Editor: `docs/migrations/0009-souvenirs.sql`
+2. Set `ADMIN_EMAIL=madhubanecoretreat@gmail.com` in Vercel → Environment Variables
+3. Create 2–3 real products via `/admin/souvenirs/new` to test end-to-end
+
+### Branch
+`feat/phase-9d-4-souvenir-shop`

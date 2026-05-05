@@ -10,6 +10,7 @@ import {
   Bed,
   Calendar,
   Tag,
+  ShoppingBag,
   Settings,
   HelpCircle,
   LogOut,
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { icon: Bed, label: "Rooms", href: "/admin/rooms" },
   { icon: Calendar, label: "Bookings", href: "/admin/bookings" },
   { icon: Tag, label: "Coupons", href: "/admin/coupons" },
+  { icon: ShoppingBag, label: "Souvenir Shop", href: "/admin/souvenirs" },
 ];
 
 const DISABLED_ITEMS: { icon: React.ElementType; label: string; note: string }[] = [];

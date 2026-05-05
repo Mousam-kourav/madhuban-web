@@ -127,7 +127,7 @@ export function PostSidebar({
 
             {/* Category */}
             <div>
-              <label className="block font-body text-xs text-[var(--color-muted)] mb-2">
+              <label className="block font-body text-xs text-charcoal mb-2">
                 Category
               </label>
               <select
@@ -146,7 +146,7 @@ export function PostSidebar({
 
             {/* Tags */}
             <div>
-              <label className="block font-body text-xs text-[var(--color-muted)] mb-2">
+              <label className="block font-body text-xs text-charcoal mb-2">
                 Tags
               </label>
               <div className="flex flex-wrap gap-1.5 mb-2">
@@ -240,7 +240,7 @@ export function PostSidebar({
 
             {/* SEO Title */}
             <div>
-              <label className="block font-body text-xs text-[var(--color-muted)] mb-1.5">
+              <label className="block font-body text-xs text-charcoal mb-1.5">
                 SEO Title
               </label>
               <input
@@ -265,7 +265,7 @@ export function PostSidebar({
 
             {/* Meta Description */}
             <div>
-              <label className="block font-body text-xs text-[var(--color-muted)] mb-1.5">
+              <label className="block font-body text-xs text-charcoal mb-1.5">
                 Meta Description
               </label>
               <textarea

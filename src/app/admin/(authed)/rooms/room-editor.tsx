@@ -705,7 +705,7 @@ export function RoomEditor({ room, initialFaqs }: Props) {
           </label>
           {heroImage && (
             <div className="max-w-sm">
-              <label className="block font-body text-xs text-[var(--color-muted)] mb-1">Alt text</label>
+              <label className="block font-body text-xs text-charcoal mb-1">Alt text</label>
               <input
                 type="text"
                 value={heroImage.alt}

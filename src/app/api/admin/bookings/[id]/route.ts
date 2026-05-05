@@ -189,8 +189,17 @@ export async function PATCH(
       const refundAmount = typeof body.refundAmount === "number"
         ? body.refundAmount
         : typeof body.refundAmount === "string" ? Number(body.refundAmount) : 0;
+      const cancelReason = typeof body.reason === "string" ? body.reason.trim() : "";
+      const cancelNotes = typeof body.notes === "string" ? body.notes.trim() : "";
+      const fullReason = cancelReason && cancelNotes
+        ? `${cancelReason} — ${cancelNotes}`
+        : cancelReason || cancelNotes || null;
 
-      await supabase.from("bookings").update({ status: "CANCELLED" }).eq("id", id);
+      await supabase.from("bookings").update({
+        status: "CANCELLED",
+        cancellation_reason: fullReason,
+        cancelled_at: new Date().toISOString(),
+      }).eq("id", id);
 
       if (refundAmount > 0) {
         // Find captured advance payment and mark refunded
@@ -211,6 +220,7 @@ export async function PATCH(
       }
 
       await writeAuditLog(supabase, adminId, id, "cancelled", {
+        reason: fullReason,
         refundAmount,
         before: { status: booking.status },
         after: { status: "CANCELLED" },

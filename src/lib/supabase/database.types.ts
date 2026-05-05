@@ -57,6 +57,7 @@ type RoomRow = {
   gallery: Json | null;
   seo_title: string | null;
   seo_description: string | null;
+  inventory_count: number;
 };
 
 type RoomFaqRow = {
@@ -252,6 +253,7 @@ export type Database = {
           gallery?: Json | null;
           seo_title?: string | null;
           seo_description?: string | null;
+          inventory_count?: number;
         };
         Update: Partial<RoomRow>;
         Relationships: [];

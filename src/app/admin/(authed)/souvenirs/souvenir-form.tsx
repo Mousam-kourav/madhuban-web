@@ -245,7 +245,7 @@ export function SouvenirForm({ initial }: Props) {
             required
           />
           {isEdit && (
-            <p className="mt-1 font-body text-xs text-[var(--color-muted)]">
+            <p className="mt-1 font-body text-xs text-charcoal/70">
               Note: changing slug after images are uploaded won&#39;t move image files. Re-upload if needed.
             </p>
           )}
@@ -275,7 +275,7 @@ export function SouvenirForm({ initial }: Props) {
       {/* Short description */}
       <div>
         <label htmlFor="sv-short" className={labelCls}>
-          Short Description <span className="normal-case text-[var(--color-muted)]">(shown on cards, ~120 chars)</span>
+          Short Description <span className="normal-case text-charcoal/70">(shown on cards, ~120 chars)</span>
         </label>
         <textarea
           id="sv-short"
@@ -294,7 +294,7 @@ export function SouvenirForm({ initial }: Props) {
       {/* Long description */}
       <div>
         <label htmlFor="sv-long" className={labelCls}>
-          Long Description <span className="normal-case text-[var(--color-muted)]">(shown on detail page)</span>
+          Long Description <span className="normal-case text-charcoal/70">(shown on detail page)</span>
         </label>
         <textarea
           id="sv-long"
@@ -310,7 +310,7 @@ export function SouvenirForm({ initial }: Props) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="sv-price" className={labelCls}>
-            Price (INR) <span className="normal-case text-[var(--color-muted)]">— leave blank if not set</span>
+            Price (INR) <span className="normal-case text-charcoal/70">— leave blank if not set</span>
           </label>
           <input
             id="sv-price"
@@ -325,7 +325,7 @@ export function SouvenirForm({ initial }: Props) {
         <div className="flex flex-col justify-end gap-1">
           <label className={labelCls}>
             Show Price?
-            <span className="ml-1 normal-case font-normal text-[var(--color-muted)]">
+            <span className="ml-1 normal-case font-normal text-charcoal/70">
               Off = display &quot;Ask for price&quot;
             </span>
           </label>
@@ -389,7 +389,7 @@ export function SouvenirForm({ initial }: Props) {
       {/* Artisan credit */}
       <div>
         <label htmlFor="sv-artisan" className={labelCls}>
-          Artisan Credit <span className="normal-case text-[var(--color-muted)]">(optional)</span>
+          Artisan Credit <span className="normal-case text-charcoal/70">(optional)</span>
         </label>
         <input
           id="sv-artisan"

@@ -29,6 +29,48 @@
 
 ---
 
+## Phase A2 — Admin Dashboard 🔄 IN REVIEW (2026-05-05)
+
+### What shipped
+
+**Migration**
+- `supabase/migrations/20260505000000_phase_a2_room_inventory.sql` — `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS inventory_count int NOT NULL DEFAULT 1`
+- `database.types.ts` updated with `inventory_count: number` on `RoomRow`
+
+**Data layer** (`src/lib/admin/dashboard.ts`)
+- `fetchDashboardData()` — single entry-point, 5–6 parallelized Supabase queries via `Promise.all`
+- Stat queries: tonight check-ins, in-house count, this/last-month revenue, monthly occupancy %, today free rooms, pending count
+- Room availability: per-room occupied/inventory for tonight
+- Calendar heatmap: day-by-day occupancy % for current month (JS-side, no SQL complexity)
+- Weekend alert: next Sat+Sun occupancy %, skips current weekend if on a weekend day
+- Formatters: `formatIndianCurrency` (₹ lakh format), `revenueDirection`, `bookingStatusVariant/Label`, `initialsFromName`, `avatarColor`, `formatCheckinDate`
+
+**Dashboard page** (`src/app/admin/(authed)/page.tsx`)
+- `force-dynamic` — live data on every load
+- 4 stat cards: Tonight Check-ins, This Month Revenue (MoM delta), Monthly Occupancy %, Pending Confirmations
+- Recent Bookings panel: 5 latest, initials avatar (consistent color hash per name), click-through to detail, empty state
+- Room Availability Tonight: progress bars per room (FULL badge / AVAILABLE label / partial fill)
+- Calendar Heatmap: 7-col grid, 4-level color (available/partial/busy/full), today ring, DOW offset
+- Quick Actions: 2×2 grid — 3 toast placeholders + Check-in List routes to `/admin/bookings`
+- Weekend Occupancy Alert: dark banner, only renders when ≥ 90%
+
+### Decisions made
+- **inventory_count = 1 per room row** (Option B migration) — each rooms table row = 1 physical unit, matching current booking engine per-room_id availability checks
+- Weekend alert skips the current weekend if today is Saturday/Sunday, showing next upcoming weekend instead
+- All occupancy math runs in JS (JS-side loop over bookings), not SQL — clearer and fast enough for a boutique property with <10 rooms and <500 bookings/year
+
+### Build status
+- `pnpm typecheck` ✅ clean
+- `pnpm lint` ✅ 0 errors (2 pre-existing warnings in scripts/)
+- `pnpm build` ✅ 74 routes
+
+### Still needed before merge
+- Run migration in Supabase SQL editor: `ALTER TABLE rooms ADD COLUMN IF NOT EXISTS inventory_count int NOT NULL DEFAULT 1;`
+- Architect review + Vercel preview URL verification
+- Smoke test: `/admin` loads, stat cards show real numbers, all 4 quick action buttons work
+
+---
+
 ## Phase 1 — Design System Foundation (Part 1) ✅ COMPLETE (2026-04-24)
 
 ### What shipped

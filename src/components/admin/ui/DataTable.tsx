@@ -30,6 +30,12 @@ interface DataTableProps<T extends Record<string, unknown>> {
   emptyTitle?: string;
   emptyDescription?: string;
   className?: string;
+  // Controlled sort — when provided, disables client-side sort and calls onSortChange instead
+  serverSortKey?: string | null;
+  serverSortDir?: 'asc' | 'desc';
+  onSortChange?: (key: string) => void;
+  // Selection callback — called with selected rows whenever selection changes
+  onSelectionChange?: (selectedRows: T[]) => void;
 }
 
 type SortDir = 'asc' | 'desc';
@@ -44,24 +50,39 @@ export function DataTable<T extends Record<string, unknown>>({
   emptyTitle = 'No records found',
   emptyDescription = 'There is nothing here yet.',
   className,
+  serverSortKey,
+  serverSortDir,
+  onSortChange,
+  onSelectionChange,
 }: DataTableProps<T>) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
+  const isServerSort = onSortChange !== undefined;
+  const activeSortKey = isServerSort ? (serverSortKey ?? null) : sortKey;
+  const activeSortDir: SortDir = isServerSort ? (serverSortDir ?? 'desc') : sortDir;
+
   const allSelected = data.length > 0 && selected.size === data.length;
 
   function toggleAll() {
-    setSelected(allSelected ? new Set() : new Set(data.map((_, i) => i)));
+    const next = allSelected ? new Set<number>() : new Set(data.map((_, i) => i));
+    setSelected(next);
+    onSelectionChange?.(allSelected ? [] : [...data]);
   }
 
   function toggleRow(i: number) {
     const next = new Set(selected);
     if (next.has(i)) { next.delete(i); } else { next.add(i); }
     setSelected(next);
+    onSelectionChange?.([...next].map((idx) => data[idx]).filter(Boolean) as T[]);
   }
 
   function handleSort(key: string) {
+    if (isServerSort) {
+      onSortChange(key);
+      return;
+    }
     if (sortKey === key) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -70,7 +91,8 @@ export function DataTable<T extends Record<string, unknown>>({
     }
   }
 
-  const sorted = sortKey
+  // Client-side sort only when not using server sort
+  const sorted = (!isServerSort && sortKey)
     ? [...data].sort((a, b) => {
         const av = a[sortKey];
         const bv = b[sortKey];
@@ -119,8 +141,8 @@ export function DataTable<T extends Record<string, unknown>>({
                         className="inline-flex items-center gap-1 font-semibold text-xs uppercase tracking-wider text-charcoal/60 hover:text-charcoal transition-colors"
                       >
                         {col.label}
-                        {sortKey === col.key ? (
-                          sortDir === 'asc' ? (
+                        {activeSortKey === col.key ? (
+                          activeSortDir === 'asc' ? (
                             <ChevronUp className="w-3 h-3" />
                           ) : (
                             <ChevronDown className="w-3 h-3" />

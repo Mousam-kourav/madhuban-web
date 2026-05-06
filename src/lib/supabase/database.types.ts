@@ -111,12 +111,14 @@ type PricingRuleRow = {
 };
 
 // manual_blocks: date_from/date_to (not start_date/end_date)
+// Migration 0015: added notes text null
 type ManualBlockRow = {
   id: string;
   room_id: string;
   date_from: string;
   date_to: string;
   reason: string | null;
+  notes: string | null;
   created_by: string | null;
   created_at: string;
 };

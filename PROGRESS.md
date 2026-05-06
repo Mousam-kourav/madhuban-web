@@ -29,6 +29,62 @@
 
 ---
 
+## Phase A4 — Manual Booking Creation 🔄 IN REVIEW (2026-05-06)
+
+### What shipped
+
+**Migration (0012)**
+- `docs/migrations/0012-a4-corporate-gstin-addons.sql` — record of migration already run in production
+- Added to `bookings` table: `corporate_gstin text`, `corporate_company_name text`, `corporate_address text`, `addons jsonb DEFAULT '[]'`
+- `database.types.ts` updated with new columns on `BookingRow` and `bookings.Insert`
+
+**Data layer**
+- `src/lib/admin/booking-addons.ts` — hardcoded `BOOKING_ADDONS` catalog (9 add-ons with id/label/price/unit). Prices stored at booking time for historical immutability.
+- `src/lib/admin/calculate-admin-pricing.ts` — `calculateAdminPricing({ roomId, checkIn, checkOut, addons[] })` takes room UUID (not slug), reuses `gstRate()` + `priceBreakdown()` from `src/lib/gst.ts`. Public pricing function untouched.
+
+**API endpoints**
+- `GET /api/admin/bookings/availability?from=&to=` — returns all active rooms with `available_units` count (inventory_count minus overlapping CONFIRMED/CHECKED_IN bookings and manual_blocks)
+- `POST /api/admin/bookings/create` — full booking creation: admin auth, server-side availability re-check (race condition protection), find/create guest, `calculateAdminPricing`, inserts booking + offline payment record, writes staff_notes, sends optional email, writes audit log
+
+**Form page** (`/admin/bookings/new`)
+- `src/app/admin/(authed)/bookings/new/page.tsx` — server component wrapper
+- `src/app/admin/(authed)/bookings/new/booking-new-form.tsx` — full client form with:
+  - Stay Details: date pickers, debounced availability check (500ms), room type dropdown with availability counts, adults/children steppers, special requests
+  - Guest Information: name, +91 mobile, email, ID type/number, source select (default: walkin), corporate/GST toggle revealing GSTIN + company name + address with validation
+  - Experience Add-ons: 2-column selectable card grid with qty steppers; enabled add-ons flow into pricing panel
+  - Internal Notes: operations-only textarea, saved as first entry in `staff_notes` JSONB array on creation
+  - Pricing Summary (sticky right panel): live client-side calculation, room rent + add-on breakdown, GST split, total, advance input, payment method select, balance due
+  - Action buttons: Save & Confirm (primary), Save as Draft (secondary), Send confirmation email checkbox (default ON)
+  - LocalStorage draft system: 30s auto-save, manual save, draft restoration banner on page load, 7-day TTL auto-discard, auto-clear on successful submit
+
+**"New Booking" button** already linked from bookings list (A3.1 wired it to `/admin/bookings/new`)
+
+### Decisions made
+- Add-on prices stored at booking time: `[{ id, label, price, qty, unit }]` — historical immutability when catalog prices change
+- Corporate GSTIN stored on `bookings` (not on `guests`): same guest might book personally vs. for different companies. `guests.gstin` field pre-existed but is unused by A4.
+- `calculateAdminPricing` takes `room_id` UUID (admin form works with IDs). Public `calculatePricing` unchanged.
+- `DatePicker` component: removed overly-narrow `min?: string; max?: string;` re-declarations to stay compatible with react-hook-form `register()` spread (which types these as `string | number | undefined`)
+- No new dependencies added
+
+### Build status
+- `pnpm typecheck` ✅ 0 errors
+- `pnpm eslint` ✅ 0 errors (3 pre-existing warnings: react-hooks/incompatible-library on form.watch — same pattern throughout codebase)
+- `pnpm build` ✅ clean
+
+### Still needed before merge
+- Architect review
+- Vercel preview URL smoke test:
+  - `/admin/bookings/new` loads, form renders
+  - Set dates → availability check fires → room dropdown populates
+  - Select room → pricing panel updates
+  - Toggle corporate → GSTIN fields reveal
+  - Select add-ons → pricing panel reflects add-ons
+  - Save Draft → refresh → draft restoration banner appears → Restore → form refills
+  - Submit valid booking → detail page redirect, booking appears in list
+  - Verify Public booking engine untouched (visit `/booking`)
+
+---
+
 ## Phase A2 — Admin Dashboard 🔄 IN REVIEW (2026-05-05)
 
 ### What shipped

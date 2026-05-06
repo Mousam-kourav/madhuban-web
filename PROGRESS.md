@@ -1,5 +1,33 @@
 # Madhuban Eco Retreat — Rebuild Progress
 
+## Phase A6 — Block Dates + Availability Calendar ✅ IN REVIEW (2026-05-06)
+
+### What shipped
+- `/admin/availability` page — month/week toggle, URL-driven state (?view=month|week&start=YYYY-MM-DD)
+- Per-room-type rows × per-day cells calendar grid, color-coded (Available/Partial/Fully Booked/Check-in/Blocked)
+- Month view: all days of month as scrollable columns; today highlighted with gold ring
+- Week view: 7 columns, wider cells with occupancy label
+- Prev/Next/Today navigation via router.push (server refetch)
+- Side panel on cell click: guest bookings list (with booking detail links), block details, Remove Block action
+- Block Dates modal: Room Type + Start/End Date + Reason category + optional Notes; 409 if active bookings conflict
+- API: POST /api/admin/availability/block + POST /api/admin/availability/unblock with audit log entries
+- Data layer: getAvailabilityData (2 parallel queries), computeCellState pure function split into availability-utils.ts
+- Sidebar: "Availability" nav item (CalendarRange icon) added between Bookings and Rooms
+- Migration 0015: `ALTER TABLE manual_blocks ADD COLUMN IF NOT EXISTS notes text` — **must be run manually in Supabase SQL editor before testing**
+
+### Decisions made
+- Split availability.ts (server-only) from availability-utils.ts (pure, client-safe) to avoid 'server-only' error in client component
+- Used `key` prop on BlockDatesModal to remount and reset form state on each open — avoids useEffect+setState antipattern flagged by React Compiler
+- Block modal form reset via key remount rather than useEffect; prefill is passed as initial state value
+- Month view shows all days as columns (not 7-col traditional calendar), consistent with per-room-type row architecture
+- notes column added via migration; if migration not yet run, block creation without notes works but with notes will fail silently — recommend running migration first
+- `date_from` and `date_to` confirmed as the exact column names (not start_date/end_date)
+
+### Public booking flow
+- Confirmed: `src/lib/booking/availability.ts` already queries manual_blocks (.lt("date_from", checkOut).gt("date_to", checkIn)). Public flow DOES respect manual blocks — no fix needed.
+
+---
+
 ## Phase 0 — Scaffold ✅ COMPLETE (2026-04-23)
 
 ### What shipped

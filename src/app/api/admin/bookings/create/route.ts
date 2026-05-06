@@ -50,6 +50,7 @@ const createBookingBodySchema = z.object({
   }).nullable(),
   addons: z.array(addonSchema),
   internalNote: z.string().optional(),
+  assignedUnit: z.string().optional(),
   advance: z.object({
     amount:        z.number().nonnegative(),
     paymentMethod: z.string().min(1),
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest) {
 
   const {
     checkIn, checkOut, roomId, numAdults, numChildren,
-    specialRequests, guest, source, corporate, addons, internalNote, advance, sendEmail: doSendEmail,
+    specialRequests, guest, source, corporate, addons, internalNote, assignedUnit, advance, sendEmail: doSendEmail,
   } = parsed.data;
 
   if (checkIn >= checkOut) {
@@ -187,6 +188,7 @@ export async function POST(req: NextRequest) {
         corporate_company_name: corporate?.companyName ?? null,
         corporate_address:      corporate?.address ?? null,
         addons:                 addonsForStorage,
+        assigned_unit:          assignedUnit?.trim() || null,
       })
       .select("id, booking_ref")
       .single();

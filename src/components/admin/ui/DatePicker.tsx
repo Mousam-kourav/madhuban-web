@@ -7,8 +7,8 @@ interface DatePickerProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 't
   label?: string;
   helperText?: string;
   error?: string;
-  min?: string;
-  max?: string;
+  // min/max inherited from InputHTMLAttributes (string | number | undefined) to stay
+  // compatible with react-hook-form register() spread which types these as string | number
 }
 
 export const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(

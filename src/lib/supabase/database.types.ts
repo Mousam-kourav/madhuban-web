@@ -126,6 +126,7 @@ type ManualBlockRow = {
 // payment_status; no nights/price_per_night/gst_rate/coupon_id/advance_amount/balance_due/razorpay_*
 // Migration 0011: added staff_notes jsonb, cancellation_reason text, cancelled_at timestamptz
 // Migration 0012: added corporate_gstin, corporate_company_name, corporate_address, addons jsonb
+// Migration 0013: added assigned_unit text
 type BookingRow = {
   id: string;
   booking_ref: string;
@@ -152,6 +153,7 @@ type BookingRow = {
   corporate_company_name: string | null;
   corporate_address: string | null;
   addons: Json;
+  assigned_unit: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -349,6 +351,7 @@ export type Database = {
           corporate_company_name?: string | null;
           corporate_address?: string | null;
           addons?: unknown;
+          assigned_unit?: string | null;
         };
         Update: Partial<BookingRow>;
         Relationships: [];

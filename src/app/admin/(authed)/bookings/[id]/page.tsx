@@ -7,6 +7,7 @@ import {
   CheckCircle2, XCircle, Circle, Zap,
   CreditCard, Banknote, CalendarDays, Users, BedDouble,
 } from "lucide-react";
+import { computeRoomGstRate } from "@/lib/gst";
 import { Card, Badge } from "@/components/admin/ui";
 import {
   bookingStatusVariant, bookingStatusLabel,
@@ -46,6 +47,7 @@ type BookingRow = {
   special_requests: string | null; internal_notes: string | null;
   staff_notes: StaffNote[] | null;
   cancellation_reason: string | null; cancelled_at: string | null;
+  assigned_unit: string | null;
   created_at: string; updated_at: string;
   guests: GuestRow | null; rooms: RoomRow | null;
 };
@@ -272,6 +274,7 @@ export default async function BookingDetailPage({ params }: Props) {
   const nights = Math.max(1, Math.round(
     (new Date(booking.checkout).getTime() - new Date(booking.checkin).getTime()) / 86400000,
   ));
+  const derivedGstRate = room ? computeRoomGstRate(room.base_price_per_night) : 0;
   const totalPaid = payments
     .filter(p => p.status === "captured")
     .reduce((s, p) => s + Number(p.amount), 0);
@@ -431,7 +434,7 @@ export default async function BookingDetailPage({ params }: Props) {
                   </p>
                   <p className="font-body text-xs text-charcoal/50">
                     ₹{fmtAmt(room?.base_price_per_night ?? 0)}/night
-                    {room?.gst_rate ? ` + ${room.gst_rate}% GST` : ""}
+                    {room ? ` + ${derivedGstRate}% GST` : ""}
                   </p>
                 </div>
                 <span className="flex-shrink-0 font-body text-sm font-medium text-charcoal">
@@ -458,7 +461,7 @@ export default async function BookingDetailPage({ params }: Props) {
                 <span>₹{fmtAmt(Number(booking.base_amount) - Number(booking.discount_amount))}</span>
               </div>
               <div className="flex justify-between font-body text-sm text-charcoal/70">
-                <span>GST ({room?.gst_rate ?? 0}%)</span>
+                <span>GST ({derivedGstRate}%)</span>
                 <span>₹{fmtAmt(Number(booking.gst_amount))}</span>
               </div>
               <div className="flex justify-between border-t border-admin-card-border pt-2">
@@ -611,6 +614,13 @@ export default async function BookingDetailPage({ params }: Props) {
               <p className="font-body text-xs text-charcoal/40">{nights}N</p>
             </div>
           </div>
+          {booking.assigned_unit && (
+            <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 border-t border-admin-card-border pt-4">
+              <DlRow label="Assigned Unit">
+                <span className="font-mono text-xs">{booking.assigned_unit}</span>
+              </DlRow>
+            </dl>
+          )}
         </Card>
 
         {/* Payment History */}

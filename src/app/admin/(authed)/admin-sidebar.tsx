@@ -9,6 +9,7 @@ import {
   FileText,
   Bed,
   Calendar,
+  CalendarRange,
   Tag,
   ShoppingBag,
   Settings,
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { icon: FileText, label: "Blog Posts", href: "/admin/posts" },
   { icon: Bed, label: "Rooms", href: "/admin/rooms" },
   { icon: Calendar, label: "Bookings", href: "/admin/bookings" },
+  { icon: CalendarRange, label: "Availability", href: "/admin/availability" },
   { icon: Tag, label: "Coupons", href: "/admin/coupons" },
   { icon: ShoppingBag, label: "Souvenir Shop", href: "/admin/souvenirs" },
 ];

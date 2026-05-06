@@ -50,6 +50,7 @@ const schema = z
     corporateAddress:     z.string().optional(),
     addons:               z.array(addonItemSchema),
     internalNote:         z.string().optional(),
+    assignedUnit:         z.string().optional(),
     advanceAmount:        z.number().min(0),
     paymentMethod:        z.string().optional(),
     sendEmail:            z.boolean(),
@@ -86,6 +87,7 @@ const defaultValues: FormData = {
   corporateGstin: "", corporateCompanyName: "", corporateAddress: "",
   addons: BOOKING_ADDONS.map(() => ({ enabled: false, qty: 1 })),
   internalNote: "",
+  assignedUnit: "",
   advanceAmount: 0,
   paymentMethod: "",
   sendEmail: true,
@@ -350,6 +352,7 @@ export function BookingNewForm() {
         } : null,
         addons: selectedAddons,
         internalNote: data.internalNote || undefined,
+        assignedUnit: data.assignedUnit?.trim() || undefined,
         advance: (data.advanceAmount > 0 && data.paymentMethod)
           ? { amount: data.advanceAmount, paymentMethod: data.paymentMethod }
           : null,
@@ -555,6 +558,15 @@ export function BookingNewForm() {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    label="Assigned Unit"
+                    placeholder="e.g. ST-03, River-facing tent"
+                    helperText="Optional — physical unit identifier"
+                    {...form.register("assignedUnit")}
+                  />
                 </div>
 
                 <div className="mt-4">

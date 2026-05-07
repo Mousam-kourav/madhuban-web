@@ -10,6 +10,7 @@ import { createNotification } from "@/lib/admin/notifications";
 import type { Json } from "@/lib/supabase/database.types";
 import { z } from "zod";
 import { assertAdmin } from "@/lib/admin/auth";
+import { validatePhone, PHONE_ERROR } from "@/lib/validation/phone";
 
 
 const addonSchema = z.object({
@@ -30,7 +31,7 @@ const createBookingBodySchema = z.object({
   specialRequests: z.string().optional(),
   guest: z.object({
     name:    z.string().min(1),
-    mobile:  z.string().regex(/^\d{10}$/, "Mobile must be 10 digits"),
+    mobile:  z.string().refine((v) => validatePhone(v).valid, PHONE_ERROR),
     email:   z.string().email().optional().or(z.literal("")),
     idType:  z.string().optional(),
     idNumber: z.string().optional(),
@@ -94,7 +95,7 @@ export async function POST(req: NextRequest) {
     // Find or create guest (look up by mobile first since email is optional)
     let guestId: string;
     const normalizedEmail = guest.email?.trim().toLowerCase() || null;
-    const normalizedMobile = guest.mobile.trim();
+    const normalizedMobile = validatePhone(guest.mobile).normalized;
 
     // Try find by email if provided, then by mobile
     const { data: existingByEmail } = normalizedEmail

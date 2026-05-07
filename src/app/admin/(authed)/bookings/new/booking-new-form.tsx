@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodV4Resolver } from "@/lib/forms/resolver";
+import { isValidPhone, PHONE_ERROR } from "@/lib/validation/phone";
 import { toast } from "sonner";
 import {
   Calendar, User, Sparkles, FileText, ChevronLeft,
@@ -39,7 +40,7 @@ const schema = z
     extraMattress:        z.number().int().min(0),
     specialRequests:      z.string().optional(),
     guestName:            z.string().min(1, "Guest name required"),
-    guestMobile:          z.string().regex(/^\d{10}$/, "Enter 10-digit mobile"),
+    guestMobile:          z.string().refine(isValidPhone, PHONE_ERROR),
     guestEmail:           z.string().email("Invalid email").or(z.literal("")).optional(),
     idType:               z.string().optional(),
     idNumber:             z.string().optional(),

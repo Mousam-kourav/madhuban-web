@@ -4,6 +4,7 @@ import { checkAvailability } from "@/lib/booking/availability";
 import { calculatePricing } from "@/lib/booking/pricing";
 import { generateBookingReference } from "@/lib/booking/reference";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { validatePhone } from "@/lib/validation/phone";
 
 export async function POST(req: NextRequest) {
   let body: unknown;
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
         .insert({
           name: guestName.trim(),
           email: guestEmail.trim().toLowerCase(),
-          mobile: guestPhone.trim(),
+          mobile: validatePhone(guestPhone).normalized,
         })
         .select("id")
         .single();

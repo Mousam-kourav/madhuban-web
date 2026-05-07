@@ -2,6 +2,7 @@ import path from "path";
 import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import { fmtINR } from "@/lib/gst";
 
+// outputFileTracingIncludes in next.config.ts ensures Vercel bundles these woff files.
 const NOTO_FILES = path.join(process.cwd(), "node_modules/@fontsource/noto-sans/files");
 Font.register({
   family: "Noto Sans",

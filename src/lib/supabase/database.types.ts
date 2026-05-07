@@ -180,17 +180,55 @@ type PaymentRow = {
   created_at: string;
 };
 
-// invoices: booking_id, invoice_number, issued_at, base_amount, gst_amount, total_amount, pdf_url
-type InvoiceRow = {
+// invoices: full A7 GST-compliant schema (replaces A3 placeholder)
+export type InvoiceRow = {
   id: string;
-  booking_id: string;
   invoice_number: string;
-  issued_at: string;
-  base_amount: number;
-  gst_amount: number;
+  fy: string;
+  serial_number: number;
+  booking_id: string;
+  issuer_legal_name: string;
+  issuer_trade_name: string;
+  issuer_gstin: string;
+  issuer_address: string;
+  issuer_state: string;
+  bill_to_name: string;
+  bill_to_phone: string | null;
+  bill_to_email: string | null;
+  bill_to_address: string | null;
+  bill_to_state: string | null;
+  bill_to_gstin: string | null;
+  bill_to_company_name: string | null;
+  service_period_from: string;
+  service_period_to: string;
+  place_of_supply_state: string;
+  place_of_supply_state_code: string;
+  is_inter_state: boolean;
+  gst_rate_percent: number;
+  taxable_amount: number;
+  cgst_rate: number | null;
+  cgst_amount: number | null;
+  sgst_rate: number | null;
+  sgst_amount: number | null;
+  igst_rate: number | null;
+  igst_amount: number | null;
+  total_gst_amount: number;
   total_amount: number;
-  pdf_url: string | null;
+  line_items: Json;
+  status: string;
+  cancellation_reason: string | null;
+  cancelled_at: string | null;
+  generated_by: string;
+  generated_at: string;
+  notes: string | null;
   created_at: string;
+  updated_at: string;
+};
+
+type InvoiceCounterRow = {
+  fy: string;
+  last_serial: number;
+  updated_at: string;
 };
 
 export type SouvenirRow = {
@@ -381,18 +419,15 @@ export type Database = {
       };
       invoices: {
         Row: InvoiceRow;
-        Insert: {
-          booking_id: string;
-          invoice_number: string;
-          issued_at: string;
-          base_amount: number;
-          gst_amount: number;
-          total_amount: number;
-          id?: string;
-          created_at?: string;
-          pdf_url?: string | null;
-        };
+        Insert: Omit<InvoiceRow, 'id' | 'created_at' | 'updated_at' | 'generated_at' | 'place_of_supply_state' | 'place_of_supply_state_code' | 'status'> &
+          Partial<Pick<InvoiceRow, 'id' | 'created_at' | 'updated_at' | 'generated_at' | 'place_of_supply_state' | 'place_of_supply_state_code' | 'status'>>;
         Update: Partial<InvoiceRow>;
+        Relationships: [];
+      };
+      invoice_counters: {
+        Row: InvoiceCounterRow;
+        Insert: { fy: string; last_serial?: number; updated_at?: string };
+        Update: Partial<InvoiceCounterRow>;
         Relationships: [];
       };
       souvenirs: {
@@ -428,7 +463,24 @@ export type Database = {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      increment_invoice_counter: {
+        Args: { p_fy: string };
+        Returns: number;
+      };
+      create_invoice_atomic: {
+        Args: {
+          p_booking_id: string;
+          p_issuer: Json;
+          p_bill_to: Json;
+          p_service: Json;
+          p_tax: Json;
+          p_line_items: Json;
+          p_generated_by: string;
+        };
+        Returns: Json;
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };

@@ -5,6 +5,7 @@ import { calculatePricing } from "@/lib/booking/pricing";
 import { generateBookingReference } from "@/lib/booking/reference";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { validatePhone } from "@/lib/validation/phone";
+import { createNotification } from "@/lib/admin/notifications";
 
 export async function POST(req: NextRequest) {
   let body: unknown;
@@ -118,6 +119,18 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error("[booking/create]", error);
       return NextResponse.json({ error: "Failed to create booking" }, { status: 500 });
+    }
+
+    // Notification — non-fatal
+    try {
+      await createNotification({
+        type: "booking_created",
+        title: `New booking — ${booking.booking_ref}`,
+        body: `${guestName.trim()} · ${pricing.roomName} · ₹${pricing.totalAmount.toLocaleString("en-IN")}`,
+        linkUrl: `/admin/bookings/${booking.id}`,
+      });
+    } catch (err) {
+      console.error("[booking/create] notification failed:", err);
     }
 
     // Increment coupon used_count if applied

@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
 
   await supabase.from("audit_log").insert({
     admin_user_id: "system",
+    actor_email: "system",
     action: "payment_confirmed_via_webhook",
     entity_type: "booking",
     entity_id: bookingId,

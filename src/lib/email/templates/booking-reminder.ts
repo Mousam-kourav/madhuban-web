@@ -1,4 +1,4 @@
-export interface BookingConfirmationData {
+export interface BookingReminderData {
   bookingRef: string;
   guestName: string;
   roomName: string;
@@ -7,14 +7,12 @@ export interface BookingConfirmationData {
   nights: number;
   adults: number;
   children: number;
-  totalAmount: number;
-  specialRequests?: string | null;
 }
 
-export function bookingConfirmationGuestEmail(
-  data: BookingConfirmationData,
-): { subject: string; html: string } {
-  const subject = `Your Madhuban booking is confirmed — ${data.bookingRef}`;
+export function bookingReminderEmail(
+  data: BookingReminderData,
+): { subject: string; html: string; text: string } {
+  const subject = `Your stay at Madhuban begins tomorrow — ${data.bookingRef}`;
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -26,13 +24,13 @@ export function bookingConfirmationGuestEmail(
         <tr>
           <td style="background:#2D3B2D;padding:24px 32px;">
             <p style="margin:0;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#D1C8C1;">Madhuban Eco Retreat</p>
-            <h1 style="margin:6px 0 0;font-size:20px;font-weight:600;color:#FEFCF8;">Booking Confirmed</h1>
+            <h1 style="margin:6px 0 0;font-size:20px;font-weight:600;color:#FEFCF8;">See you tomorrow!</h1>
           </td>
         </tr>
         <tr>
           <td style="background:#4A6741;padding:12px 32px;">
             <p style="margin:0;font-size:13px;color:#FEFCF8;">
-              ✓ &nbsp;Payment received in full. Your stay is confirmed.
+              🌿 &nbsp;Your stay at ${escapeHtml(data.roomName)} begins tomorrow. Here's everything you need.
             </p>
           </td>
         </tr>
@@ -54,54 +52,45 @@ export function bookingConfirmationGuestEmail(
             <table width="100%" cellpadding="0" cellspacing="0">
               ${row("Booking Ref", `<strong style="font-size:16px;letter-spacing:0.06em;color:#6E6146;">${escapeHtml(data.bookingRef)}</strong>`)}
               ${row("Guest", escapeHtml(data.guestName))}
-              ${row("Room", escapeHtml(data.roomName))}
-              ${row("Check-in", formatDate(data.checkIn))}
-              ${row("Check-out", formatDate(data.checkOut))}
-              ${row("Duration", `${data.nights} night${data.nights !== 1 ? "s" : ""}`)}
+              ${row("Check-in", `<strong>${formatDate(data.checkIn)}</strong> from 2:00 PM`)}
+              ${row("Check-out", `${formatDate(data.checkOut)} by 11:00 AM`)}
               ${row("Guests", `${data.adults} adult${data.adults !== 1 ? "s" : ""}${data.children > 0 ? `, ${data.children} child${data.children !== 1 ? "ren" : ""}` : ""}`)}
-              ${data.specialRequests ? row("Special requests", `<span style="white-space:pre-wrap;">${escapeHtml(data.specialRequests)}</span>`) : ""}
-            </table>
-
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:#FAF7F2;border-radius:8px;border:1px solid #EAE5DC;">
-              <tr>
-                <td style="padding:16px 20px;">
-                  <p style="margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#8B8578;">Payment Summary</p>
-                  <table width="100%" cellpadding="0" cellspacing="0">
-                    <tr>
-                      <td style="font-size:13px;color:#4A6741;padding:4px 0;font-weight:600;">Total Paid</td>
-                      <td align="right" style="font-size:14px;font-weight:700;color:#4A6741;">₹${formatAmount(data.totalAmount)}</td>
-                    </tr>
-                    <tr>
-                      <td colspan="2" style="padding:4px 0;border-top:1px solid #EAE5DC;"></td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:13px;color:#2A2A2A;padding:4px 0;">Balance Due at Check-in</td>
-                      <td align="right" style="font-size:13px;font-weight:600;color:#2A2A2A;">₹0</td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
             </table>
 
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:#F5F0E8;border-radius:8px;border:1px solid #EAE5DC;">
               <tr>
                 <td style="padding:16px 20px;">
                   <p style="margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#8B8578;">Getting Here</p>
-                  <p style="margin:0 0 4px;font-size:13px;color:#2A2A2A;">Near Ratapani Wildlife Sanctuary, Village Bori, Salkanpur Road, Rehti, Sehore, MP — 466446</p>
-                  <p style="margin:4px 0 0;font-size:13px;color:#2A2A2A;">📍 60 km from Bhopal · GPS: 22.88°N, 77.52°E</p>
+                  <p style="margin:0 0 6px;font-size:13px;color:#2A2A2A;">Near Ratapani Wildlife Sanctuary, Village Bori, Salkanpur Road, Rehti, Sehore, MP — 466446</p>
+                  <p style="margin:0 0 6px;font-size:13px;color:#2A2A2A;">📍 60 km from Bhopal · GPS: 22.88°N, 77.52°E</p>
+                  <a href="https://maps.google.com/?q=22.88,77.52" style="font-size:13px;color:#6E6146;">Open in Google Maps →</a>
+                </td>
+              </tr>
+            </table>
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;background:#FAF7F2;border-radius:8px;border:1px solid #EAE5DC;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#8B8578;">What to Bring</p>
+                  <ul style="margin:0;padding-left:16px;font-size:13px;color:#2A2A2A;line-height:1.8;">
+                    <li>Government-issued photo ID (required at check-in)</li>
+                    <li>Comfortable walking shoes for forest trails</li>
+                    <li>Light layers — mornings can be cool</li>
+                    <li>Your booking reference: <strong>${escapeHtml(data.bookingRef)}</strong></li>
+                  </ul>
                 </td>
               </tr>
             </table>
 
             <p style="margin-top:24px;font-size:13px;color:#2A2A2A;line-height:1.6;">
-              Need help? WhatsApp us at <a href="https://wa.me/919770558419" style="color:#6E6146;">+91 97705 58419</a>
-              or email <a href="mailto:madhubanresort@somaiya.com" style="color:#6E6146;">madhubanresort@somaiya.com</a>.
+              Questions? WhatsApp us at <a href="https://wa.me/919770558419" style="color:#6E6146;">+91 97705 58419</a>
+              or email <a href="mailto:madhubanecoretreat@gmail.com" style="color:#6E6146;">madhubanecoretreat@gmail.com</a>.
             </p>
           </td>
         </tr>
         <tr>
           <td style="background:#FAF7F2;padding:16px 32px;border-top:1px solid #EAE5DC;">
-            <p style="margin:0;font-size:11px;color:#8B8578;">Madhuban Eco Retreat (A Somaiya Group Initiative) · +91 97705 58419</p>
+            <p style="margin:0;font-size:11px;color:#8B8578;">Madhuban Eco Retreat · +91 97705 58419</p>
           </td>
         </tr>
       </table>
@@ -110,7 +99,21 @@ export function bookingConfirmationGuestEmail(
 </body>
 </html>`;
 
-  return { subject, html };
+  const text = `Your stay at Madhuban Eco Retreat begins tomorrow!
+
+Booking Ref: ${data.bookingRef}
+Guest: ${data.guestName}
+Room: ${data.roomName}
+Check-in: ${formatDate(data.checkIn)} from 2:00 PM
+Check-out: ${formatDate(data.checkOut)} by 11:00 AM
+
+Getting Here:
+Near Ratapani Wildlife Sanctuary, Village Bori, Salkanpur Road, Rehti, Sehore, MP - 466446
+60 km from Bhopal | GPS: 22.88N, 77.52E
+
+Questions? WhatsApp: +91 97705 58419 | Email: madhubanecoretreat@gmail.com`;
+
+  return { subject, html, text };
 }
 
 function row(label: string, value: string): string {
@@ -134,8 +137,4 @@ function formatDate(iso: string): string {
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const m = Number(parts[1]) - 1;
   return `${parts[2]} ${months[m] ?? ""} ${parts[0]}`;
-}
-
-function formatAmount(n: number): string {
-  return n.toLocaleString("en-IN");
 }

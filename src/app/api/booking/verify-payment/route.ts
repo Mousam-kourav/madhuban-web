@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     await supabase.from("audit_log").insert({
       admin_user_id: "system",
+      actor_email: "system",
       action: "payment_signature_mismatch",
       entity_type: "booking",
       entity_id: bookingId,
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
   // Audit log
   await supabase.from("audit_log").insert({
     admin_user_id: "system",
+    actor_email: "system",
     action: "payment_confirmed",
     entity_type: "booking",
     entity_id: bookingId,
@@ -99,7 +101,7 @@ export async function POST(req: NextRequest) {
       orderId,
       paymentId,
       before: { status: "PENDING_PAYMENT", payment_status: "pending" },
-      after: { status: "CONFIRMED", payment_status: "partial" },
+      after: { status: "CONFIRMED", payment_status: "paid" },
     } as Json,
   });
 

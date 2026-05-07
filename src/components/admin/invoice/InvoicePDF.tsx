@@ -9,6 +9,7 @@ type LineItem = { description: string; hsn: string; qty: number; rate: number; a
 // Two registrations required: latin carries regular text; devanagari carries
 // the ₹ glyph (U+20B9), which is absent from the latin subset.
 // React-pdf v4 picks the first font in the array that contains each glyph.
+// outputFileTracingIncludes in next.config.ts ensures Vercel bundles these files.
 const NOTO_FILES = path.join(process.cwd(), "node_modules/@fontsource/noto-sans/files");
 Font.register({
   family: "Noto Sans",

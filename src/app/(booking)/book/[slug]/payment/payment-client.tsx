@@ -29,7 +29,7 @@ interface OrderData {
   amount: number;
   currency: string;
   keyId: string;
-  advanceAmountRupees: number;
+  totalAmountRupees: number;
   bookingRef: string;
   prefill: { name: string; email: string; contact: string };
 }
@@ -37,7 +37,7 @@ interface OrderData {
 interface Props {
   bookingId: string;
   roomSlug: string;
-  advanceAmountRupees: number;
+  totalAmountRupees: number;
   guestName: string;
   guestEmail: string;
   guestMobile: string;
@@ -48,7 +48,7 @@ interface Props {
 export function PaymentClient({
   bookingId,
   roomSlug,
-  advanceAmountRupees,
+  totalAmountRupees,
   guestName,
   guestEmail,
   guestMobile,
@@ -99,7 +99,7 @@ export function PaymentClient({
       currency: orderData.currency,
       order_id: orderData.orderId,
       name: "Madhuban Eco Retreat",
-      description: `Booking advance — ${orderData.bookingRef}`,
+      description: `Booking payment — ${orderData.bookingRef}`,
       prefill: {
         name: guestName,
         email: guestEmail,
@@ -189,13 +189,13 @@ export function PaymentClient({
 
           <div className="mb-6 rounded-xl bg-cream p-4">
             <div className="flex items-center justify-between font-body text-sm">
-              <span className="text-charcoal/70">Advance to pay now (50%)</span>
+              <span className="text-charcoal/70">Total amount</span>
               <span className="text-xl font-semibold text-charcoal">
-                ₹{formatPrice(advanceAmountRupees)}
+                ₹{formatPrice(totalAmountRupees)}
               </span>
             </div>
             <p className="mt-2 font-body text-xs text-muted-foreground">
-              Remaining 50% (₹{formatPrice(advanceAmountRupees)}) collected at check-in.
+              Full payment collected now. No balance due at check-in.
             </p>
           </div>
 
@@ -218,7 +218,7 @@ export function PaymentClient({
             ) : !scriptReady ? (
               "Loading payment…"
             ) : (
-              `Pay ₹${formatPrice(advanceAmountRupees)} Advance`
+              `Pay ₹${formatPrice(totalAmountRupees)}`
             )}
           </button>
 

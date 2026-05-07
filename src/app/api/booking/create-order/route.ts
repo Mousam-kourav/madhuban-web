@@ -54,8 +54,7 @@ export async function POST(req: NextRequest) {
   }
 
   const totalAmount = Number(booking.total_amount);
-  const advanceAmount = +(totalAmount * 0.5).toFixed(2);
-  const amountPaise = Math.round(advanceAmount * 100);
+  const amountPaise = Math.round(totalAmount * 100);
 
   let orderId: string;
   let amountFromOrder: number;
@@ -72,13 +71,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to create payment order" }, { status: 500 });
   }
 
-  // Insert a pending payment row
+  // Insert a pending payment row for the full amount
   await supabase.from("payments").insert({
     booking_id: booking.id,
     razorpay_order_id: orderId,
-    amount: advanceAmount,
+    amount: totalAmount,
     status: "pending",
-    payment_type: "advance",
+    payment_type: "full",
   });
 
   const guest = Array.isArray(booking.guests)
@@ -90,7 +89,7 @@ export async function POST(req: NextRequest) {
     amount: amountFromOrder,
     currency: "INR",
     keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "",
-    advanceAmountRupees: advanceAmount,
+    totalAmountRupees: totalAmount,
     bookingRef: booking.booking_ref,
     prefill: {
       name: guest?.name ?? "",

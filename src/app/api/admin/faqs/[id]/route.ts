@@ -1,19 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import type { Database } from "@/lib/supabase/database.types";
+import { assertAdmin } from "@/lib/admin/auth";
 
 type FaqUpdate = Database["public"]["Tables"]["room_faqs"]["Update"];
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 interface Params { params: Promise<{ id: string }> }
 

@@ -4,6 +4,7 @@ export interface AdminBookingConfirmationData extends BookingConfirmationData {
   guestEmail: string;
   guestMobile: string;
   source: string;
+  paidAmount?: number;
 }
 
 export function bookingConfirmationAdminEmail(
@@ -52,8 +53,8 @@ export function bookingConfirmationAdminEmail(
               ${row("Source", escapeHtml(data.source))}
               ${data.specialRequests ? row("Special requests", `<span style="white-space:pre-wrap;">${escapeHtml(data.specialRequests)}</span>`) : ""}
               ${row("Total Amount", `₹${formatAmount(data.totalAmount)}`)}
-              ${row("Advance Received", `₹${formatAmount(data.advanceAmount)}`)}
-              ${row("Balance at Check-in", `<strong style="color:#6E6146;">₹${formatAmount(data.balanceDue)}</strong>`)}
+              ${row("Payment Received", `<strong style="color:#4A6741;">₹${formatAmount(data.paidAmount ?? data.totalAmount)}</strong>`)}
+              ${row("Balance at Check-in", `₹0`)}
             </table>
           </td>
         </tr>

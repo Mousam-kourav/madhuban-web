@@ -5,6 +5,7 @@ import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 import { sendEmail } from "@/lib/email/resend";
 import { bookingConfirmationGuestEmail } from "@/lib/email/templates/booking-confirmation-guest";
 import { bookingConfirmationAdminEmail } from "@/lib/email/templates/booking-confirmation-admin";
+import { createNotification } from "@/lib/admin/notifications";
 
 export async function POST(req: NextRequest) {
   let body: unknown;
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     await supabase.from("audit_log").insert({
       admin_user_id: "system",
+      actor_email: "system",
       action: "payment_signature_mismatch",
       entity_type: "booking",
       entity_id: bookingId,
@@ -92,6 +94,7 @@ export async function POST(req: NextRequest) {
   // Audit log
   await supabase.from("audit_log").insert({
     admin_user_id: "system",
+    actor_email: "system",
     action: "payment_confirmed",
     entity_type: "booking",
     entity_id: bookingId,
@@ -99,7 +102,7 @@ export async function POST(req: NextRequest) {
       orderId,
       paymentId,
       before: { status: "PENDING_PAYMENT", payment_status: "pending" },
-      after: { status: "CONFIRMED", payment_status: "partial" },
+      after: { status: "CONFIRMED", payment_status: "paid" },
     } as Json,
   });
 
@@ -113,8 +116,6 @@ export async function POST(req: NextRequest) {
     } | null;
 
     const totalAmount = Number(booking.total_amount);
-    const advanceAmount = +(totalAmount * 0.5).toFixed(2);
-    const balanceDue = +(totalAmount - advanceAmount).toFixed(2);
     const nights = Math.round(
       (new Date(booking.checkout).getTime() - new Date(booking.checkin).getTime()) / 86400000,
     );
@@ -130,8 +131,6 @@ export async function POST(req: NextRequest) {
         adults: booking.num_adults,
         children: booking.num_children,
         totalAmount,
-        advanceAmount,
-        balanceDue,
         specialRequests: booking.special_requests,
       };
 
@@ -154,10 +153,22 @@ export async function POST(req: NextRequest) {
             guestEmail: guest.email,
             guestMobile: guest.mobile ?? "",
             source: booking.source,
+            paidAmount: totalAmount,
           }),
         });
       } catch (err) {
         console.error("[verify-payment] admin email failed:", err);
+      }
+
+      try {
+        await createNotification({
+          type: "payment_received",
+          title: `Payment received — ${booking.booking_ref}`,
+          body: `${guest.name} · ${room.name} · ₹${totalAmount.toLocaleString("en-IN")}`,
+          linkUrl: `/admin/bookings/${bookingId}`,
+        });
+      } catch (err) {
+        console.error("[verify-payment] notification failed:", err);
       }
     }
   }

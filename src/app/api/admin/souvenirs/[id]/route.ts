@@ -1,20 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { Json } from '@/lib/supabase/database.types';
 import type { SouvenirRow } from '@/lib/supabase/database.types';
+import { assertAdmin } from "@/lib/admin/auth";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'madhubanecoretreat@gmail.com';
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 export async function GET(
   _req: NextRequest,
@@ -101,6 +92,7 @@ export async function PATCH(
 
   await supabase.from('audit_log').insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: 'update',
     entity_type: 'souvenir',
     entity_id: id,
@@ -129,6 +121,7 @@ export async function DELETE(
 
   await supabase.from('audit_log').insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: 'delete',
     entity_type: 'souvenir',
     entity_id: id,

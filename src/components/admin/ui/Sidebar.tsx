@@ -13,6 +13,8 @@ import {
   Tag,
   ShoppingBag,
   Settings,
+  Users,
+  ClipboardList,
   HelpCircle,
   LogOut,
   Menu,
@@ -30,7 +32,11 @@ const NAV_ITEMS = [
   { icon: FileText,        label: 'Blog Posts',    href: '/admin/posts' },
   { icon: Tag,             label: 'Coupons',       href: '/admin/coupons' },
   { icon: ShoppingBag,     label: 'Souvenir Shop', href: '/admin/souvenirs' },
+  { icon: ClipboardList,   label: 'Audit Log',     href: '/admin/audit-log' },
+  { icon: Users,           label: 'Staff',         href: '/admin/users' },
 ];
+
+const SETTINGS_ITEM = { icon: Settings, label: 'Settings', href: '/admin/settings' };
 
 function NavLink({
   href,
@@ -102,14 +108,12 @@ function SidebarContent({ onClose }: { onClose?: () => void }) {
         className="px-3 py-4 flex-shrink-0 space-y-0.5"
         style={{ borderTop: '1px solid var(--admin-sidebar-border)' }}
       >
-        <button
-          type="button"
-          disabled
-          className="flex w-full items-center gap-3 px-4 py-2.5 rounded-xl font-body text-sm text-admin-sidebar-fg-muted opacity-40 cursor-not-allowed"
-        >
-          <Settings className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
-          Settings
-        </button>
+        <NavLink
+          href={SETTINGS_ITEM.href}
+          icon={SETTINGS_ITEM.icon}
+          label={SETTINGS_ITEM.label}
+          onClick={onClose}
+        />
         <button
           type="button"
           disabled

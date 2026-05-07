@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { calculateAdminPricing } from "@/lib/admin/calculate-admin-pricing";
 import { checkAvailability } from "@/lib/booking/availability";
@@ -7,17 +6,12 @@ import { generateBookingReference } from "@/lib/booking/reference";
 import { sendEmail } from "@/lib/email/resend";
 import { bookingConfirmationGuestEmail } from "@/lib/email/templates/booking-confirmation-guest";
 import { bookingConfirmationAdminEmail } from "@/lib/email/templates/booking-confirmation-admin";
+import { createNotification } from "@/lib/admin/notifications";
 import type { Json } from "@/lib/supabase/database.types";
 import { z } from "zod";
+import { assertAdmin } from "@/lib/admin/auth";
+import { validatePhone, PHONE_ERROR } from "@/lib/validation/phone";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 const addonSchema = z.object({
   id: z.string(),
@@ -37,7 +31,7 @@ const createBookingBodySchema = z.object({
   specialRequests: z.string().optional(),
   guest: z.object({
     name:    z.string().min(1),
-    mobile:  z.string().regex(/^\d{10}$/, "Mobile must be 10 digits"),
+    mobile:  z.string().refine((v) => validatePhone(v).valid, PHONE_ERROR),
     email:   z.string().email().optional().or(z.literal("")),
     idType:  z.string().optional(),
     idNumber: z.string().optional(),
@@ -101,7 +95,7 @@ export async function POST(req: NextRequest) {
     // Find or create guest (look up by mobile first since email is optional)
     let guestId: string;
     const normalizedEmail = guest.email?.trim().toLowerCase() || null;
-    const normalizedMobile = guest.mobile.trim();
+    const normalizedMobile = validatePhone(guest.mobile).normalized;
 
     // Try find by email if provided, then by mobile
     const { data: existingByEmail } = normalizedEmail
@@ -217,6 +211,7 @@ export async function POST(req: NextRequest) {
     // Audit log
     await supabase.from("audit_log").insert({
       admin_user_id: user.id,
+      actor_email:   user.email ?? null,
       action:        "booking_created_manual",
       entity_type:   "booking",
       entity_id:     booking.id,
@@ -231,12 +226,22 @@ export async function POST(req: NextRequest) {
       } as Json,
     });
 
+    // Notification
+    try {
+      await createNotification({
+        type: "booking_created",
+        title: `New booking — ${booking.booking_ref}`,
+        body: `${guest.name.trim()} · ${pricing.roomName} · ₹${pricing.totalAmount.toLocaleString("en-IN")} (manual)`,
+        linkUrl: `/admin/bookings/${booking.id}`,
+      });
+    } catch (err) {
+      console.error("[admin/bookings/create] notification failed:", err);
+    }
+
     // Send confirmation emails if requested
     if (doSendEmail && normalizedEmail) {
       const nights = pricing.nights;
       const totalAmount = pricing.totalAmount;
-      const advanceAmount = advance?.amount ?? 0;
-      const balanceDue = +(totalAmount - advanceAmount).toFixed(2);
 
       const confirmationData = {
         bookingRef:      booking.booking_ref,
@@ -248,8 +253,6 @@ export async function POST(req: NextRequest) {
         adults:          numAdults,
         children:        numChildren,
         totalAmount,
-        advanceAmount,
-        balanceDue,
         specialRequests: specialRequests ?? null,
       };
 
@@ -261,12 +264,13 @@ export async function POST(req: NextRequest) {
 
       try {
         await sendEmail({
-          to: ADMIN_EMAIL,
+          to: "madhubanecoretreat@gmail.com",
           ...bookingConfirmationAdminEmail({
             ...confirmationData,
             guestEmail:  normalizedEmail,
             guestMobile: normalizedMobile,
             source,
+            paidAmount: advance?.amount ?? 0,
           }),
         });
       } catch (err) {

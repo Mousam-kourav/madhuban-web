@@ -22,9 +22,7 @@ export interface PricingBreakdown {
   gstRate: 12 | 18;
   subtotalBeforeGst: number; // after discount, before GST
   gstAmount: number;
-  totalAmount: number;   // GST-inclusive final
-  advanceAmount: number; // 50% charged at booking
-  balanceDue: number;    // 50% at check-in
+  totalAmount: number;   // GST-inclusive final — charged in full at booking
 }
 
 export interface GuestDetails {

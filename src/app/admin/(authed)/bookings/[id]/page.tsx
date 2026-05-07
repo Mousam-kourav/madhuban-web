@@ -517,6 +517,7 @@ export default async function BookingDetailPage({ params }: Props) {
               roomName={roomName}
               totalAmount={Number(booking.total_amount)}
               existingInvoiceId={existingInvoiceId}
+              guestEmail={guest?.email}
             />
           </Card>
 

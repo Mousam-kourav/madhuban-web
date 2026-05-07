@@ -24,10 +24,11 @@ interface Props {
   roomName: string;
   totalAmount: number;
   existingInvoiceId?: string | null;
+  guestEmail?: string;
 }
 
 export function BookingActionsPanel({
-  bookingId, status, checkin, guestName, roomName, existingInvoiceId,
+  bookingId, status, checkin, guestName, roomName, existingInvoiceId, guestEmail,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -36,10 +37,16 @@ export function BookingActionsPanel({
   const [checkOutOpen, setCheckOutOpen] = useState(false);
   const [cancelOpen, setCancelOpen]     = useState(false);
   const [chargesOpen, setChargesOpen]   = useState(false);
+  const [emailOpen, setEmailOpen]       = useState(false);
 
   const [checkInLoading, setCheckInLoading]   = useState(false);
   const [checkOutLoading, setCheckOutLoading] = useState(false);
   const [cancelLoading, setCancelLoading]     = useState(false);
+  const [emailLoading, setEmailLoading]       = useState(false);
+
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody]       = useState("");
+  const [emailError, setEmailError]     = useState("");
 
   const [cancelReason, setCancelReason]   = useState("");
   const [cancelOther, setCancelOther]     = useState("");
@@ -131,10 +138,15 @@ export function BookingActionsPanel({
         <Button variant="secondary" size="md" className="w-full" onClick={() => toast.info("Edit booking flow — coming soon")}>
           <Pencil className="w-4 h-4" /> Modify Booking
         </Button>
-        <Button variant="secondary" size="md" className="w-full" onClick={() => toast.info("Coming in Phase A8 — Operations Polish")}>
-          <Mail className="w-4 h-4" /> Send Confirmation
+        <Button variant="secondary" size="md" className="w-full" onClick={() => { setEmailSubject(""); setEmailBody(""); setEmailError(""); setEmailOpen(true); }}>
+          <Mail className="w-4 h-4" /> Send Email
         </Button>
-        <Button variant="secondary" size="md" className="w-full" onClick={() => toast.info("Coming in Phase A8 — Operations Polish")}>
+        <Button
+          variant="secondary"
+          size="md"
+          className="w-full"
+          onClick={() => window.open(`/api/admin/bookings/${bookingId}/voucher`, "_blank")}
+        >
           <Printer className="w-4 h-4" /> Print Voucher
         </Button>
         <Button variant="ghost" size="md" className="w-full" onClick={() => setChargesOpen(true)}>
@@ -234,6 +246,66 @@ export function BookingActionsPanel({
       </Modal>
 
       <AddChargesModal open={chargesOpen} onClose={() => setChargesOpen(false)} />
+
+      {/* Send Email Modal */}
+      <Modal open={emailOpen} onClose={() => !emailLoading && setEmailOpen(false)} title="Send Email to Guest">
+        <div className="space-y-4">
+          <p className="font-body text-sm text-charcoal/70">
+            Sending to <span className="font-medium text-charcoal">{guestEmail ?? guestName}</span>
+          </p>
+          <Input
+            label="Subject"
+            required
+            value={emailSubject}
+            onChange={(e) => setEmailSubject(e.target.value)}
+          />
+          <TextArea
+            label="Message"
+            required
+            rows={6}
+            value={emailBody}
+            onChange={(e) => setEmailBody(e.target.value)}
+            helperText="Your email signature will be appended automatically."
+          />
+          {emailError && (
+            <p className="font-body text-sm text-error">{emailError}</p>
+          )}
+          <div className="flex gap-3 justify-end pt-2">
+            <Button variant="secondary" size="md" onClick={() => setEmailOpen(false)} disabled={emailLoading}>
+              Cancel
+            </Button>
+            <Button
+              size="md"
+              loading={emailLoading}
+              onClick={async () => {
+                if (!emailSubject.trim() || !emailBody.trim()) {
+                  setEmailError("Subject and message are required.");
+                  return;
+                }
+                setEmailError("");
+                setEmailLoading(true);
+                try {
+                  const res = await fetch(`/api/admin/bookings/${bookingId}/send-email`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ subject: emailSubject, body: emailBody }),
+                  });
+                  const data = (await res.json()) as { ok?: boolean; error?: string };
+                  if (!res.ok) throw new Error(data.error ?? "Failed to send");
+                  toast.success("Email sent");
+                  setEmailOpen(false);
+                } catch (err) {
+                  setEmailError(err instanceof Error ? err.message : "Failed to send email");
+                } finally {
+                  setEmailLoading(false);
+                }
+              }}
+            >
+              <Mail className="w-4 h-4" /> Send
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       {isPending && null}
     </>

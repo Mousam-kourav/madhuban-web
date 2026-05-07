@@ -382,13 +382,10 @@ export function CheckoutForm({
 
                 <div className="rounded-lg bg-warm-beige/40 p-3 text-xs text-charcoal/70">
                   <p>
-                    <strong className="text-charcoal">Due now:</strong>{" "}
-                    &#8377;{formatPrice(pricing.advanceAmount)} (50%)
+                    <strong className="text-charcoal">Due now (full payment):</strong>{" "}
+                    &#8377;{formatPrice(pricing.totalAmount)}
                   </p>
-                  <p className="mt-1">
-                    <strong className="text-charcoal">At check-in:</strong>{" "}
-                    &#8377;{formatPrice(pricing.balanceDue)} (50%)
-                  </p>
+                  <p className="mt-1">No balance due at check-in.</p>
                 </div>
               </div>
             ) : nights > 0 ? (

@@ -1,16 +1,8 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 export async function POST(
   req: NextRequest,
@@ -63,6 +55,7 @@ export async function POST(
 
   await supabase.from("audit_log").insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: "offline_payment_recorded",
     entity_type: "booking",
     entity_id: id,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidPhone, PHONE_ERROR } from "@/lib/validation/phone";
 
 export const ROOM_SLUGS = [
   "safari-tent",
@@ -24,10 +25,7 @@ export const bookingSchema = z
   .object({
     name: z.string().min(1, "Name is required").max(100, "Name must be under 100 characters"),
     email: z.string().email("Enter a valid email address"),
-    phone: z
-      .string()
-      .min(7, "Enter a valid phone number")
-      .regex(/^[\+\d\s\-\(\)]{7,20}$/, "Enter a valid phone number"),
+    phone: z.string().refine(isValidPhone, PHONE_ERROR),
     checkIn: z.string().date("Enter a valid check-in date"),
     checkOut: z.string().date("Enter a valid check-out date"),
     adults: z.number().int().min(1, "At least 1 adult required").max(10, "Maximum 10 adults"),

@@ -8,8 +8,6 @@ export interface BookingConfirmationData {
   adults: number;
   children: number;
   totalAmount: number;
-  advanceAmount: number;
-  balanceDue: number;
   specialRequests?: string | null;
 }
 
@@ -34,7 +32,7 @@ export function bookingConfirmationGuestEmail(
         <tr>
           <td style="background:#4A6741;padding:12px 32px;">
             <p style="margin:0;font-size:13px;color:#FEFCF8;">
-              ✓ &nbsp;Your advance payment has been received. Your stay is confirmed.
+              ✓ &nbsp;Payment received in full. Your stay is confirmed.
             </p>
           </td>
         </tr>
@@ -70,19 +68,15 @@ export function bookingConfirmationGuestEmail(
                   <p style="margin:0 0 8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#8B8578;">Payment Summary</p>
                   <table width="100%" cellpadding="0" cellspacing="0">
                     <tr>
-                      <td style="font-size:13px;color:#2A2A2A;padding:4px 0;">Total Stay Amount</td>
-                      <td align="right" style="font-size:13px;font-weight:600;color:#2A2A2A;">₹${formatAmount(data.totalAmount)}</td>
-                    </tr>
-                    <tr>
-                      <td style="font-size:13px;color:#4A6741;padding:4px 0;">Advance Paid (50%)</td>
-                      <td align="right" style="font-size:13px;font-weight:600;color:#4A6741;">₹${formatAmount(data.advanceAmount)}</td>
+                      <td style="font-size:13px;color:#4A6741;padding:4px 0;font-weight:600;">Total Paid</td>
+                      <td align="right" style="font-size:14px;font-weight:700;color:#4A6741;">₹${formatAmount(data.totalAmount)}</td>
                     </tr>
                     <tr>
                       <td colspan="2" style="padding:4px 0;border-top:1px solid #EAE5DC;"></td>
                     </tr>
                     <tr>
-                      <td style="font-size:13px;color:#6E6146;padding:4px 0;font-weight:600;">Balance Due at Check-in</td>
-                      <td align="right" style="font-size:14px;font-weight:700;color:#6E6146;">₹${formatAmount(data.balanceDue)}</td>
+                      <td style="font-size:13px;color:#2A2A2A;padding:4px 0;">Balance Due at Check-in</td>
+                      <td align="right" style="font-size:13px;font-weight:600;color:#2A2A2A;">₹0</td>
                     </tr>
                   </table>
                 </td>

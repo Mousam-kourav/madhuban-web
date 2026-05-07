@@ -53,7 +53,7 @@ export const BUSINESS = {
   },
 
   /** Booking model */
-  advancePayment: '50% at booking, 50% at check-in',
+  advancePayment: '100% at booking — no balance at check-in',
 } as const;
 
 export type BusinessData = typeof BUSINESS;

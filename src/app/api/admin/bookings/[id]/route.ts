@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -6,25 +5,21 @@ import type { Json } from "@/lib/supabase/database.types";
 import { sendEmail } from "@/lib/email/resend";
 import { bookingCancelledGuestEmail } from "@/lib/email/templates/booking-cancelled-guest";
 import { bookingCancelledAdminEmail } from "@/lib/email/templates/booking-cancelled-admin";
+import { createNotification } from "@/lib/admin/notifications";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 async function writeAuditLog(
   supabase: ReturnType<typeof createAdminClient>,
   adminUserId: string,
+  actorEmail: string | null,
   bookingId: string,
   action: string,
   details: Json,
 ) {
   await supabase.from("audit_log").insert({
     admin_user_id: adminUserId,
+    actor_email: actorEmail,
     action,
     entity_type: "booking",
     entity_id: bookingId,
@@ -109,6 +104,7 @@ export async function PATCH(
   } | null;
 
   const adminId = user.id;
+  const actorEmail = user.email ?? null;
 
   switch (action) {
     case "CHECKED_IN": {
@@ -116,7 +112,7 @@ export async function PATCH(
         return NextResponse.json({ error: "Booking must be CONFIRMED to check in" }, { status: 409 });
       }
       await supabase.from("bookings").update({ status: "CHECKED_IN" }).eq("id", id);
-      await writeAuditLog(supabase, adminId, id, "check_in", {
+      await writeAuditLog(supabase, adminId, actorEmail, id, "check_in", {
         before: { status: booking.status },
         after: { status: "CHECKED_IN" },
       });
@@ -128,7 +124,7 @@ export async function PATCH(
         return NextResponse.json({ error: "Booking must be CHECKED_IN to check out" }, { status: 409 });
       }
       await supabase.from("bookings").update({ status: "CHECKED_OUT" }).eq("id", id);
-      await writeAuditLog(supabase, adminId, id, "check_out", {
+      await writeAuditLog(supabase, adminId, actorEmail, id, "check_out", {
         before: { status: booking.status },
         after: { status: "CHECKED_OUT" },
       });
@@ -153,7 +149,7 @@ export async function PATCH(
         captured_at: new Date().toISOString(),
       });
       await supabase.from("bookings").update({ payment_status: "paid" }).eq("id", id);
-      await writeAuditLog(supabase, adminId, id, "balance_paid", {
+      await writeAuditLog(supabase, adminId, actorEmail, id, "balance_paid", {
         amount,
         method,
         before: { payment_status: booking.payment_status },
@@ -167,7 +163,7 @@ export async function PATCH(
         return NextResponse.json({ error: "Cannot mark no-show for this booking status" }, { status: 409 });
       }
       await supabase.from("bookings").update({ status: "NO_SHOW" }).eq("id", id);
-      await writeAuditLog(supabase, adminId, id, "no_show", {
+      await writeAuditLog(supabase, adminId, actorEmail, id, "no_show", {
         before: { status: booking.status },
         after: { status: "NO_SHOW" },
       });
@@ -177,7 +173,7 @@ export async function PATCH(
     case "INTERNAL_NOTE": {
       const note = typeof body.note === "string" ? body.note.trim() : "";
       await supabase.from("bookings").update({ internal_notes: note || null }).eq("id", id);
-      await writeAuditLog(supabase, adminId, id, "internal_note_updated", { note });
+      await writeAuditLog(supabase, adminId, actorEmail, id, "internal_note_updated", { note });
       return NextResponse.json({ ok: true });
     }
 
@@ -219,7 +215,7 @@ export async function PATCH(
         }
       }
 
-      await writeAuditLog(supabase, adminId, id, "cancelled", {
+      await writeAuditLog(supabase, adminId, actorEmail, id, "cancelled", {
         reason: fullReason,
         refundAmount,
         before: { status: booking.status },
@@ -236,7 +232,7 @@ export async function PATCH(
           checkOut: booking.checkout,
           refundAmount,
         };
-        const notifyEmail = process.env.CONTACT_FORM_TO ?? ADMIN_EMAIL;
+        const notifyEmail = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
         try { await sendEmail({ to: guest.email, ...bookingCancelledGuestEmail(data) }); }
         catch (err) { console.error("[admin/cancel] guest email:", err); }
         try {
@@ -251,6 +247,15 @@ export async function PATCH(
           });
         } catch (err) { console.error("[admin/cancel] admin email:", err); }
       }
+
+      try {
+        await createNotification({
+          type: "booking_cancelled",
+          title: `Booking cancelled — ${booking.booking_ref}`,
+          body: `${guest?.name ?? "Guest"} · Cancelled by ${user.email ?? "admin"}`,
+          linkUrl: `/admin/bookings/${id}`,
+        });
+      } catch (err) { console.error("[admin/cancel] notification:", err); }
 
       return NextResponse.json({ ok: true });
     }

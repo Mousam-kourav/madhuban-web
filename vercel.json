@@ -1,4 +1,7 @@
 {
+  "crons": [
+    { "path": "/api/cron/send-reminders", "schedule": "30 3 * * *" }
+  ],
   "headers": [
     {
       "source": "/_next/static/(.*)",

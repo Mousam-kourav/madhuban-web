@@ -60,7 +60,7 @@ export async function POST(
 
   await supabase.from("audit_log").insert({
     admin_user_id: user.id,
-    actor_email: user.email,
+    actor_email: user.email ?? null,
     action: "custom_email_sent",
     entity_type: "booking",
     entity_id: id,

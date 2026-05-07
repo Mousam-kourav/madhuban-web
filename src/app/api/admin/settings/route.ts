@@ -29,7 +29,8 @@ export async function PATCH(req: NextRequest) {
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("app_settings")
-    .update(update)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .update(update as any)
     .eq("id", "singleton");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

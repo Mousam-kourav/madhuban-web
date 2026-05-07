@@ -95,8 +95,6 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
   const discountedTotal = +(baseNightlyTotal - discountAmount).toFixed(2);
   const { base: subtotalBeforeGst, gst: gstAmount } = priceBreakdown(discountedTotal, gstRatePct);
   const totalAmount = discountedTotal;
-  const advanceAmount = +(totalAmount * 0.5).toFixed(2);
-  const balanceDue = +(totalAmount - advanceAmount).toFixed(2);
 
   return {
     roomId: room.id,
@@ -115,7 +113,5 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
     subtotalBeforeGst,
     gstAmount,
     totalAmount,
-    advanceAmount,
-    balanceDue,
   };
 }

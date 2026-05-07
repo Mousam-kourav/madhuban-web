@@ -55,6 +55,7 @@ export async function POST(
 
   await supabase.from("audit_log").insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: "offline_payment_recorded",
     entity_type: "booking",
     entity_id: id,

@@ -253,7 +253,7 @@ export type SouvenirRow = {
 
 // audit_log: admin_user_id (not user_id), entity_type/entity_id (not entity/entity_id), details (not before/after_json)
 // Migration 0020: added actor_email text null
-type AuditLogRow = {
+export type AuditLogRow = {
   id: string;
   admin_user_id: string;
   actor_email: string | null;
@@ -517,8 +517,8 @@ export type Database = {
       };
       notifications: {
         Row: NotificationRow;
-        Insert: Omit<NotificationRow, "id" | "created_at"> &
-          Partial<Pick<NotificationRow, "id" | "created_at">>;
+        Insert: Omit<NotificationRow, "id" | "created_at" | "read_at"> &
+          Partial<Pick<NotificationRow, "id" | "created_at" | "read_at">>;
         Update: Partial<NotificationRow>;
         Relationships: [];
       };

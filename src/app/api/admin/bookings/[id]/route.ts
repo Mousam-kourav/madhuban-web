@@ -232,7 +232,7 @@ export async function PATCH(
           checkOut: booking.checkout,
           refundAmount,
         };
-        const notifyEmail = process.env.CONTACT_FORM_TO ?? ADMIN_EMAIL;
+        const notifyEmail = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
         try { await sendEmail({ to: guest.email, ...bookingCancelledGuestEmail(data) }); }
         catch (err) { console.error("[admin/cancel] guest email:", err); }
         try {

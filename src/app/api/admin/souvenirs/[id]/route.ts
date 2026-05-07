@@ -92,6 +92,7 @@ export async function PATCH(
 
   await supabase.from('audit_log').insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: 'update',
     entity_type: 'souvenir',
     entity_id: id,
@@ -120,6 +121,7 @@ export async function DELETE(
 
   await supabase.from('audit_log').insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: 'delete',
     entity_type: 'souvenir',
     entity_id: id,

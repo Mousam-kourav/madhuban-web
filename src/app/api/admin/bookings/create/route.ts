@@ -264,7 +264,7 @@ export async function POST(req: NextRequest) {
 
       try {
         await sendEmail({
-          to: ADMIN_EMAIL,
+          to: "madhubanecoretreat@gmail.com",
           ...bookingConfirmationAdminEmail({
             ...confirmationData,
             guestEmail:  normalizedEmail,

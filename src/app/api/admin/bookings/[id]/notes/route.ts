@@ -55,6 +55,7 @@ export async function PATCH(
 
   await supabase.from("audit_log").insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: "internal_note_added",
     entity_type: "booking",
     entity_id: id,

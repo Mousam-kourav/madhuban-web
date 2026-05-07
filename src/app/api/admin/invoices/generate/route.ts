@@ -177,6 +177,7 @@ export async function POST(req: NextRequest) {
   // Audit log
   await supabase.from("audit_log").insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: "invoice_generated",
     entity_type: "invoice",
     entity_id: invoice_id,

@@ -74,7 +74,6 @@ export default async function PaymentPage({ params, searchParams }: Props) {
   } | null;
 
   const totalAmount = Number(booking.total_amount);
-  const advanceAmountRupees = +(totalAmount * 0.5).toFixed(2);
 
   return (
     <div className="py-10 px-4">
@@ -97,14 +96,14 @@ export default async function PaymentPage({ params, searchParams }: Props) {
             Secure Payment
           </h1>
           <p className="mt-2 font-body text-sm text-charcoal/70">
-            Pay 50% advance to confirm your stay at {room?.name ?? "Madhuban Eco Retreat"}.
+            Complete your payment to confirm your stay at {room?.name ?? "Madhuban Eco Retreat"}.
           </p>
         </div>
 
         <PaymentClient
           bookingId={booking.id}
           roomSlug={slug}
-          advanceAmountRupees={advanceAmountRupees}
+          totalAmountRupees={totalAmount}
           guestName={guest?.name ?? ""}
           guestEmail={guest?.email ?? ""}
           guestMobile={guest?.mobile ?? ""}

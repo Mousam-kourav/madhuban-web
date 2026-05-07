@@ -92,8 +92,6 @@ export default async function ConfirmationPage({ searchParams }: Props) {
   } | null;
 
   const totalAmount = Number(booking.total_amount);
-  const advanceAmount = +(totalAmount * 0.5).toFixed(2);
-  const balanceDue = +(totalAmount - advanceAmount).toFixed(2);
   const nights = Math.round(
     (new Date(booking.checkout).getTime() - new Date(booking.checkin).getTime()) / 86400000,
   );
@@ -167,16 +165,16 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           </h2>
           <div className="space-y-2 font-body text-sm">
             <div className="flex justify-between">
-              <span className="text-charcoal/70">Total Stay Amount</span>
+              <span className="text-charcoal/70">Total Amount</span>
               <span className="font-medium">₹{formatAmount(totalAmount)}</span>
             </div>
-            <div className="flex justify-between text-[var(--color-moss-green)]">
-              <span>Advance Paid (50%)</span>
-              <span className="font-medium">₹{formatAmount(advanceAmount)}</span>
+            <div className="flex justify-between border-t border-border pt-2 font-semibold text-[var(--color-moss-green)]">
+              <span>Total Paid</span>
+              <span>₹{formatAmount(totalAmount)}</span>
             </div>
-            <div className="flex justify-between border-t border-border pt-2 font-semibold text-earth-brown">
+            <div className="flex justify-between text-charcoal/60">
               <span>Balance Due at Check-in</span>
-              <span>₹{formatAmount(balanceDue)}</span>
+              <span>₹0</span>
             </div>
           </div>
         </section>
@@ -188,7 +186,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           </h2>
           <ul className="space-y-2 font-body text-sm text-charcoal/70">
             <li>• Check-in from 2:00 PM · Check-out by 11:00 AM</li>
-            <li>• Balance of ₹{formatAmount(balanceDue)} collected at check-in (cash / UPI)</li>
+            <li>• Payment received in full — no balance due at check-in</li>
             <li>• Directions and driving route will be shared via WhatsApp</li>
             <li>• 60 km from Bhopal via NH-46 · GPS: 22.88°N, 77.52°E</li>
           </ul>

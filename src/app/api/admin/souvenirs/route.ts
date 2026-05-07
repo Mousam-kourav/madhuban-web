@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
 
   await supabase.from('audit_log').insert({
     admin_user_id: user.id,
+    actor_email: user.email ?? null,
     action: 'create',
     entity_type: 'souvenir',
     entity_id: (data as { id: string }).id,

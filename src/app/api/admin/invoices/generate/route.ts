@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { computeRoomGstRate, isInterStateGuest, computeTaxBreakdown, getFinancialYear } from "@/lib/gst";
+import { computeRoomGstRate, isInterStateGuest, computeTaxBreakdown, getFinancialYear, priceBreakdownInclusive } from "@/lib/gst";
 import type { Json } from "@/lib/supabase/database.types";
 
 const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
   const checkinLabel = checkinDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
   const checkoutLabel = checkoutDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 
-  // Build line items
+  // Build line items — amounts are GST-inclusive (what the guest paid)
   const addons = (Array.isArray(booking.addons) ? booking.addons : []) as AddonItem[];
 
   const lineItems: LineItem[] = [
@@ -119,10 +119,12 @@ export async function POST(req: NextRequest) {
     })),
   ];
 
-  const taxableAmount = Math.round(lineItems.reduce((s, i) => s + i.amount, 0) * 100) / 100;
-
-  // GST rate from room's base price (per architect decision — always computed, never read stored column)
+  // GST rate always computed from base price — never read stored column
   const gstRatePct = computeRoomGstRate(room.base_price_per_night);
+
+  // Inclusive total → back-calculate pre-tax base and GST portion
+  const inclusiveTotal = Math.round(lineItems.reduce((s, i) => s + i.amount, 0) * 100) / 100;
+  const { base: taxableAmount } = priceBreakdownInclusive(inclusiveTotal, gstRatePct);
 
   // Determine guest state for intra/inter-state split
   const isCorporate = !!booking.corporate_gstin;

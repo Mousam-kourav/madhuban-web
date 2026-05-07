@@ -141,7 +141,12 @@ export function BookingActionsPanel({
         <Button variant="secondary" size="md" className="w-full" onClick={() => { setEmailSubject(""); setEmailBody(""); setEmailError(""); setEmailOpen(true); }}>
           <Mail className="w-4 h-4" /> Send Email
         </Button>
-        <Button variant="secondary" size="md" className="w-full" onClick={() => toast.info("Coming in Phase A8 — Operations Polish")}>
+        <Button
+          variant="secondary"
+          size="md"
+          className="w-full"
+          onClick={() => window.open(`/api/admin/bookings/${bookingId}/voucher`, "_blank")}
+        >
           <Printer className="w-4 h-4" /> Print Voucher
         </Button>
         <Button variant="ghost" size="md" className="w-full" onClick={() => setChargesOpen(true)}>

@@ -7,6 +7,7 @@ import { generateBookingReference } from "@/lib/booking/reference";
 import { sendEmail } from "@/lib/email/resend";
 import { bookingConfirmationGuestEmail } from "@/lib/email/templates/booking-confirmation-guest";
 import { bookingConfirmationAdminEmail } from "@/lib/email/templates/booking-confirmation-admin";
+import { createNotification } from "@/lib/admin/notifications";
 import type { Json } from "@/lib/supabase/database.types";
 import { z } from "zod";
 
@@ -217,6 +218,7 @@ export async function POST(req: NextRequest) {
     // Audit log
     await supabase.from("audit_log").insert({
       admin_user_id: user.id,
+      actor_email:   user.email ?? null,
       action:        "booking_created_manual",
       entity_type:   "booking",
       entity_id:     booking.id,
@@ -231,12 +233,22 @@ export async function POST(req: NextRequest) {
       } as Json,
     });
 
+    // Notification
+    try {
+      await createNotification({
+        type: "booking_created",
+        title: `New booking — ${booking.booking_ref}`,
+        body: `${guest.name.trim()} · ${pricing.roomName} · ₹${pricing.totalAmount.toLocaleString("en-IN")} (manual)`,
+        linkUrl: `/admin/bookings/${booking.id}`,
+      });
+    } catch (err) {
+      console.error("[admin/bookings/create] notification failed:", err);
+    }
+
     // Send confirmation emails if requested
     if (doSendEmail && normalizedEmail) {
       const nights = pricing.nights;
       const totalAmount = pricing.totalAmount;
-      const advanceAmount = advance?.amount ?? 0;
-      const balanceDue = +(totalAmount - advanceAmount).toFixed(2);
 
       const confirmationData = {
         bookingRef:      booking.booking_ref,
@@ -248,8 +260,6 @@ export async function POST(req: NextRequest) {
         adults:          numAdults,
         children:        numChildren,
         totalAmount,
-        advanceAmount,
-        balanceDue,
         specialRequests: specialRequests ?? null,
       };
 
@@ -267,6 +277,7 @@ export async function POST(req: NextRequest) {
             guestEmail:  normalizedEmail,
             guestMobile: normalizedMobile,
             source,
+            paidAmount: advance?.amount ?? 0,
           }),
         });
       } catch (err) {

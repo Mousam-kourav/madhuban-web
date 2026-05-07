@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/resend";
 import { bookingReminderEmail } from "@/lib/email/templates/booking-reminder";
+import { createNotification } from "@/lib/admin/notifications";
 import type { Json } from "@/lib/supabase/database.types";
 
 // Called by Vercel cron at 09:00 IST daily (03:30 UTC).
@@ -69,6 +70,15 @@ export async function POST(req: NextRequest) {
         entity_id: booking.id,
         details: { checkin: booking.checkin, guestEmail: guest.email } as Json,
       });
+
+      try {
+        await createNotification({
+          type: "check_in_today",
+          title: `Check-in tomorrow — ${booking.booking_ref}`,
+          body: `${guest.name} · ${room.name} · ${tomorrowStr}`,
+          linkUrl: `/admin/bookings/${booking.id}`,
+        });
+      } catch { /* non-fatal */ }
 
       sent++;
     } catch (err) {

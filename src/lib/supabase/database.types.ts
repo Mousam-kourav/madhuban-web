@@ -252,14 +252,62 @@ export type SouvenirRow = {
 };
 
 // audit_log: admin_user_id (not user_id), entity_type/entity_id (not entity/entity_id), details (not before/after_json)
+// Migration 0020: added actor_email text null
 type AuditLogRow = {
   id: string;
   admin_user_id: string;
+  actor_email: string | null;
   action: string;
   entity_type: string;
   entity_id: string;
   details: Json | null;
   created_at: string;
+};
+
+// Migration 0017: app_settings singleton
+export type AppSettingsRow = {
+  id: string;
+  contact_email: string;
+  contact_phone: string;
+  whatsapp_number: string;
+  gstin: string;
+  legal_entity_name: string;
+  trade_name: string;
+  registered_address: string;
+  business_hours_open: string;
+  business_hours_close: string;
+  upi_id: string | null;
+  upi_payee_name: string | null;
+  email_signature: string;
+  default_gst_rate_low: number;
+  default_gst_rate_high: number;
+  gst_rate_threshold: number;
+  updated_at: string;
+  updated_by: string | null;
+};
+
+// Migration 0018: notifications
+export type NotificationRow = {
+  id: string;
+  recipient_email: string;
+  type: 'booking_created' | 'payment_received' | 'check_in_today' | 'booking_cancelled';
+  title: string;
+  body: string;
+  link_url: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
+// Migration 0019: user_profiles (RBAC)
+export type UserProfileRow = {
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  role: 'admin' | 'front_desk' | 'read_only';
+  is_active: boolean;
+  created_at: string;
+  created_by: string | null;
+  last_login_at: string | null;
 };
 
 export type Database = {
@@ -459,6 +507,33 @@ export type Database = {
         Insert: Omit<AuditLogRow, "id" | "created_at"> &
           Partial<Pick<AuditLogRow, "id" | "created_at">>;
         Update: never;
+        Relationships: [];
+      };
+      app_settings: {
+        Row: AppSettingsRow;
+        Insert: Partial<AppSettingsRow> & { id?: string };
+        Update: Partial<Omit<AppSettingsRow, "id">>;
+        Relationships: [];
+      };
+      notifications: {
+        Row: NotificationRow;
+        Insert: Omit<NotificationRow, "id" | "created_at"> &
+          Partial<Pick<NotificationRow, "id" | "created_at">>;
+        Update: Partial<NotificationRow>;
+        Relationships: [];
+      };
+      user_profiles: {
+        Row: UserProfileRow;
+        Insert: {
+          user_id: string;
+          email: string;
+          role: 'admin' | 'front_desk' | 'read_only';
+          full_name?: string | null;
+          is_active?: boolean;
+          created_by?: string | null;
+          last_login_at?: string | null;
+        };
+        Update: Partial<Omit<UserProfileRow, "user_id">>;
         Relationships: [];
       };
     };

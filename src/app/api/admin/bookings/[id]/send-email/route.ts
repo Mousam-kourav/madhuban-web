@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email/resend";
 import { bookingCustomEmail } from "@/lib/email/templates/booking-custom";
 import { getSettings } from "@/lib/admin/settings";
 import type { Json } from "@/lib/supabase/database.types";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 export async function POST(
   req: NextRequest,

@@ -1,19 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import React from "react";
 import { renderToStream } from "@react-pdf/renderer";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { VoucherPDF } from "@/components/admin/voucher/VoucherPDF";
 import type { DocumentProps } from "@react-pdf/renderer";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 export async function GET(
   _req: NextRequest,

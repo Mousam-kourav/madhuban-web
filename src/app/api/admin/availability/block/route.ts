@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 const BlockSchema = z.object({
   room_id: z.string().uuid(),

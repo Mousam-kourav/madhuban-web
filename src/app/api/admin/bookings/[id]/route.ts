@@ -1,4 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -7,15 +6,8 @@ import { sendEmail } from "@/lib/email/resend";
 import { bookingCancelledGuestEmail } from "@/lib/email/templates/booking-cancelled-guest";
 import { bookingCancelledAdminEmail } from "@/lib/email/templates/booking-cancelled-admin";
 import { createNotification } from "@/lib/admin/notifications";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 async function writeAuditLog(
   supabase: ReturnType<typeof createAdminClient>,

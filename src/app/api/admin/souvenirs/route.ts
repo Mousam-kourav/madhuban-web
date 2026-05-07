@@ -1,20 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import type { DbSouvenir } from '@/lib/souvenirs/types';
 import type { Json } from '@/lib/supabase/database.types';
+import { assertAdmin } from "@/lib/admin/auth";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'madhubanecoretreat@gmail.com';
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 function slugify(text: string) {
   return text

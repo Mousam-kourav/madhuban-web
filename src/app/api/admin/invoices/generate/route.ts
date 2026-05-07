@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeRoomGstRate, isInterStateGuest, computeTaxBreakdown, getFinancialYear, priceBreakdownInclusive } from "@/lib/gst";
 import type { Json } from "@/lib/supabase/database.types";
+import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
 
 const ISSUER = {
   legal_name: "Somaiya Properties And Investments Private Limited",
@@ -16,13 +15,6 @@ const ISSUER = {
 
 type AddonItem = { id: string; label: string; price: number; qty: number; unit: string };
 type LineItem = { description: string; hsn: string; qty: number; rate: number; amount: number };
-
-async function assertAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user || user.email !== ADMIN_EMAIL) return null;
-  return user;
-}
 
 /** Checks if "Madhya Pradesh" or common abbreviations appear in an address string. */
 function extractStateFromAddress(address: string | null): string | null {

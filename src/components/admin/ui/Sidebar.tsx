@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   FileText,
+  Receipt,
   Bed,
   Calendar,
   Tag,
@@ -24,6 +25,7 @@ const R2 = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: 'Dashboard',     href: '/admin' },
   { icon: Calendar,        label: 'Bookings',      href: '/admin/bookings' },
+  { icon: Receipt,         label: 'Invoices',      href: '/admin/invoices' },
   { icon: Bed,             label: 'Rooms',         href: '/admin/rooms' },
   { icon: FileText,        label: 'Blog Posts',    href: '/admin/posts' },
   { icon: Tag,             label: 'Coupons',       href: '/admin/coupons' },

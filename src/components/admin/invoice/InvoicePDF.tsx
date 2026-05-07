@@ -1,8 +1,31 @@
-import { Document, Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer";
+import path from "path";
+import { Document, Page, View, Text, StyleSheet, Image, Font } from "@react-pdf/renderer";
 import { amountToWords, fmtINR } from "@/lib/gst";
 import type { InvoiceRow } from "@/lib/supabase/database.types";
 
 type LineItem = { description: string; hsn: string; qty: number; rate: number; amount: number };
+
+// Noto Sans woff files from @fontsource/noto-sans (local disk, no CDN).
+// Two registrations required: latin carries regular text; devanagari carries
+// the ₹ glyph (U+20B9), which is absent from the latin subset.
+// React-pdf v4 picks the first font in the array that contains each glyph.
+const NOTO_FILES = path.join(process.cwd(), "node_modules/@fontsource/noto-sans/files");
+Font.register({
+  family: "Noto Sans",
+  fonts: [
+    { src: path.join(NOTO_FILES, "noto-sans-latin-400-normal.woff"), fontWeight: 400 },
+    { src: path.join(NOTO_FILES, "noto-sans-latin-700-normal.woff"), fontWeight: 700 },
+  ],
+});
+Font.register({
+  family: "Noto Sans Devanagari",
+  fonts: [
+    { src: path.join(NOTO_FILES, "noto-sans-devanagari-400-normal.woff"), fontWeight: 400 },
+    { src: path.join(NOTO_FILES, "noto-sans-devanagari-700-normal.woff"), fontWeight: 700 },
+  ],
+});
+
+const FONT_STACK: [string, string] = ["Noto Sans", "Noto Sans Devanagari"];
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? "";
 const LOGO_URL = `${R2_BASE}/branding/logo/madhuban-mark-md.png`;
@@ -19,7 +42,7 @@ const C = {
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Helvetica",
+    fontFamily: FONT_STACK,
     fontSize: 9,
     color: C.charcoal,
     padding: 36,
@@ -29,7 +52,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
   logo: { width: 48, height: 48, objectFit: "contain" },
   headerRight: { alignItems: "flex-end" },
-  invoiceTitle: { fontSize: 16, fontFamily: "Helvetica-Bold", color: C.olive, letterSpacing: 1 },
+  invoiceTitle: { fontSize: 16, fontWeight: 700, color: C.olive, letterSpacing: 1 },
   issuerBlock: { marginTop: 4 },
   issuerLegal: { fontSize: 8, color: C.muted, marginTop: 1 },
   issuerLine: { fontSize: 9, color: C.charcoal, marginTop: 1 },
@@ -40,16 +63,16 @@ const styles = StyleSheet.create({
   metaRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
   metaBlock: { flex: 1 },
   metaLabel: { fontSize: 7, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 },
-  metaValue: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.charcoal },
+  metaValue: { fontSize: 9, fontWeight: 700, color: C.charcoal },
   metaValueNormal: { fontSize: 9, color: C.charcoal },
   // Bill-to
   sectionLabel: { fontSize: 7, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 3 },
-  billToName: { fontSize: 10, fontFamily: "Helvetica-Bold", color: C.charcoal, marginBottom: 2 },
+  billToName: { fontSize: 10, fontWeight: 700, color: C.charcoal, marginBottom: 2 },
   billToLine: { fontSize: 9, color: C.charcoal, marginBottom: 1 },
   // Table
   table: { marginTop: 12 },
   tableHeader: { flexDirection: "row", backgroundColor: C.olive, paddingVertical: 5, paddingHorizontal: 4 },
-  tableHeaderCell: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.white },
+  tableHeaderCell: { fontSize: 8, fontWeight: 700, color: C.white },
   tableRow: { flexDirection: "row", paddingVertical: 5, paddingHorizontal: 4, borderBottomWidth: 1, borderBottomColor: C.border },
   tableRowAlt: { backgroundColor: C.lightGrey },
   colDesc: { flex: 4 },
@@ -65,19 +88,19 @@ const styles = StyleSheet.create({
   totalsValue: { fontSize: 9, color: C.charcoal, textAlign: "right" },
   totalsDivider: { borderBottomWidth: 1, borderBottomColor: C.border, marginVertical: 4 },
   grandTotalRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 3, backgroundColor: C.olive, paddingHorizontal: 6, marginTop: 2 },
-  grandTotalLabel: { fontSize: 10, fontFamily: "Helvetica-Bold", color: C.white },
-  grandTotalValue: { fontSize: 10, fontFamily: "Helvetica-Bold", color: C.white },
+  grandTotalLabel: { fontSize: 10, fontWeight: 700, color: C.white },
+  grandTotalValue: { fontSize: 10, fontWeight: 700, color: C.white },
   // Amount in words
   amountWords: { marginTop: 8, borderWidth: 1, borderColor: C.border, padding: 8, backgroundColor: C.lightGrey },
   amountWordsLabel: { fontSize: 7, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 2 },
-  amountWordsText: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.charcoal },
+  amountWordsText: { fontSize: 9, fontWeight: 700, color: C.charcoal },
   // Footer
   footerSection: { flexDirection: "row", justifyContent: "space-between", marginTop: 16 },
   qrBox: { width: 90, height: 90, borderWidth: 1, borderColor: C.border, alignItems: "center", justifyContent: "center", backgroundColor: C.lightGrey },
   qrPlaceholderText: { fontSize: 7, color: C.muted, textAlign: "center", padding: 4 },
   signatureBlock: { alignItems: "flex-end", justifyContent: "flex-end" },
   signatureLine: { fontSize: 8, color: C.muted, marginBottom: 2 },
-  signatureName: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.charcoal },
+  signatureName: { fontSize: 9, fontWeight: 700, color: C.charcoal },
   // Footnote
   footnote: { marginTop: 12, borderTopWidth: 1, borderTopColor: C.border, paddingTop: 6 },
   footnoteText: { fontSize: 7, color: C.muted, textAlign: "center" },
@@ -109,7 +132,7 @@ export function InvoicePDF({ invoice }: Props) {
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src={LOGO_URL} style={styles.logo} />
             <View style={styles.issuerBlock}>
-              <Text style={[styles.issuerLine, { fontFamily: "Helvetica-Bold", fontSize: 11 }]}>
+              <Text style={[styles.issuerLine, { fontWeight: 700, fontSize: 11 }]}>
                 {invoice.issuer_trade_name}
               </Text>
               <Text style={styles.issuerLegal}>{invoice.issuer_legal_name}</Text>

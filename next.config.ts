@@ -2,6 +2,17 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Include @fontsource woff files in Vercel serverless bundles for PDF routes.
+  // Without this, path.join(process.cwd(), "node_modules/...") fails with ENOENT
+  // because Vercel's file tracer doesn't pick up font files that are read at runtime.
+  outputFileTracingIncludes: {
+    "/api/admin/bookings/(.*)": [
+      "./node_modules/@fontsource/noto-sans/files/*.woff",
+    ],
+    "/api/admin/invoices/(.*)": [
+      "./node_modules/@fontsource/noto-sans/files/*.woff",
+    ],
+  },
   images: {
     remotePatterns: [
       {

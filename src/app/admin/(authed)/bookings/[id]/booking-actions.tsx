@@ -3,9 +3,10 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { LogIn, LogOut, XCircle, Plus, Mail, Pencil, Printer, FileText } from "lucide-react";
+import { LogIn, LogOut, XCircle, Plus, Mail, Pencil, Printer } from "lucide-react";
 import { Button, Modal, Select, Input, TextArea } from "@/components/admin/ui";
 import { AddChargesModal } from "./add-charges-modal";
+import { GenerateInvoiceBtn } from "./booking-detail-islands";
 
 const CANCEL_REASON_OPTIONS = [
   { value: "Guest requested cancellation", label: "Guest requested cancellation" },
@@ -22,10 +23,11 @@ interface Props {
   guestName: string;
   roomName: string;
   totalAmount: number;
+  existingInvoiceId?: string | null;
 }
 
 export function BookingActionsPanel({
-  bookingId, status, checkin, guestName, roomName,
+  bookingId, status, checkin, guestName, roomName, existingInvoiceId,
 }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -138,9 +140,7 @@ export function BookingActionsPanel({
         <Button variant="ghost" size="md" className="w-full" onClick={() => setChargesOpen(true)}>
           <Plus className="w-4 h-4" /> Add Charges
         </Button>
-        <Button variant="secondary" size="md" className="w-full" onClick={() => toast.info("Coming in Phase A7 — Invoices & GST")}>
-          <FileText className="w-4 h-4" /> Generate Invoice
-        </Button>
+        <GenerateInvoiceBtn bookingId={bookingId} existingInvoiceId={existingInvoiceId ?? null} />
 
         {canCancel && (
           <Button variant="danger" size="md" className="w-full" onClick={() => setCancelOpen(true)}>

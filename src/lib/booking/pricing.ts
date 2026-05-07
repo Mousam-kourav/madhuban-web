@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { gstRate, priceBreakdown } from "@/lib/gst";
+import { computeRoomGstRate, priceBreakdown } from "@/lib/gst";
 import type { PricingBreakdown } from "./types";
 
 interface PricingParams {
@@ -24,7 +24,7 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
   // Fetch room
   const { data: room, error: roomError } = await supabase
     .from("rooms")
-    .select("id, name, slug, base_price_per_night, gst_rate, min_nights")
+    .select("id, name, slug, base_price_per_night, min_nights")
     .eq("slug", roomSlug)
     .eq("is_active", true)
     .single();
@@ -56,7 +56,7 @@ export async function calculatePricing(params: PricingParams): Promise<PricingBr
 
   const baseNightlyRate = Number(room.base_price_per_night);
   const effectiveNightlyRate = +(baseNightlyRate * multiplier).toFixed(2);
-  const gstRatePct = (room.gst_rate ?? gstRate(baseNightlyRate)) as 12 | 18;
+  const gstRatePct = computeRoomGstRate(baseNightlyRate);
 
   const baseNightlyTotal = +(effectiveNightlyRate * nights).toFixed(2);
 

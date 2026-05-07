@@ -162,14 +162,14 @@ export function ReviewClient({ slug }: ReviewClientProps) {
             </div>
           )}
 
-          <div className="flex justify-between text-charcoal/70">
-            <span>GST ({pricing.gstRate}%)</span>
-            <span>&#8377;{formatPrice(pricing.gstAmount)}</span>
+          <div className="flex justify-between border-t border-border pt-3 font-semibold text-charcoal">
+            <span>Total (incl. {pricing.gstRate}% GST)</span>
+            <span>&#8377;{formatPrice(pricing.totalAmount)}</span>
           </div>
 
-          <div className="flex justify-between border-t border-border pt-3 font-semibold text-charcoal">
-            <span>Total</span>
-            <span>&#8377;{formatPrice(pricing.totalAmount)}</span>
+          <div className="flex justify-between text-charcoal/50">
+            <span>GST included</span>
+            <span>&#8377;{formatPrice(pricing.gstAmount)}</span>
           </div>
 
           <div className="mt-4 rounded-lg bg-warm-beige/40 p-4 text-xs text-charcoal/70">

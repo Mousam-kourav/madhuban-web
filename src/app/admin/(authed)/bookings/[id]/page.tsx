@@ -16,7 +16,7 @@ import {
 import { BookingActionsPanel } from "./booking-actions";
 import { StaffNotesPanel } from "./internal-note-form";
 import { RecordPaymentSection } from "./record-payment-section";
-import { TopbarToastBtn, ArrivingBannerBtn, FolioAddChargesBtn } from "./booking-detail-islands";
+import { TopbarToastBtn, ArrivingBannerBtn, FolioAddChargesBtn, GenerateInvoiceBtn } from "./booking-detail-islands";
 
 export const metadata: Metadata = { title: "Booking Detail — Madhuban Admin" };
 
@@ -270,6 +270,14 @@ export default async function BookingDetailPage({ params }: Props) {
     .eq("entity_id", id).order("created_at", { ascending: true });
   const auditLog = (auditRaw ?? []) as unknown as AuditEntry[];
 
+  // Check for existing invoice (for the button state)
+  const { data: invoiceRow } = await supabase
+    .from("invoices")
+    .select("id")
+    .eq("booking_id", id)
+    .maybeSingle();
+  const existingInvoiceId = invoiceRow?.id ?? null;
+
   // derived
   const nights = Math.max(1, Math.round(
     (new Date(booking.checkout).getTime() - new Date(booking.checkin).getTime()) / 86400000,
@@ -313,7 +321,9 @@ export default async function BookingDetailPage({ params }: Props) {
         </div>
         <div className="flex gap-2 flex-wrap">
           <TopbarToastBtn label="Print" msg="Coming in Phase A8 — Operations Polish" variant="secondary" />
-          <TopbarToastBtn label="Generate Invoice" msg="Coming in Phase A7 — Invoices & GST" variant="primary" />
+          {!isCancelled && (
+            <GenerateInvoiceBtn bookingId={booking.id} existingInvoiceId={existingInvoiceId} />
+          )}
         </div>
       </div>
 

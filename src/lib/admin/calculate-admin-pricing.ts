@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { gstRate, priceBreakdown } from "@/lib/gst";
+import { computeRoomGstRate, priceBreakdown } from "@/lib/gst";
 
 export interface AdminAddonLine {
   id: string;
@@ -51,7 +51,7 @@ export async function calculateAdminPricing(params: {
 
   const { data: room, error } = await supabase
     .from("rooms")
-    .select("id, name, base_price_per_night, gst_rate")
+    .select("id, name, base_price_per_night")
     .eq("id", roomId)
     .single();
 
@@ -65,7 +65,7 @@ export async function calculateAdminPricing(params: {
   const addonsTotal = +calcAddonTotal(addons, nights).toFixed(2);
   const subtotalInclusive = +(roomTotal + addonsTotal).toFixed(2);
 
-  const gstRatePct = (room.gst_rate ?? gstRate(basePricePerNight)) as 12 | 18;
+  const gstRatePct = computeRoomGstRate(basePricePerNight);
   const { base: subtotalBeforeGst, gst: gstAmount } = priceBreakdown(subtotalInclusive, gstRatePct);
 
   return {

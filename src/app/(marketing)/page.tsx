@@ -29,11 +29,20 @@ const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Forest Resort near Ratapani Tiger Reserve, Bhopal',
-  titleOverride: 'Madhuban Eco Retreat | Best Eco Resort Near Bhopal',
+  titleOverride: 'Madhuban Eco Retreat | Eco-Luxury Resort Near Ratapani, Bhopal',
   description:
-    'Discover Madhuban Eco Retreat, a premier eco resort near Bhopal & Ratapani. Enjoy safari tents, mud houses, forest walks & sustainable luxury. Book your stay!',
+    'Experience eco-luxury at Madhuban Eco Retreat in Ratapani near Bhopal. Forest stays, nature trails, birdwatching, farm-to-table dining & sustainable travel.',
   path: '/',
   ogImage: `${R2_BASE}/home/hero/hero-aerial-sunset-1920.jpg`,
+  keywords: [
+    'eco retreat bhopal',
+    'ratapani eco resort',
+    'nature resort near bhopal',
+    'forest stay madhya pradesh',
+    'eco luxury resort mp',
+    'sustainable tourism mp',
+    'ratapani tiger reserve stay',
+  ],
 });
 
 export default function HomePage() {

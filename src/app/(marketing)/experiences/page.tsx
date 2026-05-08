@@ -11,9 +11,20 @@ import { faqPage, breadcrumbListFromPath } from '@/lib/schema';
 
 export const metadata = buildMetadata({
   title: 'Experiences & Activities',
+  titleOverride: 'Nature Experiences Ratapani | Forest Walks, Bird Watching & Activities',
   description:
-    'Explore guided forest walks, bird watching, and eco-friendly recreation at Madhuban Eco Retreat — 60 km from Bhopal in the Ratapani forest belt.',
+    'Explore nature trails, bird watching, and recreational activities at Madhuban Eco Retreat near Bhopal. Eco-friendly experiences in Ratapani Wildlife Sanctuary.',
   path: '/experiences',
+  keywords: [
+    'experiences near bhopal',
+    'forest walks ratapani',
+    'nature trails bhopal',
+    'bird watching ratapani',
+    'wilderness bhopal',
+    'recreational activities bhopal',
+    'eco tourism ratapani',
+    'satpura nature experiences',
+  ],
 });
 
 const INDEX_FAQS = [

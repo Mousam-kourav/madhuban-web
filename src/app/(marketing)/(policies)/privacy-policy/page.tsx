@@ -8,9 +8,17 @@ import { Heading } from "@/components/ui/heading";
 
 export const metadata: Metadata = buildMetadata({
   title: "Privacy Policy",
+  titleOverride: "Privacy Policy - Madhuban Eco Retreat, Near Bhopal",
   description:
-    "Learn how Madhuban Eco Retreat collects, uses, and protects your personal information when you visit our website or make a reservation.",
+    "Read Madhuban Eco Retreat's privacy policy to learn how we collect, use and protect your personal information when you visit or contact us.",
   path: "/privacy-policy",
+  keywords: [
+    'Madhuban Eco Retreat privacy policy',
+    'resort privacy policy',
+    'lodge data protection',
+    'eco tourism website policy',
+    'guest data protection',
+  ],
 });
 
 const BASE_URL =

@@ -7,12 +7,28 @@ import { NewsletterCta } from "@/components/marketing/homepage/newsletter-cta";
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildMetadata({
+  const base = buildMetadata({
     title: "Journal",
+    titleOverride: "Madhuban Blog | Nature, Travel & Eco-Living Stories",
     description:
-      "Stories from nature, wellness, and wilderness — Madhuban Eco Retreat's journal from the forest edge of Ratapani.",
+      "Read nature stories, travel guides, wildlife insights, and eco-living tips from Madhuban Eco Retreat. Explore Ratapani and sustainable travel through our blog.",
     path: "/blogs",
+    keywords: [
+      'madhuban blog',
+      'ratapani travel blog',
+      'eco travel mp',
+      'sustainable travel madhya pradesh',
+      'nature blog bhopal',
+      'ratapani guides',
+    ],
   });
+  return {
+    ...base,
+    alternates: {
+      ...base.alternates,
+      types: { 'application/rss+xml': '/blogs/rss.xml' },
+    },
+  };
 }
 
 export default async function BlogsPage() {

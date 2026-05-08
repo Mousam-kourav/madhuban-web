@@ -8,9 +8,19 @@ import { Heading } from "@/components/ui/heading";
 
 export const metadata: Metadata = buildMetadata({
   title: "Disclaimer",
+  titleOverride: "Disclaimer | Madhuban Eco Retreat Ratapani Near Bhopal",
   description:
-    "Disclaimer for Madhuban Eco Retreat — limitations on liability, nature of information, outdoor activities, and intellectual property.",
+    "Read the official disclaimer of Madhuban Eco Retreat covering website information, nature activities, wildlife experiences, liability and external links.",
   path: "/disclaimer",
+  keywords: [
+    'disclaimer',
+    'madhuban eco retreat',
+    'resort disclaimer',
+    'eco retreat policy',
+    'nature resort',
+    'ratapani resort',
+    'resort near bhopal',
+  ],
 });
 
 const BASE_URL =

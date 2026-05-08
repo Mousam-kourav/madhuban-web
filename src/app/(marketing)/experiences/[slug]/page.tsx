@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: Props) {
     description: experience.seoDescription,
     path: experience.href,
     ogImage: experience.gallery[0]?.webp.desktop,
+    keywords: experience.keywords,
   });
 }
 

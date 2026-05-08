@@ -8,6 +8,8 @@ import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card'
 import { BLOG_POSTS } from '@/lib/content/blog';
 
 export function BlogPreview() {
+  if (!BLOG_POSTS.length) return null;
+
   return (
     <Section label="From the Madhuban Journal" id="blog-preview" className="bg-cream">
       <Container>

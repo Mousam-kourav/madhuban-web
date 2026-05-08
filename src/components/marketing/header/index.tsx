@@ -55,7 +55,7 @@ export function Header() {
           >
             <Image
               src={`${R2_BASE}/branding/logo/madhuban-mark-md.webp`}
-              alt=""
+              alt="Madhuban Eco Retreat logo"
               width={40}
               height={40}
               priority

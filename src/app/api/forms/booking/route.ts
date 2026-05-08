@@ -4,8 +4,9 @@ import { bookingSchema } from "@/lib/forms/booking-schema";
 import { bookingEnquiryEmail } from "@/lib/email/templates/booking-enquiry";
 import { sendEmail } from "@/lib/email/resend";
 import { checkRateLimit } from "@/lib/ratelimit";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
-const RECIPIENT = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
+const RECIPIENT = ADMIN_EMAIL;
 
 export async function POST(req: NextRequest) {
   const rl = await checkRateLimit(req);

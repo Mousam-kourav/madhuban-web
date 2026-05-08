@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 import type { Json } from "@/lib/supabase/database.types";
 import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 import { sendEmail } from "@/lib/email/resend";
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
         specialRequests: booking.special_requests,
       };
 
-      const adminEmail = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
+      const adminEmail = ADMIN_EMAIL;
 
       try {
         await sendEmail({

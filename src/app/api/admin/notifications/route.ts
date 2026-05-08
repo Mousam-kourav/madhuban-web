@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 async function getUser() {
   const supabase = await createClient();

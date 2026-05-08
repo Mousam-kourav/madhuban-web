@@ -6,8 +6,9 @@ import { sendEmail } from "@/lib/email/resend";
 import { checkRateLimit } from "@/lib/ratelimit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/admin/notifications";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
-const RECIPIENT = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
+const RECIPIENT = ADMIN_EMAIL;
 
 export async function POST(req: NextRequest) {
   const rl = await checkRateLimit(req);

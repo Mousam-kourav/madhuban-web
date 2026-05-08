@@ -4,7 +4,7 @@ import sharp from "sharp";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 

@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'madhubanecoretreat@gmail.com';
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();

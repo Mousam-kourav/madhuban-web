@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 export type AdminRole = "admin" | "front_desk" | "read_only";
 
@@ -20,7 +21,7 @@ export async function assertAdmin() {
   if (profile?.is_active) return user;
 
   // Fallback: primary admin email always allowed
-  if (user.email === "madhubanecoretreat@gmail.com") return user;
+  if (user.email === ADMIN_EMAIL) return user;
 
   return null;
 }

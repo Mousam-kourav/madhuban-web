@@ -8,7 +8,7 @@ import { PrintControls } from "./print-controls";
 
 export const metadata: Metadata = { title: "Invoice — Madhuban Eco Retreat" };
 
-const ADMIN_EMAIL = "madhubanecoretreat@gmail.com";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? "";
 
 type LineItem = { description: string; hsn: string; qty: number; rate: number; amount: number };

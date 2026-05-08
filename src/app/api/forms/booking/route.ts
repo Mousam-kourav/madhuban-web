@@ -3,10 +3,19 @@ import type { NextRequest } from "next/server";
 import { bookingSchema } from "@/lib/forms/booking-schema";
 import { bookingEnquiryEmail } from "@/lib/email/templates/booking-enquiry";
 import { sendEmail } from "@/lib/email/resend";
+import { checkRateLimit } from "@/lib/ratelimit";
 
 const RECIPIENT = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
 
 export async function POST(req: NextRequest) {
+  const rl = await checkRateLimit(req);
+  if (rl.limited) {
+    return NextResponse.json(
+      { error: "rate_limited", retry_after: rl.retryAfter },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

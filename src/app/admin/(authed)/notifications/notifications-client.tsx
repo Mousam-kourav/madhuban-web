@@ -17,6 +17,8 @@ function typeLabel(type: NotificationRow["type"]): string {
     payment_received: "Payment Received",
     check_in_today: "Check-in Today",
     booking_cancelled: "Booking Cancelled",
+    lead_received: "New Lead",
+    newsletter_subscribed: "Newsletter",
   };
   return map[type] ?? type;
 }

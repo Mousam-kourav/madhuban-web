@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ConsentProvider } from "@/lib/consent/consent-context";
 import { CookieBanner } from "@/components/consent/cookie-banner";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { R2_BASE } from "@/lib/r2";
 
 const cormorant = Cormorant_Garamond({
@@ -57,6 +58,9 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && {
+    verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION },
+  }),
 };
 
 export default function RootLayout({
@@ -79,6 +83,7 @@ export default function RootLayout({
           <ConsentProvider>
             {children}
             <CookieBanner />
+            <GoogleAnalytics />
           </ConsentProvider>
         </body>
     </html>

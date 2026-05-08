@@ -310,16 +310,43 @@ export type AppSettingsRow = {
   updated_by: string | null;
 };
 
-// Migration 0018: notifications
+// Migration 0018: notifications — type extended in 0021 (lead_received, newsletter_subscribed) and 0023 (gallery_uploaded)
 export type NotificationRow = {
   id: string;
   recipient_email: string;
-  type: 'booking_created' | 'payment_received' | 'check_in_today' | 'booking_cancelled' | 'lead_received' | 'newsletter_subscribed';
+  type: 'booking_created' | 'payment_received' | 'check_in_today' | 'booking_cancelled' | 'lead_received' | 'newsletter_subscribed' | 'gallery_uploaded';
   title: string;
   body: string;
   link_url: string | null;
   read_at: string | null;
   created_at: string;
+};
+
+// Migration 0023: gallery_items
+export type GalleryCategory = 'stays' | 'dining' | 'aranyashala' | 'forest' | 'events' | 'behind-the-scenes';
+export type GalleryItemType = 'image' | 'video';
+export type GalleryStatus = 'published' | 'draft';
+
+export type GalleryItemRow = {
+  id: string;
+  filename: string;
+  alt_text: string;
+  caption: string | null;
+  category: GalleryCategory;
+  type: GalleryItemType;
+  r2_key: string;
+  r2_url: string;
+  thumbnail_url: string | null;
+  width: number | null;
+  height: number | null;
+  file_size_bytes: number;
+  mime_type: string;
+  sort_order: number;
+  status: GalleryStatus;
+  uploaded_by: string;
+  uploaded_at: string;
+  updated_at: string;
+  view_count: number;
 };
 
 // Migration 0019: user_profiles (RBAC)
@@ -587,6 +614,32 @@ export type Database = {
           last_login_at?: string | null;
         };
         Update: Partial<Omit<UserProfileRow, "user_id">>;
+        Relationships: [];
+      };
+      gallery_items: {
+        Row: GalleryItemRow;
+        Insert: {
+          filename: string;
+          alt_text: string;
+          category: GalleryCategory;
+          type: GalleryItemType;
+          r2_key: string;
+          r2_url: string;
+          file_size_bytes: number;
+          mime_type: string;
+          uploaded_by: string;
+          id?: string;
+          caption?: string | null;
+          thumbnail_url?: string | null;
+          width?: number | null;
+          height?: number | null;
+          sort_order?: number;
+          status?: GalleryStatus;
+          uploaded_at?: string;
+          updated_at?: string;
+          view_count?: number;
+        };
+        Update: Partial<Omit<GalleryItemRow, 'id' | 'uploaded_at' | 'r2_key' | 'r2_url'>>;
         Relationships: [];
       };
     };

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
 import { Heading } from '@/components/ui/heading';
@@ -34,6 +35,15 @@ export function FollowOurJourney() {
             </li>
           ))}
         </ul>
+
+        <div className="mt-10 text-center">
+          <Link
+            href="/gallery"
+            className="inline-flex h-11 items-center rounded-full bg-earth-brown px-8 font-body text-sm text-white transition-opacity hover:opacity-90"
+          >
+            View Full Gallery
+          </Link>
+        </div>
       </Container>
     </Section>
   );

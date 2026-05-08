@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { deleteFromR2 } from '@/lib/r2/upload';
@@ -49,6 +50,9 @@ export async function PATCH(
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
+  revalidatePath('/gallery');
+  revalidatePath('/sitemap-images.xml');
+
   await supabase.from('audit_log').insert({
     admin_user_id: auth.user.id,
     actor_email: auth.user.email ?? null,
@@ -83,6 +87,9 @@ export async function DELETE(
 
   const { error } = await supabase.from('gallery_items').delete().eq('id', id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  revalidatePath('/gallery');
+  revalidatePath('/sitemap-images.xml');
 
   await supabase.from('audit_log').insert({
     admin_user_id: auth.user.id,

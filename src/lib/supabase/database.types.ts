@@ -264,6 +264,14 @@ export type AuditLogRow = {
   created_at: string;
 };
 
+export type NewsletterSubscriberRow = {
+  id: string;
+  email: string;
+  subscribed_at: string;
+  unsubscribed_at: string | null;
+  source: string | null;
+};
+
 export type LeadSource = 'contact_form' | 'souvenirs_inquiry' | 'experiences_inquiry' | 'other';
 export type LeadStatus = 'new' | 'contacted' | 'closed';
 
@@ -536,6 +544,18 @@ export type Database = {
         Insert: Omit<NotificationRow, "id" | "created_at" | "read_at"> &
           Partial<Pick<NotificationRow, "id" | "created_at" | "read_at">>;
         Update: Partial<NotificationRow>;
+        Relationships: [];
+      };
+      newsletter_subscribers: {
+        Row: NewsletterSubscriberRow;
+        Insert: {
+          email: string;
+          id?: string;
+          subscribed_at?: string;
+          unsubscribed_at?: string | null;
+          source?: string | null;
+        };
+        Update: Partial<Omit<NewsletterSubscriberRow, 'id'>>;
         Relationships: [];
       };
       leads: {

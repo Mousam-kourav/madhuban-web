@@ -39,15 +39,13 @@ import { DayOutingVideo } from '@/components/marketing/day-outing/day-outing-vid
 import { DayOutingWaForm } from '@/components/marketing/day-outing/day-outing-wa-form';
 
 // ── SEO — exact title + description preserved from old site (currently ranking) ─
-export const metadata: Metadata = {
-  ...buildMetadata({
-    title: 'Day Outing',
-    titleOverride: 'Resorts Near Bhopal for Day Outing | Madhuban Eco Retreat',
-    description:
-      'Looking for resorts near Bhopal for day outing? Enjoy breakfast, lunch, pool access, nature walk & activities at Madhuban Eco Retreat.',
-    path: '/day-outing',
-    ogImage: DAY_OUTING.hero.image.desktop,
-  }),
+export const metadata: Metadata = buildMetadata({
+  title: 'Day Outing',
+  titleOverride: 'Resorts Near Bhopal for Day Outing | Madhuban Eco Retreat',
+  description:
+    'Looking for resorts near Bhopal for day outing? Enjoy breakfast, lunch, pool access, nature walk & activities at Madhuban Eco Retreat.',
+  path: '/day-outing',
+  ogImage: DAY_OUTING.hero.image.desktop,
   keywords: [
     'resorts near bhopal for day outing',
     'one day picnic near bhopal',
@@ -55,7 +53,7 @@ export const metadata: Metadata = {
     'pool day package near bhopal',
     'nature resort day outing',
   ],
-};
+});
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.madhubanecoretreat.com';
 

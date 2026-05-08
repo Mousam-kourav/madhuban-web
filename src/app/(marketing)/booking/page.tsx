@@ -19,15 +19,13 @@ import { formatPrice } from '@/lib/utils';
 import { WhatsAppLeadForm } from '@/components/booking/whatsapp-lead-form';
 
 // SEO — exact title + description preserved from old site (page ranks in Google)
-export const metadata: Metadata = {
-  ...buildMetadata({
-    title: 'Book',
-    titleOverride: 'Book Madhuban Eco Retreat | Hotel Near Ratapani Jungle',
-    description:
-      'Book Madhuban Eco Retreat near Ratapani Wildlife Sanctuary. Check resort price, availability & secure your eco-friendly jungle stay today!',
-    path: '/booking',
-    ogImage: `${process.env.NEXT_PUBLIC_R2_BASE ?? ''}/home/hero/hero-aerial-sunset-1280.webp`,
-  }),
+export const metadata: Metadata = buildMetadata({
+  title: 'Book',
+  titleOverride: 'Book Madhuban Eco Retreat | Hotel Near Ratapani Jungle',
+  description:
+    'Book Madhuban Eco Retreat near Ratapani Wildlife Sanctuary. Check resort price, availability & secure your eco-friendly jungle stay today!',
+  path: '/booking',
+  ogImage: `${process.env.NEXT_PUBLIC_R2_BASE ?? ''}/home/hero/hero-aerial-sunset-1280.webp`,
   keywords: [
     'Book resort near ratapani jungle',
     'Ratapani resort price',
@@ -38,7 +36,7 @@ export const metadata: Metadata = {
     'Book hotel near ratapani for family',
     'Hotel in Ratapani online booking',
   ],
-};
+});
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 

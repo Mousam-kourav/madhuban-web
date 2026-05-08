@@ -14,27 +14,24 @@ import { DINING } from '@/lib/content/dining';
 import { DiningWaForm } from '@/components/marketing/dining/dining-wa-form';
 
 // ── SEO ───────────────────────────────────────────────────────────────────────
-export const metadata: Metadata = {
-  ...buildMetadata({
-    titleOverride:
-      'Dining at Madhuban | Pure Veg Restaurant Near Bhopal | Forest Dining Experience',
-    title: 'Dining',
-    description:
-      '100% vegetarian dining at Madhuban Eco Retreat. Open-air restaurant, private bush dining & alfresco forest dining experiences near Ratapani, 60km from Bhopal. Farm-to-fork regional cuisine.',
-    path: '/dining',
-    ogImage: DINING.hero.image.desktop,
-  }),
+export const metadata: Metadata = buildMetadata({
+  titleOverride:
+    'Farm-to-Table Dining Ratapani | Pure Veg Buffet Near Bhopal',
+  title: 'Dining',
+  description:
+    'Experience fresh farm-to-table dining at Madhuban Eco Retreat. Pure veg meals, organic produce, sustainable cuisine & clean eating near Ratapani.',
+  path: '/dining',
+  ogImage: DINING.hero.image.desktop,
   keywords: [
-    'best vegetarian restaurant near bhopal',
-    'pure veg restaurant ratapani',
-    'forest dining bhopal',
-    'farm to fork restaurant madhya pradesh',
-    'outdoor dining experience near bhopal',
-    'madhuban dining',
-    'private dining bhopal',
-    'alfresco restaurant madhya pradesh',
+    'veg food near ratapani',
+    'buffet near ratapani',
+    'madhuban eco retreat menu',
+    'farm to table dining bhopal',
+    'organic food retreat mp',
+    'sustainable cuisine ratapani',
+    'best dinner in ratapani',
   ],
-};
+});
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.madhubanecoretreat.com';
 

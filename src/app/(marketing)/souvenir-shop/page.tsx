@@ -12,16 +12,14 @@ import { FilterBar } from './filter-bar';
 
 const R2 = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
-export const metadata: Metadata = {
-  ...buildMetadata({
-    titleOverride:
-      'Souvenir Shop | Madhuban Eco Retreat | Local Crafts, Books & Gifts Near Bhopal',
-    title: 'Souvenir Shop',
-    description:
-      "Browse Madhuban's curated souvenir shop. Local handicrafts, books, regional food & spices, wellness products, and more — supporting tribal artisans near Ratapani.",
-    path: '/souvenir-shop',
-    ogImage: `${R2}/souvenir-shop/hero-1280.webp`,
-  }),
+export const metadata: Metadata = buildMetadata({
+  titleOverride:
+    'Souvenir Shop | Madhuban Eco Retreat | Local Crafts, Books & Gifts Near Bhopal',
+  title: 'Souvenir Shop',
+  description:
+    "Browse Madhuban's curated souvenir shop. Local handicrafts, books, regional food & spices, wellness products, and more — supporting tribal artisans near Ratapani.",
+  path: '/souvenir-shop',
+  ogImage: `${R2}/souvenir-shop/hero-1280.webp`,
   keywords: [
     'madhuban souvenir shop',
     'tribal handicrafts bhopal',
@@ -30,7 +28,7 @@ export const metadata: Metadata = {
     'regional food spices madhya pradesh',
     'souvenirs near bhopal',
   ],
-};
+});
 
 const collectionSchema: Record<string, unknown> = {
   '@context': 'https://schema.org',

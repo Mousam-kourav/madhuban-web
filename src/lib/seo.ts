@@ -11,7 +11,7 @@ interface BuildMetadataInput {
   description: string;
   /** URL path, e.g. '/stay/safari-tent'. Used to build canonical URL and OG url. */
   path: string;
-  /** Full URL to OG image. Falls back to /og-default.jpg. */
+  /** Full URL to OG image. Falls back to default R2 logo. */
   ogImage?: string;
   /** When true, emits robots: noindex, nofollow. Use for admin, booking/payment, staging. */
   noIndex?: boolean;
@@ -20,6 +20,10 @@ interface BuildMetadataInput {
    * Use only for pages whose exact title is already indexed (e.g. homepage).
    */
   titleOverride?: string;
+  /** Optional keywords for the page. Passed through to Next.js metadata. */
+  keywords?: string[];
+  /** OpenGraph type. Defaults to 'website'; use 'article' for blog posts. */
+  ogType?: 'website' | 'article';
 }
 
 /**
@@ -30,6 +34,7 @@ interface BuildMetadataInput {
  *   title: 'Safari Tent Accommodation',
  *   description: 'Sleep under canvas in our safari tent...',
  *   path: '/stay/safari-tent',
+ *   keywords: ['safari tent near bhopal', 'eco stay ratapani'],
  * });
  */
 export function buildMetadata({
@@ -39,6 +44,8 @@ export function buildMetadata({
   ogImage,
   noIndex = false,
   titleOverride,
+  keywords,
+  ogType = 'website',
 }: BuildMetadataInput): Metadata {
   const canonical = `${BASE_URL}${path}`;
   const image = ogImage ?? DEFAULT_OG_IMAGE;
@@ -48,20 +55,26 @@ export function buildMetadata({
     metadataBase: new URL(BASE_URL),
     title: fullTitle,
     description,
+    ...(keywords?.length && { keywords }),
     alternates: {
       canonical,
+      languages: {
+        'en-IN': canonical,
+        'x-default': canonical,
+      },
     },
     openGraph: {
       title: titleOverride ?? title,
       description,
       url: canonical,
       siteName: SITE_NAME,
-      images: [{ url: image }],
+      images: [{ url: image, width: 1200, height: 630 }],
       locale: 'en_IN',
-      type: 'website',
+      type: ogType,
     },
     twitter: {
       card: 'summary_large_image',
+      site: '@madhubanretreat',
       title: titleOverride ?? title,
       description,
       images: [image],

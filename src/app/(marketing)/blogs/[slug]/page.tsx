@@ -11,7 +11,8 @@ import { renderTiptap, extractHeadings } from "@/lib/blog/render-tiptap";
 import { buildMetadata } from "@/lib/seo";
 import { Seo } from "@/components/ui/seo";
 import { blogPosting } from "@/lib/schema/blog-posting";
-import { breadcrumbListFromPath } from "@/lib/schema/breadcrumb-list";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
+import { Container } from "@/components/ui/container";
 import { BlogCard } from "../blog-card";
 import { TableOfContents } from "./toc";
 
@@ -71,12 +72,7 @@ export default async function BlogDetailPage({ params }: Props) {
 
   return (
     <>
-      <Seo
-        schemas={[
-          blogPosting(post),
-          breadcrumbListFromPath(`/blogs/${post.slug}`),
-        ]}
-      />
+      <Seo schemas={[blogPosting(post)]} />
 
       {/* Hero */}
       <section className="relative h-[70vh] min-h-[500px] flex items-end justify-center overflow-hidden">
@@ -116,6 +112,13 @@ export default async function BlogDetailPage({ params }: Props) {
           )}
         </div>
       </section>
+
+      {/* Breadcrumb */}
+      <div className="border-b border-border bg-cream">
+        <Container>
+          <Breadcrumb pathname={`/blogs/${post.slug}`} />
+        </Container>
+      </div>
 
       {/* Body */}
       <section className="bg-[var(--color-cream)] py-16 px-4">

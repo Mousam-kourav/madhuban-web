@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import sharp from 'sharp';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -34,9 +35,12 @@ function getUploadLimiter(): Ratelimit | null {
 function slugifyFilename(name: string): string {
   return name
     .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/\.[^.]+$/, '')
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
     .slice(0, 60);
 }
 
@@ -142,6 +146,9 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  revalidatePath('/gallery');
+  revalidatePath('/sitemap-images.xml');
 
   await createNotification({
     type: 'gallery_uploaded',

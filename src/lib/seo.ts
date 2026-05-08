@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
+import { R2_BASE } from '@/lib/r2';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.madhubanecoretreat.com';
 const SITE_NAME = 'Madhuban Eco Retreat';
-// NEXT_PUBLIC_OG_DEFAULT_IMAGE should point to an R2 hero image, e.g.
-// https://pub-988c0a6b938742458b908a7a49295f61.r2.dev/home/hero/hero-aerial-sunset-1280.webp
-const DEFAULT_OG_IMAGE =
-  process.env.NEXT_PUBLIC_OG_DEFAULT_IMAGE ?? `${BASE_URL}/og-default.jpg`;
+const DEFAULT_OG_IMAGE = `${R2_BASE}/branding/logo/madhuban-logo-full-md.webp`;
 
 interface BuildMetadataInput {
   /** Page-specific title. Brand suffix is appended automatically. Keep ≤38 chars so full title stays ≤60. */

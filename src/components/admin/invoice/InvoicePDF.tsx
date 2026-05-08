@@ -1,24 +1,29 @@
+import path from "path";
+import fs from "fs";
 import { Document, Page, View, Text, StyleSheet, Image, Font } from "@react-pdf/renderer";
 import { amountToWords, fmtINR } from "@/lib/gst";
 import type { InvoiceRow } from "@/lib/supabase/database.types";
 
 type LineItem = { description: string; hsn: string; qty: number; rate: number; amount: number };
 
-// Fonts served from public/fonts/ as static HTTPS assets — react-pdf fetches and caches them.
-// Two families required: latin for regular text, devanagari for ₹ (U+20B9, absent from latin subset).
-const FONT_BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://madhuban-web.vercel.app";
+// Fonts read from public/fonts/ via Buffer — process.cwd() on Vercel resolves to the
+// function root where public/ is accessible. No network fetch, no env var dependency.
+// Two families required: latin for regular text, devanagari for ₹ (U+20B9).
+const FONTS_DIR = path.join(process.cwd(), "public", "fonts");
+const toDataUri = (file: string) =>
+  `data:font/woff;base64,${fs.readFileSync(path.join(FONTS_DIR, file)).toString("base64")}`;
 Font.register({
   family: "Noto Sans",
   fonts: [
-    { src: `${FONT_BASE}/fonts/noto-sans-latin-400-normal.woff`, fontWeight: 400 },
-    { src: `${FONT_BASE}/fonts/noto-sans-latin-700-normal.woff`, fontWeight: 700 },
+    { src: toDataUri("noto-sans-latin-400-normal.woff"), fontWeight: 400 },
+    { src: toDataUri("noto-sans-latin-700-normal.woff"), fontWeight: 700 },
   ],
 });
 Font.register({
   family: "Noto Sans Devanagari",
   fonts: [
-    { src: `${FONT_BASE}/fonts/noto-sans-devanagari-400-normal.woff`, fontWeight: 400 },
-    { src: `${FONT_BASE}/fonts/noto-sans-devanagari-700-normal.woff`, fontWeight: 700 },
+    { src: toDataUri("noto-sans-devanagari-400-normal.woff"), fontWeight: 400 },
+    { src: toDataUri("noto-sans-devanagari-700-normal.woff"), fontWeight: 700 },
   ],
 });
 

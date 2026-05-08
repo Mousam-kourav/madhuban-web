@@ -1,21 +1,23 @@
+import path from "path";
+import fs from "fs";
 import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import { fmtINR } from "@/lib/gst";
 
-// Fonts are served as static files from public/fonts/ so react-pdf can fetch them
-// via HTTPS URL. This avoids Vercel serverless ENOENT on node_modules path reads.
-const FONT_BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://madhuban-web.vercel.app";
+const FONTS_DIR = path.join(process.cwd(), "public", "fonts");
+const toDataUri = (file: string) =>
+  `data:font/woff;base64,${fs.readFileSync(path.join(FONTS_DIR, file)).toString("base64")}`;
 Font.register({
   family: "Noto Sans",
   fonts: [
-    { src: `${FONT_BASE}/fonts/noto-sans-latin-400-normal.woff`, fontWeight: 400 },
-    { src: `${FONT_BASE}/fonts/noto-sans-latin-700-normal.woff`, fontWeight: 700 },
+    { src: toDataUri("noto-sans-latin-400-normal.woff"), fontWeight: 400 },
+    { src: toDataUri("noto-sans-latin-700-normal.woff"), fontWeight: 700 },
   ],
 });
 Font.register({
   family: "Noto Sans Devanagari",
   fonts: [
-    { src: `${FONT_BASE}/fonts/noto-sans-devanagari-400-normal.woff`, fontWeight: 400 },
-    { src: `${FONT_BASE}/fonts/noto-sans-devanagari-700-normal.woff`, fontWeight: 700 },
+    { src: toDataUri("noto-sans-devanagari-400-normal.woff"), fontWeight: 400 },
+    { src: toDataUri("noto-sans-devanagari-700-normal.woff"), fontWeight: 700 },
   ],
 });
 

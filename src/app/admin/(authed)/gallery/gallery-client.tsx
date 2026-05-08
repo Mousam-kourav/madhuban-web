@@ -26,8 +26,16 @@ function getCategoryLabel(category: string) {
   return CATEGORIES.find((c) => c.value === category)?.label ?? category;
 }
 
-function slugify(name: string) {
-  return name.toLowerCase().replace(/\.[^.]+$/, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+function slugify(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/\.[^.]+$/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-')
+    .slice(0, 60);
 }
 
 interface UploadItem {
@@ -397,8 +405,12 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">Filename (slug)</label>
-                          <input value={u.filename} onChange={(e) => updateUploadItem(idx, { filename: slugify(e.target.value) })}
-                            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-1.5 font-body text-xs" />
+                          <input
+                            value={u.filename}
+                            onChange={(e) => updateUploadItem(idx, { filename: e.target.value })}
+                            onBlur={(e) => updateUploadItem(idx, { filename: slugify(e.target.value) })}
+                            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-1.5 font-body text-xs"
+                          />
                         </div>
                         <div>
                           <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">Category <span className="text-red-500">*</span></label>

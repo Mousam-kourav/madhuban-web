@@ -1,21 +1,21 @@
-import path from "path";
 import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import { fmtINR } from "@/lib/gst";
 
-// outputFileTracingIncludes in next.config.ts ensures Vercel bundles these woff files.
-const NOTO_FILES = path.join(process.cwd(), "node_modules/@fontsource/noto-sans/files");
+// Fonts are served as static files from public/fonts/ so react-pdf can fetch them
+// via HTTPS URL. This avoids Vercel serverless ENOENT on node_modules path reads.
+const FONT_BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://madhuban-web.vercel.app";
 Font.register({
   family: "Noto Sans",
   fonts: [
-    { src: path.join(NOTO_FILES, "noto-sans-latin-400-normal.woff"), fontWeight: 400 },
-    { src: path.join(NOTO_FILES, "noto-sans-latin-700-normal.woff"), fontWeight: 700 },
+    { src: `${FONT_BASE}/fonts/noto-sans-latin-400-normal.woff`, fontWeight: 400 },
+    { src: `${FONT_BASE}/fonts/noto-sans-latin-700-normal.woff`, fontWeight: 700 },
   ],
 });
 Font.register({
   family: "Noto Sans Devanagari",
   fonts: [
-    { src: path.join(NOTO_FILES, "noto-sans-devanagari-400-normal.woff"), fontWeight: 400 },
-    { src: path.join(NOTO_FILES, "noto-sans-devanagari-700-normal.woff"), fontWeight: 700 },
+    { src: `${FONT_BASE}/fonts/noto-sans-devanagari-400-normal.woff`, fontWeight: 400 },
+    { src: `${FONT_BASE}/fonts/noto-sans-devanagari-700-normal.woff`, fontWeight: 700 },
   ],
 });
 

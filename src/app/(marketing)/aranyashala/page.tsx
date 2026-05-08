@@ -783,6 +783,12 @@ export default function AranyashalaPage() {
                 <Mail className="size-4" aria-hidden="true" />
                 {ARANYASHALA.cta.email}
               </Link>
+              <Link
+                href="/gallery?category=aranyashala"
+                className="inline-flex h-12 items-center gap-2 rounded-md border border-ivory/40 px-8 font-body text-sm font-medium text-ivory/90 transition hover:border-ivory hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ivory focus-visible:ring-offset-2 focus-visible:ring-offset-forest-green"
+              >
+                View Gallery
+              </Link>
             </div>
 
             {/* Phone strip */}

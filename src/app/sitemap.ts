@@ -13,7 +13,7 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/day-outing`, changeFrequency: "monthly", priority: 0.7 },
   { url: `${BASE_URL}/blogs`, changeFrequency: "weekly", priority: 0.8 },
   { url: `${BASE_URL}/about-us`, changeFrequency: "monthly", priority: 0.7 },
-  { url: `${BASE_URL}/gallery`, changeFrequency: "monthly", priority: 0.6 },
+  { url: `${BASE_URL}/gallery`, changeFrequency: "weekly", priority: 0.8 },
   { url: `${BASE_URL}/nearby-attractions`, changeFrequency: "monthly", priority: 0.6 },
   { url: `${BASE_URL}/aranyashala`, changeFrequency: "monthly", priority: 0.5 },
   { url: `${BASE_URL}/souvenir-shop`, changeFrequency: "monthly", priority: 0.5 },

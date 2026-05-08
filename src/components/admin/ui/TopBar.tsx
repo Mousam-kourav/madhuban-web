@@ -19,6 +19,7 @@ function typeLabel(type: NotificationRow['type']): string {
     booking_cancelled: 'Cancelled',
     lead_received: 'Lead',
     newsletter_subscribed: 'Newsletter',
+    gallery_uploaded: 'Gallery',
   };
   return map[type] ?? type;
 }

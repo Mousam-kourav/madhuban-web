@@ -1,3 +1,5 @@
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
+
 export interface BookingReminderData {
   bookingRef: string;
   guestName: string;
@@ -84,7 +86,7 @@ export function bookingReminderEmail(
 
             <p style="margin-top:24px;font-size:13px;color:#2A2A2A;line-height:1.6;">
               Questions? WhatsApp us at <a href="https://wa.me/919770558419" style="color:#6E6146;">+91 97705 58419</a>
-              or email <a href="mailto:madhubanecoretreat@gmail.com" style="color:#6E6146;">madhubanecoretreat@gmail.com</a>.
+              or email <a href="mailto:${ADMIN_EMAIL}" style="color:#6E6146;">${ADMIN_EMAIL}</a>.
             </p>
           </td>
         </tr>
@@ -111,7 +113,7 @@ Getting Here:
 Near Ratapani Wildlife Sanctuary, Village Bori, Salkanpur Road, Rehti, Sehore, MP - 466446
 60 km from Bhopal | GPS: 22.88N, 77.52E
 
-Questions? WhatsApp: +91 97705 58419 | Email: madhubanecoretreat@gmail.com`;
+Questions? WhatsApp: +91 97705 58419 | Email: ${ADMIN_EMAIL}`;
 
   return { subject, html, text };
 }

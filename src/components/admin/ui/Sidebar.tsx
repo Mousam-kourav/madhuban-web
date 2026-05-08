@@ -15,6 +15,7 @@ import {
   Settings,
   Users,
   ClipboardList,
+  MessageSquare,
   HelpCircle,
   LogOut,
   Menu,
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { icon: Tag,             label: 'Coupons',       href: '/admin/coupons' },
   { icon: ShoppingBag,     label: 'Souvenir Shop', href: '/admin/souvenirs' },
   { icon: ClipboardList,   label: 'Audit Log',     href: '/admin/audit-log' },
+  { icon: MessageSquare,   label: 'Leads',         href: '/admin/leads' },
   { icon: Users,           label: 'Staff',         href: '/admin/users' },
 ];
 

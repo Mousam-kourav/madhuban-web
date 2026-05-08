@@ -14,9 +14,20 @@ import { ContactForm } from '@/components/forms/contact-form';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Contact',
+  titleOverride: 'Contact Madhuban Eco Retreat | Jungle Retreat in Ratapani',
   description:
-    'Get in touch with Madhuban Eco Retreat, 60 km from Bhopal near Ratapani Tiger Reserve. Call, email, or WhatsApp us — we reply within one working day.',
+    'Contact Madhuban Eco Retreat, a top eco tourism and detox jungle retreat in Ratapani. Get a response within 24 hrs for any bookings & inquiries.',
   path: '/contact-us',
+  keywords: [
+    'Contact Madhuban Eco Retreat',
+    'Eco tourism',
+    'Nature resort near Ratapani',
+    'Detox retreat',
+    'Resorts near Bhopal for day outing',
+    'Contact jungle resort near Bhopal',
+    'Eco resort Bhopal',
+    'Eco resort India',
+  ],
 });
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';

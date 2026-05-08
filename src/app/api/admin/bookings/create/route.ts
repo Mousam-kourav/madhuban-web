@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 import { calculateAdminPricing } from "@/lib/admin/calculate-admin-pricing";
 import { checkAvailability } from "@/lib/booking/availability";
 import { generateBookingReference } from "@/lib/booking/reference";
@@ -264,7 +265,7 @@ export async function POST(req: NextRequest) {
 
       try {
         await sendEmail({
-          to: "madhubanecoretreat@gmail.com",
+          to: ADMIN_EMAIL,
           ...bookingConfirmationAdminEmail({
             ...confirmationData,
             guestEmail:  normalizedEmail,

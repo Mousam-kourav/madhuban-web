@@ -41,16 +41,12 @@ import { ARANYASHALA } from '@/lib/content/aranyashala';
 import { AranyashalaWaForm } from '@/components/marketing/aranyashala/aranyashala-wa-form';
 
 // ── SEO ───────────────────────────────────────────────────────────────────────
-export const metadata: Metadata = {
-  ...buildMetadata({
-    title: 'Aranyashala',
-    titleOverride:
-      'Aranyashala | Nature School Camp Near Bhopal | Madhuban Eco Retreat',
-    description:
-      'Aranyashala — Madhuban’s nature school program. Multi-day naturalist courses for schools & colleges. Forest learning, life skills, heritage awareness near Ratapani.',
-    path: '/aranyashala',
-    ogImage: ARANYASHALA.hero.image.desktop,
-  }),
+export const metadata: Metadata = buildMetadata({
+  title: 'Aranyashala',
+  titleOverride: 'Aranyashala | Nature School Camp Near Bhopal | Madhuban Eco Retreat',
+  description: "Aranyashala — Madhuban's nature school program. Multi-day naturalist courses for schools & colleges. Forest learning, life skills, heritage awareness near Ratapani.",
+  path: '/aranyashala',
+  ogImage: ARANYASHALA.hero.image.desktop,
   keywords: [
     'nature school near bhopal',
     'aranyashala madhuban',
@@ -60,7 +56,7 @@ export const metadata: Metadata = {
     'outdoor education camp bhopal',
     'school field trip madhya pradesh',
   ],
-};
+});
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.madhubanecoretreat.com';
 

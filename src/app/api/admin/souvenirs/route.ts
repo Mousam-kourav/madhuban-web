@@ -5,7 +5,7 @@ import type { DbSouvenir } from '@/lib/souvenirs/types';
 import type { Json } from '@/lib/supabase/database.types';
 import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'madhubanecoretreat@gmail.com';
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 function slugify(text: string) {
   return text

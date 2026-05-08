@@ -13,9 +13,22 @@ import { ChevronDown } from 'lucide-react';
 
 export const metadata: Metadata = buildMetadata({
   title: 'About Us',
+  titleOverride: 'About Madhuban Eco Retreat – Best Eco Resort Near Bhopal & Ratapani',
   description:
-    'Madhuban Eco Retreat is a 20-acre regenerative forest retreat near Ratapani Tiger Reserve, 60 km from Bhopal — a Somaiya Group initiative where sustainability meets hospitality.',
+    'Discover Madhuban Eco Retreat near Bhopal—an eco-friendly jungle resort promoting slow tourism, sustainability, and meaningful nature-based experiences in Ratapani.',
   path: '/about-us',
+  keywords: [
+    'best resorts near ratapani',
+    'jungle resort near bhopal',
+    'eco tourism',
+    'slow tourism',
+    'detox retreat bhopal',
+    'sustainable tourism india',
+    'eco lodge near ratapani',
+    'weekend getaway bhopal',
+    'nature resort bhopal',
+    'madhuban eco retreat',
+  ],
 });
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';

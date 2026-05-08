@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { R2_BASE } from '@/lib/r2';
 import {
   IconInstagram,
   IconFacebook,
@@ -69,7 +71,13 @@ export function Footer() {
 
           {/* Column 1 — Brand */}
           <div className="space-y-5">
-            <Link href="/" aria-label="Madhuban Eco Retreat — home">
+            <Link href="/" className="flex items-center gap-3" aria-label="Madhuban Eco Retreat — home">
+              <Image
+                src={`${R2_BASE}/branding/logo/madhuban-mark-md.webp`}
+                alt=""
+                width={36}
+                height={36}
+              />
               <span className="font-display text-2xl font-medium text-earth-brown leading-tight">
                 Madhuban Eco Retreat
               </span>

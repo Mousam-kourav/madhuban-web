@@ -2,6 +2,7 @@ import path from "path";
 import fs from "fs";
 import { Document, Page, View, Text, StyleSheet, Font } from "@react-pdf/renderer";
 import { fmtINR } from "@/lib/gst";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 const FONTS_DIR = path.join(process.cwd(), "public", "fonts");
 const toDataUri = (file: string) =>
@@ -150,7 +151,7 @@ export function VoucherPDF({ data }: { data: VoucherData }) {
         </View>
 
         <Text style={s.footer}>
-          Madhuban Eco Retreat · +91 97705 58419 · madhubanecoretreat@gmail.com
+          {`Madhuban Eco Retreat · +91 97705 58419 · ${ADMIN_EMAIL}`}
         </Text>
       </Page>
     </Document>

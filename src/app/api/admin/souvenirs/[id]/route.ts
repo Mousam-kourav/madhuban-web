@@ -5,7 +5,7 @@ import type { Json } from '@/lib/supabase/database.types';
 import type { SouvenirRow } from '@/lib/supabase/database.types';
 import { assertAdmin } from "@/lib/admin/auth";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'madhubanecoretreat@gmail.com';
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 export async function GET(
   _req: NextRequest,

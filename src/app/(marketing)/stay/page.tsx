@@ -17,9 +17,19 @@ export const revalidate = 60;
 
 export const metadata: Metadata = buildMetadata({
   title: 'Stay With Us',
+  titleOverride: 'Eco Stay Near Bhopal – Safari Tents, Mud Houses, Glamping & Villas | Madhuban',
   description:
-    'Six eco-luxury stays at Madhuban Eco Retreat, 60 km from Bhopal — from canvas safari tents and mud houses to a pool-side villa. All prices include GST.',
+    'Experience eco-friendly stays near Bhopal at Madhuban Eco Retreat. Safari tents, mud houses, glamping tents, poolside villas & camping near Ratapani.',
   path: '/stay',
+  keywords: [
+    'eco stay near bhopal',
+    'safari tent near bhopal',
+    'mud house bhopal',
+    'pool side villa near bhopal',
+    'glamping tent ratapani',
+    'camping in ratapani',
+    'madhuban eco retreat stay',
+  ],
 });
 
 export default async function StayPage() {

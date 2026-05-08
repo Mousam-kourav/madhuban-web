@@ -1,9 +1,10 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AppSettingsRow } from "@/lib/supabase/database.types";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 
 const DEFAULTS: Omit<AppSettingsRow, "id" | "updated_at" | "updated_by"> = {
-  contact_email: "madhubanecoretreat@gmail.com",
+  contact_email: ADMIN_EMAIL,
   contact_phone: "+919770558419",
   whatsapp_number: "+919770558419",
   gstin: "23AAACT5004A1Z9",

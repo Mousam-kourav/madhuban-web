@@ -8,9 +8,18 @@ import { Heading } from "@/components/ui/heading";
 
 export const metadata: Metadata = buildMetadata({
   title: "Cookies & Consent Policy",
+  titleOverride: "Cookies & Consent Policy | Madhuban Eco Retreat, Ratapani",
   description:
-    "Learn how Madhuban Eco Retreat uses cookies and tracking technologies on our website, and how to manage your cookie preferences.",
+    "Learn how Madhuban Eco Retreat uses cookies to improve website experience, analytics, functionality and how you can manage your cookie preferences.",
   path: "/cookies-and-consent-policy",
+  keywords: [
+    'cookies policy',
+    'cookie consent',
+    'website cookies',
+    'Madhuban Eco Retreat',
+    'privacy cookies',
+    'resort cookie policy',
+  ],
 });
 
 const BASE_URL =

@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { R2_BASE } from '@/lib/r2';
 import { isExploreActive } from '@/lib/content/navigation';
 import { TopBar } from './top-bar';
 import { NavDesktop } from './nav-desktop';
@@ -48,9 +50,16 @@ export function Header() {
           {/* Logo */}
           <Link
             href="/"
-            className="shrink-0 flex items-center"
+            className="shrink-0 flex items-center gap-3"
             aria-label="Madhuban Eco Retreat — home"
           >
+            <Image
+              src={`${R2_BASE}/branding/logo/madhuban-mark-md.webp`}
+              alt=""
+              width={40}
+              height={40}
+              priority
+            />
             <span className="font-display text-xl lg:text-2xl font-medium text-earth-brown leading-tight">
               Madhuban Eco Retreat
             </span>

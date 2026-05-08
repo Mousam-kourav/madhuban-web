@@ -54,6 +54,8 @@ export type Experience = {
   seoTitle: string;
   /** SEO description — max 160 chars */
   seoDescription: string;
+  /** Optional SEO keywords */
+  keywords?: string[];
 };
 
 function experienceImage(slug: string, alt: string): ExperienceImage {
@@ -150,8 +152,17 @@ export const EXPERIENCES: readonly Experience[] = [
         answer: 'Yes, children enjoy the nature learning experience and the easy, safe trails.',
       },
     ],
-    seoTitle: 'Forest Walks & Nature Trails',
-    seoDescription: 'Explore guided forest walks and nature trails in the Ratapani region at Madhuban Eco Retreat, 60 km from Bhopal. Safe for families, seniors, and nature lovers.',
+    seoTitle: 'Forest Walks Near Bhopal | Nature Trails in Ratapani',
+    seoDescription: 'Explore guided forest walks & nature trails near Bhopal at Madhuban Eco Retreat. Safe, scenic, eco-friendly trails in Ratapani. Ideal for families & nature lovers.',
+    keywords: [
+      'forest walks near bhopal',
+      'nature trails bhopal',
+      'ratapani forest walk',
+      'eco nature trails ratapani',
+      'offbeat nature trails bhopal',
+      'forest trekking near bhopal',
+      'eco tourism ratapani',
+    ],
   },
   {
     slug: 'bird-watching-and-wilderness',
@@ -214,8 +225,17 @@ export const EXPERIENCES: readonly Experience[] = [
         answer: 'You may bring your own binoculars or camera, but even without equipment, the bird watching experience remains enriching.',
       },
     ],
-    seoTitle: 'Bird Watching & Wilderness',
-    seoDescription: 'Spot 70+ bird species in Ratapani forest with guided birding sessions at Madhuban Eco Retreat near Bhopal. Paradise flycatchers, orioles, kingfishers & more.',
+    seoTitle: 'Bird Watching in Ratapani | Wilderness Experience Near Bhopal',
+    seoDescription: 'Experience bird watching in Ratapani near Bhopal. Spot 70+ native & migratory species during peaceful guided wilderness sessions at Madhuban Eco Retreat.',
+    keywords: [
+      'bird watching near bhopal',
+      'ratapani bird watching',
+      'wilderness near bhopal',
+      'forest birding mp',
+      'migratory birds ratapani',
+      'wildlife trails bhopal',
+      'eco tourism ratapani',
+    ],
   },
   {
     slug: 'recreational-facilities',
@@ -279,7 +299,15 @@ export const EXPERIENCES: readonly Experience[] = [
         answer: 'Yes, cycles are available for guests to explore the scenic eco-paths.',
       },
     ],
-    seoTitle: 'Recreational Facilities',
-    seoDescription: 'Unwind with eco-friendly recreation at Madhuban Eco Retreat — cycling, hammocks, indoor games, campfire evenings & more, 60 km from Bhopal in Ratapani.',
+    seoTitle: 'Recreational Activities Ratapani | Nature Recreation Near Bhopal',
+    seoDescription: 'Enjoy eco-friendly recreational activities near Bhopal. Cycling, indoor games, hammocks, campfires & nature-friendly relaxation at Madhuban Eco Retreat.',
+    keywords: [
+      'recreational activities near bhopal',
+      'ratapani recreation',
+      'outdoor activities bhopal',
+      'eco resort recreation mp',
+      'family activities bhopal',
+      'nature recreation ratapani',
+    ],
   },
 ] as const;

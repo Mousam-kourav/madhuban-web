@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { ADMIN_EMAIL } from "@/lib/admin/constants";
 import type { NextRequest } from "next/server";
 import type { Json } from "@/lib/supabase/database.types";
 import { sendEmail } from "@/lib/email/resend";
@@ -232,7 +233,7 @@ export async function PATCH(
           checkOut: booking.checkout,
           refundAmount,
         };
-        const notifyEmail = process.env.CONTACT_FORM_TO ?? "madhubanecoretreat@gmail.com";
+        const notifyEmail = ADMIN_EMAIL;
         try { await sendEmail({ to: guest.email, ...bookingCancelledGuestEmail(data) }); }
         catch (err) { console.error("[admin/cancel] guest email:", err); }
         try {

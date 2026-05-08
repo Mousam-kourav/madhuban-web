@@ -23,6 +23,7 @@ import {
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
 import { Heading } from '@/components/ui/heading';
+import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { cn } from '@/lib/utils';
 import type { Room } from '@/lib/content/rooms';
 
@@ -82,6 +83,13 @@ export function RoomDetailPage({ room }: { room: Room }) {
           <p className="mt-2 max-w-sm font-body text-sm text-ivory/75">{room.tagline}</p>
         </div>
       </section>
+
+      {/* ── Breadcrumb ───────────────────────────────────────────────────── */}
+      <div className="border-b border-border bg-cream">
+        <Container>
+          <Breadcrumb pathname={`/stay/${room.slug}`} />
+        </Container>
+      </div>
 
       {/* ── 2. Booking band ───────────────────────────────────────────────── */}
       <Section className="bg-cream" label="Room overview and booking">

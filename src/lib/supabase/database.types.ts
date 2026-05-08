@@ -264,6 +264,30 @@ export type AuditLogRow = {
   created_at: string;
 };
 
+export type NewsletterSubscriberRow = {
+  id: string;
+  email: string;
+  subscribed_at: string;
+  unsubscribed_at: string | null;
+  source: string | null;
+};
+
+export type LeadSource = 'contact_form' | 'souvenirs_inquiry' | 'experiences_inquiry' | 'other';
+export type LeadStatus = 'new' | 'contacted' | 'closed';
+
+export type LeadRow = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  message: string;
+  source: LeadSource;
+  metadata: Json;
+  status: LeadStatus;
+  created_at: string;
+  updated_at: string;
+};
+
 // Migration 0017: app_settings singleton
 export type AppSettingsRow = {
   id: string;
@@ -290,7 +314,7 @@ export type AppSettingsRow = {
 export type NotificationRow = {
   id: string;
   recipient_email: string;
-  type: 'booking_created' | 'payment_received' | 'check_in_today' | 'booking_cancelled';
+  type: 'booking_created' | 'payment_received' | 'check_in_today' | 'booking_cancelled' | 'lead_received' | 'newsletter_subscribed';
   title: string;
   body: string;
   link_url: string | null;
@@ -520,6 +544,35 @@ export type Database = {
         Insert: Omit<NotificationRow, "id" | "created_at" | "read_at"> &
           Partial<Pick<NotificationRow, "id" | "created_at" | "read_at">>;
         Update: Partial<NotificationRow>;
+        Relationships: [];
+      };
+      newsletter_subscribers: {
+        Row: NewsletterSubscriberRow;
+        Insert: {
+          email: string;
+          id?: string;
+          subscribed_at?: string;
+          unsubscribed_at?: string | null;
+          source?: string | null;
+        };
+        Update: Partial<Omit<NewsletterSubscriberRow, 'id'>>;
+        Relationships: [];
+      };
+      leads: {
+        Row: LeadRow;
+        Insert: {
+          name: string;
+          email: string;
+          message: string;
+          source: LeadSource;
+          phone?: string | null;
+          metadata?: Json;
+          status?: LeadStatus;
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Omit<LeadRow, 'id' | 'created_at'>>;
         Relationships: [];
       };
       user_profiles: {

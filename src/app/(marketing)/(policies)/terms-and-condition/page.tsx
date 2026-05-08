@@ -8,9 +8,19 @@ import { Heading } from "@/components/ui/heading";
 
 export const metadata: Metadata = buildMetadata({
   title: "Terms & Conditions",
+  titleOverride: "Terms & Conditions | Madhuban Eco Retreat Ratapani Bhopal",
   description:
-    "Terms and conditions governing reservations, cancellations, guest conduct, and use of services at Madhuban Eco Retreat near Bhopal, Madhya Pradesh.",
+    "Read the Terms & Conditions for Madhuban Eco Retreat covering reservations, safety, activities, cancellations, liability, and guest responsibilities.",
   path: "/terms-and-condition",
+  keywords: [
+    'terms and conditions',
+    'resort terms',
+    'booking terms',
+    'Madhuban Eco Retreat',
+    'Ratapani resort',
+    'Bhopal resort terms',
+    'guest policy',
+  ],
 });
 
 const BASE_URL =

@@ -50,7 +50,7 @@ export const NEARBY_ATTRACTIONS: readonly NearbyAttraction[] = [
   },
   {
     slug: 'ratapani',
-    name: 'Ratapani Wildlife Sanctuary',
+    name: 'Ratapani Tiger Reserve',
     distance: 'Adjacent',
     description: `India's newest tiger reserve, home to leopards, sloth bears, and 200+ bird species.`,
     image: nearbyImage(

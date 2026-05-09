@@ -10,3 +10,4 @@ export * from './item-list';
 export * from './contact-page';
 export * from './tourist-attraction';
 export * from './imageGallery';
+export * from './nearby-attraction';

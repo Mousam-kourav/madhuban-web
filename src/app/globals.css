@@ -207,6 +207,15 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
+/* ── Hide scrollbar (used by horizontal-scroll rails) ────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE / legacy Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;             /* WebKit / Blink */
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -9,3 +9,14 @@ export function cn(...inputs: ClassValue[]) {
 export function formatPrice(amount: number): string {
   return amount.toLocaleString('en-IN');
 }
+
+/** Returns up to 2 uppercased initials from a full name, e.g. "Vidya Balan" → "VB". */
+export function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}

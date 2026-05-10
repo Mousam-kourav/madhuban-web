@@ -10,7 +10,7 @@ import { RoomsPreview } from '@/components/marketing/homepage/rooms-preview';
 import { ExperiencesGrid } from '@/components/marketing/homepage/experiences-grid';
 import { DiningPreview } from '@/components/marketing/homepage/dining-preview';
 import { NearbyAttractions } from '@/components/marketing/homepage/nearby-attractions';
-import { VoicesFromMadhuban } from '@/components/marketing/homepage/testimonials';
+import { VoicesFromMadhuban } from '@/components/marketing/homepage/voices-from-madhuban';
 import { NotableGuests } from '@/components/marketing/homepage/notable-guests';
 import { BlogPreview } from '@/components/marketing/homepage/blog-preview';
 import { CorporateOffsiteTeaser } from '@/components/marketing/homepage/corporate-offsite-teaser';

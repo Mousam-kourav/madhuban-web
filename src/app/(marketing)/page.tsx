@@ -11,6 +11,7 @@ import { ExperiencesGrid } from '@/components/marketing/homepage/experiences-gri
 import { DiningPreview } from '@/components/marketing/homepage/dining-preview';
 import { NearbyAttractions } from '@/components/marketing/homepage/nearby-attractions';
 import { VoicesFromMadhuban } from '@/components/marketing/homepage/testimonials';
+import { NotableGuests } from '@/components/marketing/homepage/notable-guests';
 import { BlogPreview } from '@/components/marketing/homepage/blog-preview';
 import { CorporateOffsiteTeaser } from '@/components/marketing/homepage/corporate-offsite-teaser';
 import { FollowOurJourney } from '@/components/marketing/homepage/follow-our-journey';
@@ -85,6 +86,8 @@ export default function HomePage() {
       <NearbyAttractions />
 
       <VoicesFromMadhuban />
+
+      <NotableGuests />
 
       <BlogPreview />
 

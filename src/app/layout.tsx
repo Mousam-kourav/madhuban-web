@@ -1,22 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, DM_Sans } from "next/font/google";
+import { Lato } from "next/font/google";
 import "./globals.css";
 import { ConsentProvider } from "@/lib/consent/consent-context";
 import { CookieBanner } from "@/components/consent/cookie-banner";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { R2_BASE } from "@/lib/r2";
 
-const cormorant = Cormorant_Garamond({
+const lato = Lato({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-dm-sans",
+  weight: ["300", "400", "700", "900"],
+  variable: "--font-lato",
   display: "swap",
 });
 
@@ -69,7 +62,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${dmSans.variable} h-full antialiased overflow-x-clip`}
+      className={`${lato.variable} h-full antialiased overflow-x-clip`}
     >
       <head>
         <link

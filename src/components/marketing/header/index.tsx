@@ -47,22 +47,28 @@ export function Header() {
         )}
       >
         <div className="max-w-[1280px] mx-auto px-4 md:px-6 lg:px-8 h-full flex items-center justify-between gap-4">
-          {/* Logo */}
+          {/* Logo + name + tagline */}
           <Link
             href="/"
             className="shrink-0 flex items-center gap-3"
-            aria-label="Madhuban Eco Retreat — home"
+            aria-label="Madhuban Eco Retreat — Ratapani Tiger Reserve, Bhopal — home"
           >
             <Image
               src={`${R2_BASE}/branding/logo/madhuban-mark-md.webp`}
               alt="Madhuban Eco Retreat logo"
-              width={40}
-              height={40}
+              width={48}
+              height={48}
+              className="w-10 h-10 md:w-12 md:h-12"
               priority
             />
-            <span className="font-display text-xl lg:text-2xl font-medium text-earth-brown leading-tight">
-              Madhuban Eco Retreat
-            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-base md:text-lg font-bold text-charcoal tracking-tight">
+                Madhuban Eco Retreat
+              </span>
+              <span className="text-[10px] md:text-xs font-normal text-earth-brown/70 tracking-wide">
+                Ratapani Tiger Reserve, Bhopal, Madhya Pradesh, India
+              </span>
+            </div>
           </Link>
 
           {/* Desktop nav — center/right */}

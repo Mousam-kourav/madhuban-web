@@ -322,10 +322,19 @@ export type NotificationRow = {
   created_at: string;
 };
 
-// Migration 0023: gallery_items
+// Migration 0023: gallery_items (+ 0024 crop columns)
 export type GalleryCategory = 'stays' | 'dining' | 'aranyashala' | 'forest' | 'events' | 'behind-the-scenes';
 export type GalleryItemType = 'image' | 'video';
 export type GalleryStatus = 'published' | 'draft';
+
+export type CropData = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  zoom: number;
+  rotation: number;
+};
 
 export type GalleryItemRow = {
   id: string;
@@ -347,6 +356,33 @@ export type GalleryItemRow = {
   uploaded_at: string;
   updated_at: string;
   view_count: number;
+  original_r2_key: string;
+  original_r2_url: string;
+  crop_data: CropData | null;
+  needs_review: boolean;
+};
+
+// Migration 0024: featured_experiences
+export type FeaturedExperienceStatus = 'published' | 'draft';
+
+export type FeaturedExperienceRow = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  r2_key: string;
+  r2_url: string;
+  original_r2_key: string;
+  original_r2_url: string;
+  crop_data: CropData | null;
+  cta_label: string;
+  cta_link: string;
+  sort_order: number;
+  status: FeaturedExperienceStatus;
+  created_at: string;
+  updated_at: string;
+  created_by: string | null;
+  updated_by: string | null;
 };
 
 // Migration 0019: user_profiles (RBAC)
@@ -625,6 +661,8 @@ export type Database = {
           type: GalleryItemType;
           r2_key: string;
           r2_url: string;
+          original_r2_key: string;
+          original_r2_url: string;
           file_size_bytes: number;
           mime_type: string;
           uploaded_by: string;
@@ -638,8 +676,34 @@ export type Database = {
           uploaded_at?: string;
           updated_at?: string;
           view_count?: number;
+          crop_data?: CropData | null;
+          needs_review?: boolean;
         };
-        Update: Partial<Omit<GalleryItemRow, 'id' | 'uploaded_at' | 'r2_key' | 'r2_url'>>;
+        Update: Partial<Omit<GalleryItemRow, 'id' | 'uploaded_at'>>;
+        Relationships: [];
+      };
+      featured_experiences: {
+        Row: FeaturedExperienceRow;
+        Insert: {
+          slug: string;
+          title: string;
+          description: string;
+          r2_key: string;
+          r2_url: string;
+          original_r2_key: string;
+          original_r2_url: string;
+          cta_label: string;
+          cta_link: string;
+          id?: string;
+          crop_data?: CropData | null;
+          sort_order?: number;
+          status?: FeaturedExperienceStatus;
+          created_at?: string;
+          updated_at?: string;
+          created_by?: string | null;
+          updated_by?: string | null;
+        };
+        Update: Partial<Omit<FeaturedExperienceRow, 'id' | 'created_at'>>;
         Relationships: [];
       };
     };

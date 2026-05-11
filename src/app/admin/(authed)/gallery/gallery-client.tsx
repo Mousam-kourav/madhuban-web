@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import {
   Plus, Search, Pencil, Trash2, Images, Play,
-  X, Upload, Loader2, CheckSquare, Square,
-  ChevronDown, AlertTriangle,
+  X, Loader2, CheckSquare, Square,
+  ChevronDown, AlertTriangle, RefreshCcw, Crop as CropIcon, Check,
 } from 'lucide-react';
 import type { GalleryItemRow, GalleryCategory } from '@/lib/supabase/database.types';
+import { ImageCropper, type CropResult } from '@/components/admin/ImageCropper';
 
 const CATEGORIES: { value: GalleryCategory | 'all'; label: string; color: string }[] = [
   { value: 'all', label: 'All Categories', color: '' },
@@ -18,6 +19,8 @@ const CATEGORIES: { value: GalleryCategory | 'all'; label: string; color: string
   { value: 'events', label: 'Events', color: 'bg-purple-100 text-purple-800' },
   { value: 'behind-the-scenes', label: 'Behind the Scenes', color: 'bg-slate-100 text-slate-800' },
 ];
+
+const GALLERY_ASPECT = 4 / 3;
 
 function getCategoryColor(category: string) {
   return CATEGORIES.find((c) => c.value === category)?.color ?? 'bg-gray-100 text-gray-700';
@@ -38,17 +41,24 @@ function slugify(name: string): string {
     .slice(0, 60);
 }
 
-interface UploadItem {
+type UploadStep = 'pick' | 'crop' | 'meta' | 'submitting';
+
+interface UploadDraft {
   file: File;
+  preview: string;
+  isVideo: boolean;
   filename: string;
   alt_text: string;
   caption: string;
   category: GalleryCategory | '';
   sort_order: string;
   status: 'published' | 'draft';
-  preview: string;
-  progress: 'idle' | 'uploading' | 'done' | 'error';
-  errorMsg?: string;
+  cropResult: CropResult | null;
+}
+
+interface MigrateResult {
+  summary: { processed: number; succeeded: number; skipped: number; failed: number };
+  results: Array<{ id: string; filename: string; status: string; message?: string }>;
 }
 
 export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[] }) {
@@ -56,25 +66,43 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterReview, setFilterReview] = useState<string>('all');
   const [searchQ, setSearchQ] = useState('');
   const [sortBy, setSortBy] = useState<string>('sort_order');
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [showUploadModal, setShowUploadModal] = useState(false);
+
+  // Upload state
+  const [uploadStep, setUploadStep] = useState<UploadStep | null>(null);
+  const [draft, setDraft] = useState<UploadDraft | null>(null);
+  const [uploadError, setUploadError] = useState('');
+
+  // Edit state
   const [editItem, setEditItem] = useState<GalleryItemRow | null>(null);
+  const [editFields, setEditFields] = useState<Partial<GalleryItemRow>>({});
+  const [editSaving, setEditSaving] = useState(false);
+  const [recropping, setRecropping] = useState(false);
+  const [recropResult, setRecropResult] = useState<CropResult | null>(null);
+  const [recropSaving, setRecropSaving] = useState(false);
+
+  // Delete + bulk
   const [deleteItem, setDeleteItem] = useState<GalleryItemRow | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [bulkCategoryModal, setBulkCategoryModal] = useState(false);
   const [bulkNewCategory, setBulkNewCategory] = useState<GalleryCategory | ''>('');
-  const [uploadItems, setUploadItems] = useState<UploadItem[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [editSaving, setEditSaving] = useState(false);
-  const [editFields, setEditFields] = useState<Partial<GalleryItemRow>>({});
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Approve
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+
+  // Migrate-crops
+  const [migrateConfirm, setMigrateConfirm] = useState(false);
+  const [migrateRunning, setMigrateRunning] = useState(false);
+  const [migrateResult, setMigrateResult] = useState<MigrateResult | null>(null);
 
   const filtered = items.filter((item) => {
     if (filterCategory !== 'all' && item.category !== filterCategory) return false;
     if (filterType !== 'all' && item.type !== filterType) return false;
     if (filterStatus !== 'all' && item.status !== filterStatus) return false;
+    if (filterReview === 'needs_review' && !item.needs_review) return false;
     if (searchQ) {
       const q = searchQ.toLowerCase();
       if (!item.filename.toLowerCase().includes(q) && !item.alt_text.toLowerCase().includes(q)) return false;
@@ -103,66 +131,159 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
     } catch { /* ignore */ }
   }, []);
 
-  // --- Upload flow ---
-  const handleFilesSelected = (files: FileList | null) => {
-    if (!files) return;
-    const newItems: UploadItem[] = Array.from(files).map((file) => ({
+  // ── Upload flow ────────────────────────────────────────────────────────
+  const openUpload = () => {
+    setUploadStep('pick');
+    setDraft(null);
+    setUploadError('');
+  };
+  const closeUpload = () => {
+    if (draft?.preview) URL.revokeObjectURL(draft.preview);
+    setUploadStep(null);
+    setDraft(null);
+    setUploadError('');
+  };
+
+  const handleFilePick = (file: File) => {
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    if (!isImage && !isVideo) {
+      setUploadError('Only image or video files are supported.');
+      return;
+    }
+    const preview = URL.createObjectURL(file);
+    setDraft({
       file,
+      preview,
+      isVideo,
       filename: slugify(file.name),
       alt_text: '',
       caption: '',
       category: '',
       sort_order: '0',
       status: 'published',
-      preview: URL.createObjectURL(file),
-      progress: 'idle',
-    }));
-    setUploadItems((prev) => [...prev, ...newItems]);
-    setShowUploadModal(true);
+      cropResult: null,
+    });
+    setUploadError('');
+    setUploadStep(isVideo ? 'meta' : 'crop');
   };
 
-  const updateUploadItem = (idx: number, patch: Partial<UploadItem>) => {
-    setUploadItems((prev) => prev.map((item, i) => i === idx ? { ...item, ...patch } : item));
-  };
+  const handleCropComplete = useCallback((result: CropResult) => {
+    setDraft((d) => (d ? { ...d, cropResult: result } : d));
+  }, []);
 
-  const handleUploadAll = async () => {
-    const invalid = uploadItems.findIndex((u) => u.alt_text.length < 10 || !u.category);
-    if (invalid >= 0) {
-      alert('Each item needs a category and alt text (≥ 10 characters).');
+  const submitUpload = async () => {
+    if (!draft) return;
+    if (draft.alt_text.trim().length < 10) {
+      setUploadError('Alt text must be at least 10 characters.');
       return;
     }
-    setUploading(true);
-    for (let i = 0; i < uploadItems.length; i++) {
-      const u = uploadItems[i];
-      if (!u || u.progress === 'done') continue;
-      updateUploadItem(i, { progress: 'uploading' });
-      const fd = new FormData();
-      fd.append('file', u.file);
-      fd.append('filename', u.filename);
-      fd.append('alt_text', u.alt_text);
-      fd.append('caption', u.caption);
-      fd.append('category', u.category);
-      fd.append('sort_order', u.sort_order);
-      fd.append('status', u.status);
-      try {
-        const res = await fetch('/api/admin/gallery/upload', { method: 'POST', body: fd });
-        if (res.ok) {
-          updateUploadItem(i, { progress: 'done' });
-        } else {
-          const err = await res.json();
-          updateUploadItem(i, { progress: 'error', errorMsg: err.error ?? 'Upload failed' });
-        }
-      } catch {
-        updateUploadItem(i, { progress: 'error', errorMsg: 'Network error' });
-      }
+    if (!draft.category) {
+      setUploadError('Category is required.');
+      return;
     }
-    setUploading(false);
-    await reloadItems();
-    const allDone = uploadItems.every((u) => u.progress === 'done');
-    if (allDone) { setShowUploadModal(false); setUploadItems([]); }
+    if (!draft.isVideo && !draft.cropResult) {
+      setUploadError('Crop the image before submitting.');
+      return;
+    }
+
+    setUploadStep('submitting');
+    setUploadError('');
+    const fd = new FormData();
+    fd.append('file', draft.file);
+    fd.append('filename', draft.filename);
+    fd.append('alt_text', draft.alt_text);
+    fd.append('caption', draft.caption);
+    fd.append('category', draft.category);
+    fd.append('sort_order', draft.sort_order);
+    fd.append('status', draft.status);
+    if (draft.cropResult) {
+      fd.append('croppedAreaPixels', JSON.stringify(draft.cropResult.pixels));
+      fd.append('zoom', String(draft.cropResult.zoom));
+      fd.append('rotation', String(draft.cropResult.rotation));
+    }
+
+    try {
+      const res = await fetch('/api/admin/gallery/upload', { method: 'POST', body: fd });
+      const json = await res.json();
+      if (!res.ok) {
+        setUploadError(json.error ?? 'Upload failed');
+        setUploadStep('meta');
+        return;
+      }
+      await reloadItems();
+      closeUpload();
+    } catch {
+      setUploadError('Network error');
+      setUploadStep('meta');
+    }
   };
 
-  // --- Delete flow ---
+  // ── Edit + Re-crop ─────────────────────────────────────────────────────
+  const openEdit = (item: GalleryItemRow) => {
+    setEditItem(item);
+    setEditFields({
+      filename: item.filename,
+      alt_text: item.alt_text,
+      caption: item.caption ?? '',
+      category: item.category,
+      sort_order: item.sort_order,
+      status: item.status,
+    });
+    setRecropping(false);
+    setRecropResult(null);
+  };
+
+  const handleEditSave = async () => {
+    if (!editItem) return;
+    setEditSaving(true);
+    const res = await fetch(`/api/admin/gallery/${editItem.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(editFields),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => i.id === editItem.id ? updated : i));
+      setEditItem(null);
+    }
+    setEditSaving(false);
+  };
+
+  const handleRecropSave = async () => {
+    if (!editItem || !recropResult) return;
+    setRecropSaving(true);
+    const res = await fetch(`/api/admin/gallery/${editItem.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        croppedAreaPixels: recropResult.pixels,
+        zoom: recropResult.zoom,
+        rotation: recropResult.rotation,
+      }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => i.id === editItem.id ? updated : i));
+      setRecropping(false);
+      setRecropResult(null);
+      setEditItem(updated);
+    }
+    setRecropSaving(false);
+  };
+
+  // ── Approve ────────────────────────────────────────────────────────────
+  const handleApprove = async (item: GalleryItemRow) => {
+    setApprovingId(item.id);
+    const res = await fetch(`/api/admin/gallery/${item.id}/approve`, { method: 'POST' });
+    if (res.ok) {
+      const updated = await res.json();
+      setItems((prev) => prev.map((i) => i.id === item.id ? updated : i));
+    }
+    setApprovingId(null);
+  };
+
+  // ── Delete + bulk ──────────────────────────────────────────────────────
   const handleDelete = async () => {
     if (!deleteItem) return;
     setDeletingId(deleteItem.id);
@@ -197,33 +318,22 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
     setBulkNewCategory('');
   };
 
-  // --- Edit flow ---
-  const openEdit = (item: GalleryItemRow) => {
-    setEditItem(item);
-    setEditFields({
-      filename: item.filename,
-      alt_text: item.alt_text,
-      caption: item.caption ?? '',
-      category: item.category,
-      sort_order: item.sort_order,
-      status: item.status,
-    });
-  };
-  const handleEditSave = async () => {
-    if (!editItem) return;
-    setEditSaving(true);
-    const res = await fetch(`/api/admin/gallery/${editItem.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editFields),
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      setItems((prev) => prev.map((i) => i.id === editItem.id ? updated : i));
-      setEditItem(null);
+  // ── Migrate-crops ──────────────────────────────────────────────────────
+  const runMigrate = async () => {
+    setMigrateRunning(true);
+    setMigrateResult(null);
+    try {
+      const res = await fetch('/api/admin/gallery/migrate-crops', { method: 'POST' });
+      const json = (await res.json()) as MigrateResult;
+      setMigrateResult(json);
+      await reloadItems();
+    } catch {
+      setMigrateResult({ summary: { processed: 0, succeeded: 0, skipped: 0, failed: 0 }, results: [] });
     }
-    setEditSaving(false);
+    setMigrateRunning(false);
   };
+
+  const needsReviewCount = items.filter((i) => i.needs_review).length;
 
   return (
     <div>
@@ -254,6 +364,14 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
           <option value="published">Published</option>
           <option value="draft">Draft</option>
         </select>
+        <select
+          value={filterReview}
+          onChange={(e) => setFilterReview(e.target.value)}
+          className="rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 font-body text-sm"
+        >
+          <option value="all">All Items</option>
+          <option value="needs_review">Needs Review ({needsReviewCount})</option>
+        </select>
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--color-muted)]" />
           <input
@@ -274,8 +392,15 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
           <option value="uploaded_at_asc">Oldest First</option>
         </select>
         <button
-          onClick={() => setShowUploadModal(true)}
-          className="ml-auto flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white transition hover:opacity-90"
+          onClick={() => setMigrateConfirm(true)}
+          className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 font-body text-sm hover:bg-[var(--color-cream)]"
+          title="Auto-crop existing items to 4:3"
+        >
+          <RefreshCcw className="h-4 w-4" /> Migrate Crops
+        </button>
+        <button
+          onClick={openUpload}
+          className="flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white transition hover:opacity-90"
         >
           <Plus className="h-4 w-4" /> Upload New
         </button>
@@ -304,7 +429,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
           <Images className="mb-4 h-10 w-10 text-[var(--color-muted)]" />
           <p className="font-display text-xl text-[var(--color-charcoal)]">No gallery items yet</p>
           <p className="mt-2 font-body text-sm text-[var(--color-muted)]">Upload your first photo or video to get started.</p>
-          <button onClick={() => setShowUploadModal(true)} className="mt-6 flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white hover:opacity-90">
+          <button onClick={openUpload} className="mt-6 flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white hover:opacity-90">
             <Plus className="h-4 w-4" /> Upload New
           </button>
         </div>
@@ -317,7 +442,6 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                 key={item.id}
                 className={`group relative overflow-hidden rounded-xl border bg-white transition ${isSelected ? 'border-[var(--color-gold-accent)] ring-2 ring-[var(--color-gold-accent)]/30' : 'border-[var(--color-border)] hover:shadow-md'}`}
               >
-                {/* Checkbox */}
                 <button
                   onClick={() => toggleSelect(item.id)}
                   className="absolute left-2 top-2 z-10 rounded-md bg-white/90 p-1 opacity-0 shadow transition group-hover:opacity-100 data-[selected=true]:opacity-100"
@@ -327,7 +451,6 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                   {isSelected ? <CheckSquare className="h-4 w-4 text-[var(--color-gold-accent)]" /> : <Square className="h-4 w-4 text-[var(--color-muted)]" />}
                 </button>
 
-                {/* Thumbnail */}
                 <div className={`relative overflow-hidden bg-warm-beige/30 ${item.type === 'video' ? 'aspect-video' : 'aspect-[4/3]'}`}>
                   {item.r2_url ? (
                     <Image src={item.thumbnail_url ?? item.r2_url} alt={item.alt_text} fill sizes="(max-width:640px) 50vw,25vw" className="object-cover" />
@@ -342,8 +465,23 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                   {item.status === 'draft' && (
                     <span className="absolute right-2 top-2 rounded-full bg-gray-700/80 px-2 py-0.5 font-body text-[10px] text-white">Draft</span>
                   )}
-                  {/* Hover overlay */}
+                  {item.needs_review && (
+                    <span className="absolute left-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 font-body text-[10px] font-semibold text-amber-900">
+                      <AlertTriangle className="h-3 w-3" /> Needs Review
+                    </span>
+                  )}
+
                   <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition group-hover:opacity-100">
+                    {item.needs_review && (
+                      <button
+                        onClick={() => handleApprove(item)}
+                        disabled={approvingId === item.id}
+                        className="rounded-lg bg-emerald-500 p-2 text-white hover:bg-emerald-600 disabled:opacity-50"
+                        aria-label="Approve crop"
+                      >
+                        {approvingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                      </button>
+                    )}
                     <button onClick={() => openEdit(item)} className="rounded-lg bg-white/90 p-2 hover:bg-white" aria-label="Edit">
                       <Pencil className="h-4 w-4 text-[var(--color-charcoal)]" />
                     </button>
@@ -353,7 +491,6 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                   </div>
                 </div>
 
-                {/* Info */}
                 <div className="p-2.5">
                   <p className="truncate font-body text-xs font-medium text-[var(--color-charcoal)]">{item.filename}</p>
                   <div className="mt-1 flex items-center gap-1.5">
@@ -367,159 +504,268 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
         </div>
       )}
 
-      {/* Upload Modal */}
-      {showUploadModal && (
+      {/* Upload modal */}
+      {uploadStep && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-white px-6 py-4">
-              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">Upload to Gallery</h2>
-              <button onClick={() => { setShowUploadModal(false); setUploadItems([]); }} className="rounded-lg p-2 hover:bg-gray-100"><X className="h-5 w-5" /></button>
+              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">
+                {uploadStep === 'pick' && 'Upload to Gallery'}
+                {uploadStep === 'crop' && 'Crop Image (4:3)'}
+                {(uploadStep === 'meta' || uploadStep === 'submitting') && 'Add Details'}
+              </h2>
+              <button onClick={closeUpload} className="rounded-lg p-2 hover:bg-gray-100"><X className="h-5 w-5" /></button>
             </div>
-            <div className="p-6">
-              {/* Drop zone */}
-              <label
-                className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-cream)] p-8 text-center hover:border-[var(--color-gold-accent)] hover:bg-[var(--color-cream)]"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => { e.preventDefault(); handleFilesSelected(e.dataTransfer.files); }}
-              >
-                <Upload className="mb-3 h-8 w-8 text-[var(--color-muted)]" />
-                <p className="font-body text-sm font-medium text-[var(--color-charcoal)]">Drop files here or click to browse</p>
-                <p className="mt-1 font-body text-xs text-[var(--color-muted)]">JPG, PNG, WebP up to 5 MB · MP4, WebM up to 25 MB</p>
-                <input ref={fileInputRef} type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" className="sr-only" onChange={(e) => handleFilesSelected(e.target.files)} />
-              </label>
 
-              {/* File list */}
-              {uploadItems.map((u, idx) => (
-                <div key={idx} className="mt-4 rounded-xl border border-[var(--color-border)] p-4">
-                  <div className="flex items-start gap-3">
-                    {/* Preview */}
-                    <div className="h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-warm-beige/30">
-                      {u.file.type.startsWith('image/') ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={u.preview} alt="" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center"><Play className="h-6 w-6 text-[var(--color-muted)]" /></div>
-                      )}
+            <div className="p-6">
+              {uploadStep === 'pick' && (
+                <label
+                  className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-cream)] p-10 text-center hover:border-[var(--color-gold-accent)]"
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) handleFilePick(f); }}
+                >
+                  <CropIcon className="mb-3 h-8 w-8 text-[var(--color-muted)]" />
+                  <p className="font-body text-sm font-medium text-[var(--color-charcoal)]">Drop a file or click to browse</p>
+                  <p className="mt-1 font-body text-xs text-[var(--color-muted)]">JPG, PNG, WebP up to 5 MB · MP4, WebM up to 25 MB</p>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                    className="sr-only"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFilePick(f); }}
+                  />
+                  {uploadError && <p className="mt-3 font-body text-xs text-red-500">{uploadError}</p>}
+                </label>
+              )}
+
+              {uploadStep === 'crop' && draft && (
+                <>
+                  <ImageCropper imageSrc={draft.preview} aspect={GALLERY_ASPECT} onComplete={handleCropComplete} />
+                  <div className="mt-6 flex justify-end gap-3">
+                    <button onClick={() => setUploadStep('pick')} className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50">Back</button>
+                    <button
+                      onClick={() => setUploadStep('meta')}
+                      disabled={!draft.cropResult}
+                      className="rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white disabled:opacity-50"
+                    >
+                      Next: Details
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {(uploadStep === 'meta' || uploadStep === 'submitting') && draft && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block font-body text-xs font-medium">Filename (slug)</label>
+                      <input
+                        value={draft.filename}
+                        onChange={(e) => setDraft({ ...draft, filename: e.target.value })}
+                        onBlur={(e) => setDraft({ ...draft, filename: slugify(e.target.value) })}
+                        className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                      />
                     </div>
-                    <div className="flex-1 space-y-2">
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">Filename (slug)</label>
-                          <input
-                            value={u.filename}
-                            onChange={(e) => updateUploadItem(idx, { filename: e.target.value })}
-                            onBlur={(e) => updateUploadItem(idx, { filename: slugify(e.target.value) })}
-                            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-1.5 font-body text-xs"
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">Category <span className="text-red-500">*</span></label>
-                          <select value={u.category} onChange={(e) => updateUploadItem(idx, { category: e.target.value as GalleryCategory })}
-                            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-1.5 font-body text-xs">
-                            <option value="">Select…</option>
-                            {CATEGORIES.filter((c) => c.value !== 'all').map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                      <div>
-                        <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">
-                          Alt Text <span className="text-red-500">*</span>
-                          <span className="ml-1 font-normal text-[var(--color-muted)]">(describe for accessibility & SEO)</span>
-                        </label>
-                        <input value={u.alt_text} onChange={(e) => updateUploadItem(idx, { alt_text: e.target.value })}
-                          placeholder="Describe the image in detail…"
-                          className={`w-full rounded-lg border px-3 py-1.5 font-body text-xs ${u.alt_text && u.alt_text.length < 10 ? 'border-red-400' : 'border-[var(--color-border)]'}`} />
-                        {u.alt_text && u.alt_text.length < 10 && <p className="mt-0.5 font-body text-[10px] text-red-500">Must be at least 10 characters</p>}
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div className="col-span-2">
-                          <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">Caption (optional)</label>
-                          <input value={u.caption} onChange={(e) => updateUploadItem(idx, { caption: e.target.value })}
-                            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-1.5 font-body text-xs" />
-                        </div>
-                        <div>
-                          <label className="mb-1 block font-body text-xs font-medium text-[var(--color-charcoal)]">Sort Order</label>
-                          <input type="number" value={u.sort_order} onChange={(e) => updateUploadItem(idx, { sort_order: e.target.value })}
-                            className="w-full rounded-lg border border-[var(--color-border)] px-3 py-1.5 font-body text-xs" />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-body text-xs font-medium text-[var(--color-charcoal)]">Status:</span>
-                        <button onClick={() => updateUploadItem(idx, { status: u.status === 'published' ? 'draft' : 'published' })}
-                          className={`rounded-full px-3 py-1 font-body text-xs font-medium transition ${u.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'}`}>
-                          {u.status === 'published' ? 'Published' : 'Draft'}
-                        </button>
-                        {u.progress === 'error' && <span className="font-body text-xs text-red-500 flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" />{u.errorMsg}</span>}
-                        {u.progress === 'done' && <span className="font-body text-xs text-emerald-600">✓ Uploaded</span>}
-                        {u.progress === 'uploading' && <Loader2 className="h-4 w-4 animate-spin text-[var(--color-gold-accent)]" />}
-                      </div>
+                    <div>
+                      <label className="mb-1 block font-body text-xs font-medium">Category <span className="text-red-500">*</span></label>
+                      <select
+                        value={draft.category}
+                        onChange={(e) => setDraft({ ...draft, category: e.target.value as GalleryCategory })}
+                        className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                      >
+                        <option value="">Select…</option>
+                        {CATEGORIES.filter((c) => c.value !== 'all').map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                      </select>
                     </div>
-                    <button onClick={() => setUploadItems((prev) => prev.filter((_, i) => i !== idx))} className="rounded-lg p-1 hover:bg-gray-100"><X className="h-4 w-4 text-[var(--color-muted)]" /></button>
+                  </div>
+                  <div>
+                    <label className="mb-1 block font-body text-xs font-medium">
+                      Alt Text <span className="text-red-500">*</span>
+                      <span className="ml-1 font-normal text-[var(--color-muted)]">(describe for accessibility &amp; SEO, ≥ 10 chars)</span>
+                    </label>
+                    <input
+                      value={draft.alt_text}
+                      onChange={(e) => setDraft({ ...draft, alt_text: e.target.value })}
+                      placeholder="Describe the image in detail…"
+                      className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block font-body text-xs font-medium">Caption (optional)</label>
+                    <input
+                      value={draft.caption}
+                      onChange={(e) => setDraft({ ...draft, caption: e.target.value })}
+                      className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="mb-1 block font-body text-xs font-medium">Sort Order</label>
+                      <input
+                        type="number"
+                        value={draft.sort_order}
+                        onChange={(e) => setDraft({ ...draft, sort_order: e.target.value })}
+                        className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block font-body text-xs font-medium">Status</label>
+                      <select
+                        value={draft.status}
+                        onChange={(e) => setDraft({ ...draft, status: e.target.value as 'published' | 'draft' })}
+                        className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                      >
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                      </select>
+                    </div>
+                  </div>
+                  {uploadError && <p className="font-body text-sm text-red-500">{uploadError}</p>}
+                  <div className="flex justify-end gap-3 pt-2">
+                    {!draft.isVideo && (
+                      <button
+                        onClick={() => setUploadStep('crop')}
+                        className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50"
+                      >
+                        Back to Crop
+                      </button>
+                    )}
+                    <button
+                      onClick={submitUpload}
+                      disabled={uploadStep === 'submitting'}
+                      className="flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white disabled:opacity-50"
+                    >
+                      {uploadStep === 'submitting' && <Loader2 className="h-4 w-4 animate-spin" />}
+                      Save
+                    </button>
                   </div>
                 </div>
-              ))}
-
-              <div className="mt-6 flex items-center justify-end gap-3">
-                <button onClick={() => { setShowUploadModal(false); setUploadItems([]); }} className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50">Cancel</button>
-                <button onClick={handleUploadAll} disabled={uploading || !uploadItems.length} className="flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white disabled:opacity-50">
-                  {uploading && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Upload All ({uploadItems.length})
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Edit Modal */}
+      {/* Edit modal (with optional re-crop) */}
       {editItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
-              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">Edit Item</h2>
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-white px-6 py-4">
+              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">
+                {recropping ? 'Re-crop Image' : 'Edit Item'}
+              </h2>
               <button onClick={() => setEditItem(null)} className="rounded-lg p-2 hover:bg-gray-100"><X className="h-5 w-5" /></button>
             </div>
-            <div className="space-y-4 p-6">
-              {[
-                { key: 'filename', label: 'Filename', type: 'text' },
-                { key: 'alt_text', label: 'Alt Text', type: 'text' },
-                { key: 'caption', label: 'Caption', type: 'text' },
-              ].map(({ key, label, type }) => (
-                <div key={key}>
-                  <label className="mb-1 block font-body text-sm font-medium text-[var(--color-charcoal)]">{label}</label>
-                  <input type={type} value={(editFields as Record<string, string>)[key] ?? ''} onChange={(e) => setEditFields((p) => ({ ...p, [key]: e.target.value }))}
-                    className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm" />
-                </div>
-              ))}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="mb-1 block font-body text-sm font-medium text-[var(--color-charcoal)]">Category</label>
-                  <select value={editFields.category ?? ''} onChange={(e) => setEditFields((p) => ({ ...p, category: e.target.value as GalleryCategory }))}
-                    className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm">
-                    {CATEGORIES.filter((c) => c.value !== 'all').map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block font-body text-sm font-medium text-[var(--color-charcoal)]">Status</label>
-                  <select value={editFields.status ?? 'published'} onChange={(e) => setEditFields((p) => ({ ...p, status: e.target.value as 'published' | 'draft' }))}
-                    className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm">
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block font-body text-sm font-medium text-[var(--color-charcoal)]">Sort Order</label>
-                <input type="number" value={editFields.sort_order ?? 0} onChange={(e) => setEditFields((p) => ({ ...p, sort_order: parseInt(e.target.value, 10) }))}
-                  className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm" />
-              </div>
+
+            <div className="p-6">
+              {recropping ? (
+                <>
+                  <ImageCropper
+                    imageSrc={editItem.original_r2_url}
+                    aspect={GALLERY_ASPECT}
+                    initialZoom={editItem.crop_data?.zoom ?? 1}
+                    initialRotation={editItem.crop_data?.rotation ?? 0}
+                    onComplete={(r) => setRecropResult(r)}
+                  />
+                  <div className="mt-6 flex justify-end gap-3">
+                    <button
+                      onClick={() => { setRecropping(false); setRecropResult(null); }}
+                      className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleRecropSave}
+                      disabled={!recropResult || recropSaving}
+                      className="flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white disabled:opacity-50"
+                    >
+                      {recropSaving && <Loader2 className="h-4 w-4 animate-spin" />}
+                      Save New Crop
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Preview + re-crop trigger */}
+                  <div className="mb-6 flex items-start gap-4">
+                    <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-warm-beige/30">
+                      <Image src={editItem.r2_url} alt={editItem.alt_text} fill className="object-cover" sizes="128px" />
+                    </div>
+                    {editItem.type === 'image' && (
+                      <button
+                        onClick={() => setRecropping(true)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-4 py-2 font-body text-sm hover:bg-[var(--color-cream)]"
+                      >
+                        <CropIcon className="h-4 w-4" /> Re-crop
+                      </button>
+                    )}
+                    {editItem.needs_review && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 font-body text-xs font-semibold text-amber-800">
+                        <AlertTriangle className="h-3 w-3" /> Needs Review
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    {[
+                      { key: 'filename', label: 'Filename', type: 'text' },
+                      { key: 'alt_text', label: 'Alt Text', type: 'text' },
+                      { key: 'caption', label: 'Caption', type: 'text' },
+                    ].map(({ key, label, type }) => (
+                      <div key={key}>
+                        <label className="mb-1 block font-body text-sm font-medium">{label}</label>
+                        <input
+                          type={type}
+                          value={(editFields as Record<string, string>)[key] ?? ''}
+                          onChange={(e) => setEditFields((p) => ({ ...p, [key]: e.target.value }))}
+                          className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                        />
+                      </div>
+                    ))}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="mb-1 block font-body text-sm font-medium">Category</label>
+                        <select
+                          value={editFields.category ?? ''}
+                          onChange={(e) => setEditFields((p) => ({ ...p, category: e.target.value as GalleryCategory }))}
+                          className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                        >
+                          {CATEGORIES.filter((c) => c.value !== 'all').map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="mb-1 block font-body text-sm font-medium">Status</label>
+                        <select
+                          value={editFields.status ?? 'published'}
+                          onChange={(e) => setEditFields((p) => ({ ...p, status: e.target.value as 'published' | 'draft' }))}
+                          className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                        >
+                          <option value="published">Published</option>
+                          <option value="draft">Draft</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block font-body text-sm font-medium">Sort Order</label>
+                      <input
+                        type="number"
+                        value={editFields.sort_order ?? 0}
+                        onChange={(e) => setEditFields((p) => ({ ...p, sort_order: parseInt(e.target.value, 10) }))}
+                        className="w-full rounded-lg border border-[var(--color-border)] px-3 py-2 font-body text-sm"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-            <div className="flex justify-end gap-3 border-t border-[var(--color-border)] px-6 py-4">
-              <button onClick={() => setEditItem(null)} className="rounded-xl border border-[var(--color-border)] px-5 py-2 font-body text-sm hover:bg-gray-50">Cancel</button>
-              <button onClick={handleEditSave} disabled={editSaving} className="flex items-center gap-2 rounded-xl bg-[var(--color-forest-green)] px-5 py-2 font-body text-sm font-medium text-white disabled:opacity-50">
-                {editSaving && <Loader2 className="h-4 w-4 animate-spin" />} Save
-              </button>
-            </div>
+
+            {!recropping && (
+              <div className="flex justify-end gap-3 border-t border-[var(--color-border)] px-6 py-4">
+                <button onClick={() => setEditItem(null)} className="rounded-xl border border-[var(--color-border)] px-5 py-2 font-body text-sm hover:bg-gray-50">Cancel</button>
+                <button onClick={handleEditSave} disabled={editSaving} className="flex items-center gap-2 rounded-xl bg-[var(--color-forest-green)] px-5 py-2 font-body text-sm font-medium text-white disabled:opacity-50">
+                  {editSaving && <Loader2 className="h-4 w-4 animate-spin" />} Save
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -567,6 +813,60 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
           </div>
         </div>
       )}
+
+      {/* Migrate Crops Modal */}
+      {migrateConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
+            <div className="p-6">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
+                <RefreshCcw className="h-6 w-6 text-amber-600" />
+              </div>
+              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">Migrate Existing Crops</h2>
+              <p className="mt-2 font-body text-sm text-[var(--color-muted)]">
+                Auto-crops all existing image items to 4:3 centre crops and marks them &ldquo;Needs Review&rdquo;.
+                Items already cropped are skipped. This is safe to run more than once but does not undo previous runs.
+              </p>
+
+              {migrateResult && (
+                <div className="mt-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-cream)] p-4 font-body text-sm">
+                  <p className="font-medium text-[var(--color-charcoal)]">Summary</p>
+                  <ul className="mt-2 space-y-1 text-[var(--color-muted)]">
+                    <li>Processed: {migrateResult.summary.processed}</li>
+                    <li>Succeeded: {migrateResult.summary.succeeded}</li>
+                    <li>Skipped: {migrateResult.summary.skipped}</li>
+                    <li>Failed: {migrateResult.summary.failed}</li>
+                  </ul>
+                  {migrateResult.summary.failed > 0 && (
+                    <details className="mt-3">
+                      <summary className="cursor-pointer text-xs">View failures</summary>
+                      <ul className="mt-2 space-y-1 text-xs text-red-600">
+                        {migrateResult.results.filter((r) => r.status === 'failed').map((r) => (
+                          <li key={r.id}>{r.filename}: {r.message}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="flex justify-end gap-3 border-t border-[var(--color-border)] px-6 py-4">
+              <button onClick={() => { setMigrateConfirm(false); setMigrateResult(null); }} className="rounded-xl border border-[var(--color-border)] px-5 py-2 font-body text-sm hover:bg-gray-50">
+                Close
+              </button>
+              <button
+                onClick={runMigrate}
+                disabled={migrateRunning}
+                className="flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2 font-body text-sm font-medium text-white hover:bg-amber-600 disabled:opacity-50"
+              >
+                {migrateRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCcw className="h-4 w-4" />}
+                {migrateRunning ? 'Processing…' : migrateResult ? 'Run Again' : 'Start Migration'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

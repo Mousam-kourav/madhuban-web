@@ -1,5 +1,5 @@
 import 'server-only';
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 
 function getR2Client() {
   return new S3Client({
@@ -37,4 +37,20 @@ export async function deleteFromR2(key: string): Promise<void> {
       Key: key,
     }),
   );
+}
+
+export async function downloadFromR2(key: string): Promise<Buffer> {
+  const r2 = getR2Client();
+  const res = await r2.send(
+    new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME!,
+      Key: key,
+    }),
+  );
+  if (!res.Body) throw new Error(`R2 object not found: ${key}`);
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of res.Body as AsyncIterable<Uint8Array>) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
 }

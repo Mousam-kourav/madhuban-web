@@ -56,7 +56,7 @@ export default async function LoginPage() {
 
         {/* Center content */}
         <div className="relative z-10 text-center">
-          <h1 className="font-display italic text-5xl text-[var(--color-ivory)] leading-tight mb-4">
+          <h1 className="font-display text-5xl text-[var(--color-ivory)] leading-tight mb-4">
             Manage your
             <br />
             forest retreat
@@ -82,7 +82,7 @@ export default async function LoginPage() {
       <div className="flex w-full lg:w-1/2 items-center justify-center bg-[var(--color-cream)] px-6 py-12">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="font-display italic text-4xl text-[var(--color-earth-brown)] mb-2">
+            <h2 className="font-display text-4xl text-[var(--color-earth-brown)] mb-2">
               Welcome Back
             </h2>
             <p className="font-body text-[var(--color-charcoal)]/70 text-sm">

@@ -42,7 +42,7 @@ export function LoginForm() {
           <div className="w-12 h-12 bg-[var(--color-forest-green)]/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Mail className="w-5 h-5 text-[var(--color-forest-green)]" />
           </div>
-          <h3 className="font-display italic text-2xl text-[var(--color-charcoal)] mb-2">
+          <h3 className="font-display text-2xl text-[var(--color-charcoal)] mb-2">
             Check your inbox
           </h3>
           <p className="font-body text-sm text-[var(--color-charcoal)]/70">

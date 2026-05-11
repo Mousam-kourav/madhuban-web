@@ -95,7 +95,7 @@ export default async function BlogDetailPage({ params }: Props) {
             {post.category && post.published_at ? " · " : ""}
             {formatDate(post.published_at)}
           </p>
-          <h1 className="font-display italic text-5xl md:text-6xl text-[var(--color-ivory)] leading-tight mb-6">
+          <h1 className="font-display text-5xl md:text-6xl text-[var(--color-ivory)] leading-tight mb-6">
             {post.title}
           </h1>
           {post.author_name && (
@@ -105,7 +105,7 @@ export default async function BlogDetailPage({ params }: Props) {
                   {post.author_name.charAt(0)}
                 </span>
               </div>
-              <span className="font-body text-sm italic text-[var(--color-ivory)]/80">
+              <span className="font-body text-sm text-[var(--color-ivory)]/80">
                 by {post.author_name}
               </span>
             </div>
@@ -143,7 +143,7 @@ export default async function BlogDetailPage({ params }: Props) {
       {/* Plan Your Retreat CTA */}
       <section className="bg-[var(--color-forest-green)] py-20 px-4 my-16">
         <div className="max-w-md mx-auto text-center">
-          <h2 className="font-display italic text-3xl text-[var(--color-ivory)] mb-4">
+          <h2 className="font-display text-3xl text-[var(--color-ivory)] mb-4">
             Plan Your Retreat
           </h2>
           <p className="font-body text-sm text-[var(--color-ivory)]/80 leading-relaxed mb-8">
@@ -168,7 +168,7 @@ export default async function BlogDetailPage({ params }: Props) {
                 <p className="font-body text-xs font-semibold tracking-widest uppercase text-[var(--color-muted)] mb-2">
                   Continue Exploring
                 </p>
-                <h2 className="font-display italic text-3xl text-[var(--color-charcoal)]">
+                <h2 className="font-display text-3xl text-[var(--color-charcoal)]">
                   Related Journeys
                 </h2>
               </div>

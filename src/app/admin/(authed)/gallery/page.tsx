@@ -19,7 +19,7 @@ export default async function AdminGalleryPage() {
             <Images className="h-5 w-5 text-[var(--color-earth-brown)]" />
           </div>
           <div>
-            <h1 className="font-display italic text-4xl text-[var(--color-charcoal)]">
+            <h1 className="font-display text-4xl text-[var(--color-charcoal)]">
               Gallery Management
             </h1>
             <p className="mt-0.5 font-body text-sm text-[var(--color-muted)]">

@@ -302,7 +302,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[var(--color-border)] bg-white py-24 text-center">
           <Images className="mb-4 h-10 w-10 text-[var(--color-muted)]" />
-          <p className="font-display italic text-xl text-[var(--color-charcoal)]">No gallery items yet</p>
+          <p className="font-display text-xl text-[var(--color-charcoal)]">No gallery items yet</p>
           <p className="mt-2 font-body text-sm text-[var(--color-muted)]">Upload your first photo or video to get started.</p>
           <button onClick={() => setShowUploadModal(true)} className="mt-6 flex items-center gap-2 rounded-xl bg-[var(--color-gold-accent)] px-5 py-2.5 font-body text-sm font-medium text-white hover:opacity-90">
             <Plus className="h-4 w-4" /> Upload New
@@ -372,7 +372,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-white px-6 py-4">
-              <h2 className="font-display italic text-2xl text-[var(--color-charcoal)]">Upload to Gallery</h2>
+              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">Upload to Gallery</h2>
               <button onClick={() => { setShowUploadModal(false); setUploadItems([]); }} className="rounded-lg p-2 hover:bg-gray-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6">
@@ -476,7 +476,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
-              <h2 className="font-display italic text-2xl text-[var(--color-charcoal)]">Edit Item</h2>
+              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">Edit Item</h2>
               <button onClick={() => setEditItem(null)} className="rounded-lg p-2 hover:bg-gray-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="space-y-4 p-6">
@@ -532,7 +532,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
               <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
                 <AlertTriangle className="h-6 w-6 text-red-500" />
               </div>
-              <h2 className="font-display italic text-2xl text-[var(--color-charcoal)]">Delete &ldquo;{deleteItem.filename}&rdquo;?</h2>
+              <h2 className="font-display text-2xl text-[var(--color-charcoal)]">Delete &ldquo;{deleteItem.filename}&rdquo;?</h2>
               <p className="mt-2 font-body text-sm text-[var(--color-muted)]">This will permanently remove the file from R2 and your gallery. This cannot be undone.</p>
             </div>
             <div className="flex justify-end gap-3 border-t border-[var(--color-border)] px-6 py-4">
@@ -550,7 +550,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
-              <h2 className="font-display italic text-xl text-[var(--color-charcoal)]">Change Category</h2>
+              <h2 className="font-display text-xl text-[var(--color-charcoal)]">Change Category</h2>
               <button onClick={() => setBulkCategoryModal(false)} className="rounded-lg p-2 hover:bg-gray-100"><X className="h-5 w-5" /></button>
             </div>
             <div className="p-6">

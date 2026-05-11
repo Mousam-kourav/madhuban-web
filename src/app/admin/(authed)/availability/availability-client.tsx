@@ -622,7 +622,7 @@ function SidePanel({
                       {format(parseISO(bl.date_to), "d MMM yyyy")}
                     </p>
                     {bl.notes && (
-                      <p className="font-body text-xs text-charcoal/60 mt-1 italic">
+                      <p className="font-body text-xs text-charcoal/60 mt-1">
                         {bl.notes}
                       </p>
                     )}

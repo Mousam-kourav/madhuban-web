@@ -77,7 +77,7 @@ export function RoomDetailPage({ room }: { room: Room }) {
           <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/70">
             Stay / {room.name}
           </p>
-          <h1 className="font-display text-4xl font-medium italic text-ivory md:text-6xl">
+          <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl">
             {room.name}
           </h1>
           <p className="mt-2 max-w-sm font-body text-sm text-ivory/75">{room.tagline}</p>
@@ -248,7 +248,7 @@ export function RoomDetailPage({ room }: { room: Room }) {
             <p className="mb-4 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
               Book Your Stay
             </p>
-            <h2 className="mb-6 font-display text-3xl font-medium italic text-ivory md:text-5xl">
+            <h2 className="mb-6 font-display text-3xl font-medium text-ivory md:text-5xl">
               Begin Your Journey
             </h2>
             <p className="mb-8 font-body text-base text-ivory/75">

@@ -60,7 +60,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
           >
             ← Back to Booking
           </Link>
-          <h1 className="mt-1 font-display text-2xl font-medium italic text-charcoal">
+          <h1 className="mt-1 font-display text-2xl font-medium text-charcoal">
             {invoice.invoice_number}
           </h1>
           <p className="mt-0.5 font-body text-xs text-charcoal/50">

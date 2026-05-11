@@ -84,7 +84,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
           <h1
             key={key}
             id={id}
-            className="font-display italic text-4xl mt-14 mb-4 text-[var(--color-charcoal)]"
+            className="font-display text-4xl mt-14 mb-4 text-[var(--color-charcoal)]"
           >
             {children}
           </h1>
@@ -95,7 +95,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
           <h2
             key={key}
             id={id}
-            className="font-display italic text-3xl mt-12 mb-4 text-[var(--color-charcoal)]"
+            className="font-display text-3xl mt-12 mb-4 text-[var(--color-charcoal)]"
           >
             {children}
           </h2>
@@ -105,7 +105,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
         <h3
           key={key}
           id={id}
-          className="font-display italic text-2xl mt-8 mb-2 text-[var(--color-charcoal)]"
+          className="font-display text-2xl mt-8 mb-2 text-[var(--color-charcoal)]"
         >
           {children}
         </h3>
@@ -147,7 +147,7 @@ function renderNode(node: TiptapNode, index: number): React.ReactNode {
       return (
         <blockquote
           key={key}
-          className="border-l-2 border-[var(--color-earth-brown)] pl-6 italic my-8 text-[var(--color-charcoal)]/80"
+          className="border-l-2 border-[var(--color-earth-brown)] pl-6 my-8 text-[var(--color-charcoal)]/80"
         >
           {(node.content ?? []).map((child, i) => renderNode(child, i))}
         </blockquote>

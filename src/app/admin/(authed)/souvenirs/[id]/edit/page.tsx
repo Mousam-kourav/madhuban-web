@@ -30,7 +30,7 @@ export default async function EditSouvenirPage({
         <ChevronLeft className="h-4 w-4" />
         Back to Souvenir Shop
       </Link>
-      <h1 className="mb-8 font-display italic text-4xl text-[var(--color-charcoal)]">
+      <h1 className="mb-8 font-display text-4xl text-[var(--color-charcoal)]">
         Edit Product
       </h1>
       <div className="max-w-2xl rounded-2xl border border-[var(--color-border)] bg-white p-8">

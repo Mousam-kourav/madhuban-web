@@ -114,7 +114,7 @@ export default function DiningPage() {
           <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.2em] text-ivory/80">
             {DINING.hero.eyebrow}
           </p>
-          <h1 className="font-display text-5xl font-light italic text-ivory md:text-6xl lg:text-7xl">
+          <h1 className="font-display text-5xl font-light text-ivory md:text-6xl lg:text-7xl">
             {DINING.hero.title}
           </h1>
           <p className="mx-auto mt-4 max-w-xl font-body text-base text-ivory/90 md:text-lg">
@@ -185,7 +185,7 @@ export default function DiningPage() {
               <p className="mb-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-earth-brown">
                 {DINING.openAir.eyebrow}
               </p>
-              <h2 className="font-display text-4xl font-light italic text-charcoal md:text-5xl">
+              <h2 className="font-display text-4xl font-light text-charcoal md:text-5xl">
                 {DINING.openAir.title}
               </h2>
               <div className="mt-6 space-y-4">
@@ -270,7 +270,7 @@ export default function DiningPage() {
               />
             </div>
             <div className="lg:order-1">
-              <h2 className="font-display text-4xl font-light italic text-charcoal md:text-5xl">
+              <h2 className="font-display text-4xl font-light text-charcoal md:text-5xl">
                 {DINING.alfresco.title}
               </h2>
               <p className="mt-2 font-body text-sm font-medium text-earth-brown">
@@ -420,7 +420,7 @@ export default function DiningPage() {
             ))}
           </div>
 
-          <p className="mt-8 text-center font-body text-sm italic text-charcoal/60">
+          <p className="mt-8 text-center font-body text-sm text-charcoal/60">
             {DINING.menu.footnote}
           </p>
         </Container>
@@ -431,7 +431,7 @@ export default function DiningPage() {
         <Container>
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <h2 className="font-display text-4xl font-light italic text-charcoal md:text-5xl">
+              <h2 className="font-display text-4xl font-light text-charcoal md:text-5xl">
                 {DINING.philosophyStory.title}
               </h2>
               <div className="mt-6 space-y-4">
@@ -516,7 +516,7 @@ export default function DiningPage() {
         className="bg-forest-green py-16 text-center"
       >
         <Container>
-          <h2 className="font-display text-3xl font-light italic text-ivory md:text-4xl">
+          <h2 className="font-display text-3xl font-light text-ivory md:text-4xl">
             Ready for a forest meal?
           </h2>
           <p className="mx-auto mt-3 max-w-md font-body text-base text-ivory/80">

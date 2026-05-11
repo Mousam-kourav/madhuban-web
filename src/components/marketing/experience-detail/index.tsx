@@ -34,7 +34,7 @@ export function ExperienceDetailPage({ experience }: { experience: Experience })
           <p className="mb-3 font-body text-xs uppercase tracking-[0.2em] text-ivory/80">
             Experiences at Madhuban
           </p>
-          <h1 className="font-display text-4xl font-medium italic text-ivory md:text-6xl lg:text-7xl">
+          <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl lg:text-7xl">
             {experience.name}
           </h1>
           <p className="mt-4 max-w-xl font-body text-base text-ivory/90 md:text-lg">
@@ -197,7 +197,7 @@ export function ExperienceDetailPage({ experience }: { experience: Experience })
           <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
             Madhuban Eco Retreat · Ratapani, Madhya Pradesh
           </p>
-          <h2 className="mb-4 font-display text-3xl font-medium italic text-ivory md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-medium text-ivory md:text-5xl">
             Ready to Experience It?
           </h2>
           <p className="mx-auto mb-8 max-w-xl font-body text-base text-ivory/80">

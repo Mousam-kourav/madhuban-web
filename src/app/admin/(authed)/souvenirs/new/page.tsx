@@ -12,7 +12,7 @@ export default function NewSouvenirPage() {
         <ChevronLeft className="h-4 w-4" />
         Back to Souvenir Shop
       </Link>
-      <h1 className="mb-8 font-display italic text-4xl text-[var(--color-charcoal)]">
+      <h1 className="mb-8 font-display text-4xl text-[var(--color-charcoal)]">
         New Product
       </h1>
       <div className="max-w-2xl rounded-2xl border border-[var(--color-border)] bg-white p-8">

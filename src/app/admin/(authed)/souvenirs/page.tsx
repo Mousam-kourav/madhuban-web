@@ -10,7 +10,7 @@ export default async function AdminSouvenirsPage() {
     <div>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-display italic text-4xl text-[var(--color-charcoal)]">
+          <h1 className="font-display text-4xl text-[var(--color-charcoal)]">
             Souvenir Shop
           </h1>
           <p className="mt-1 font-body text-sm text-[var(--color-muted)]">
@@ -29,7 +29,7 @@ export default async function AdminSouvenirsPage() {
       {souvenirs.length === 0 ? (
         <div className="rounded-2xl border border-[var(--color-border)] bg-white p-16 text-center">
           <ShoppingBag className="mx-auto mb-4 h-8 w-8 text-[var(--color-muted)]" />
-          <p className="font-display italic text-xl text-[var(--color-charcoal)]">
+          <p className="font-display text-xl text-[var(--color-charcoal)]">
             No products yet
           </p>
           <p className="mt-2 font-body text-sm text-[var(--color-muted)]">

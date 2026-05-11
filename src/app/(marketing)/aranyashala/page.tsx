@@ -204,7 +204,7 @@ export default function AranyashalaPage() {
           <span className="mb-4 inline-block rounded-full bg-earth-brown/80 px-5 py-1.5 font-body text-[10px] font-semibold uppercase tracking-[0.25em] text-ivory">
             {ARANYASHALA.hero.eyebrow}
           </span>
-          <h1 className="max-w-3xl font-display text-4xl font-medium italic text-ivory drop-shadow-sm md:text-5xl lg:text-6xl">
+          <h1 className="max-w-3xl font-display text-4xl font-medium text-ivory drop-shadow-sm md:text-5xl lg:text-6xl">
             {ARANYASHALA.hero.title}
           </h1>
           <p className="mt-5 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
@@ -237,7 +237,7 @@ export default function AranyashalaPage() {
               <span className="block h-px w-12 bg-earth-brown/40" />
             </div>
             <blockquote>
-              <p className="font-display text-2xl font-light italic leading-relaxed text-charcoal md:text-3xl">
+              <p className="font-display text-2xl font-light leading-relaxed text-charcoal md:text-3xl">
                 &ldquo;{ARANYASHALA.missionQuote}&rdquo;
               </p>
             </blockquote>
@@ -449,7 +449,7 @@ export default function AranyashalaPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             {/* Text */}
             <div>
-              <h2 className="font-display text-3xl font-medium italic leading-tight text-charcoal md:text-4xl">
+              <h2 className="font-display text-3xl font-medium leading-tight text-charcoal md:text-4xl">
                 {ARANYASHALA.camping.title}
               </h2>
               <div className="my-5 flex items-center gap-3" aria-hidden="true">
@@ -588,7 +588,7 @@ export default function AranyashalaPage() {
 
                 {/* Quote */}
                 <blockquote>
-                  <p className="font-display text-xl font-light italic leading-relaxed text-charcoal sm:text-2xl md:text-3xl">
+                  <p className="font-display text-xl font-light leading-relaxed text-charcoal sm:text-2xl md:text-3xl">
                     &ldquo;{ARANYASHALA.testimonials.featured.quote}&rdquo;
                   </p>
                   <footer className="mt-5">
@@ -628,7 +628,7 @@ export default function AranyashalaPage() {
 
                   {/* Quote */}
                   <blockquote>
-                    <p className="font-body text-sm italic leading-relaxed text-charcoal/80">
+                    <p className="font-body text-sm leading-relaxed text-charcoal/80">
                       &ldquo;{t.quote}&rdquo;
                     </p>
                   </blockquote>
@@ -761,7 +761,7 @@ export default function AranyashalaPage() {
       >
         <Container>
           <div className="text-center">
-            <h2 className="font-display text-3xl font-medium italic text-ivory md:text-4xl lg:text-5xl">
+            <h2 className="font-display text-3xl font-medium text-ivory md:text-4xl lg:text-5xl">
               Plan a Group Visit
             </h2>
             <p className="mx-auto mt-4 max-w-xl font-body text-base text-ivory/80">

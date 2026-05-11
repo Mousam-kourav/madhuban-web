@@ -486,7 +486,7 @@ export function BookingsListClient({
           <p className="font-body text-xs uppercase tracking-widest text-charcoal/50">
             Admin · Bookings
           </p>
-          <h1 className="mt-1 font-display text-3xl font-medium italic text-charcoal">
+          <h1 className="mt-1 font-display text-3xl font-medium text-charcoal">
             All Reservations
           </h1>
           <p className="mt-0.5 font-body text-sm text-charcoal/60">{todayFormatted}</p>

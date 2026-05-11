@@ -49,7 +49,7 @@ export default async function PaymentPage({ params, searchParams }: Props) {
           <p className="font-body text-xs uppercase tracking-widest text-muted-foreground">
             {booking.status === "CONFIRMED" ? "Payment Complete" : "Booking Status"}
           </p>
-          <h1 className="mt-2 font-display text-3xl font-medium italic text-charcoal">
+          <h1 className="mt-2 font-display text-3xl font-medium text-charcoal">
             {booking.status === "CONFIRMED" ? "You&apos;re all set!" : "Booking Update"}
           </h1>
           <p className="mt-4 font-body text-sm text-charcoal/70">{msg}</p>
@@ -92,7 +92,7 @@ export default async function PaymentPage({ params, searchParams }: Props) {
           <p className="font-body text-xs uppercase tracking-widest text-muted-foreground">
             Step 3 of 3
           </p>
-          <h1 className="font-display text-3xl font-medium italic text-charcoal md:text-4xl">
+          <h1 className="font-display text-3xl font-medium text-charcoal md:text-4xl">
             Secure Payment
           </h1>
           <p className="mt-2 font-body text-sm text-charcoal/70">

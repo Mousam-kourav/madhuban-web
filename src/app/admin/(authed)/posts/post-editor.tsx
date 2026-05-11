@@ -249,11 +249,11 @@ export function PostEditor({ post }: Props) {
         <div className="flex-1" />
 
         {saving ? (
-          <span className="font-body text-xs italic text-[var(--color-earth-brown)]">
+          <span className="font-body text-xs text-[var(--color-earth-brown)]">
             Saving…
           </span>
         ) : lastSaved ? (
-          <span className="font-body text-xs italic text-charcoal/60">
+          <span className="font-body text-xs text-charcoal/60">
             {formatSaveTime(lastSaved)}
           </span>
         ) : null}
@@ -349,7 +349,7 @@ export function PostEditor({ post }: Props) {
               if (!slugEdited) setSlug(slugify(e.target.value));
             }}
             placeholder="Your title…"
-            className="w-full font-display italic text-4xl text-[var(--color-charcoal)] placeholder:text-[var(--color-muted)] bg-transparent border-none outline-none mb-4 leading-tight"
+            className="w-full font-display text-4xl text-[var(--color-charcoal)] placeholder:text-[var(--color-muted)] bg-transparent border-none outline-none mb-4 leading-tight"
           />
 
           {/* Slug */}

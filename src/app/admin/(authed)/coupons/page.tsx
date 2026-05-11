@@ -26,7 +26,7 @@ export default async function CouponsPage() {
           <p className="font-body text-xs uppercase tracking-widest text-muted-foreground">
             Admin · CMS
           </p>
-          <h1 className="mt-1 font-display text-3xl font-medium italic text-charcoal">
+          <h1 className="mt-1 font-display text-3xl font-medium text-charcoal">
             Coupons
           </h1>
         </div>

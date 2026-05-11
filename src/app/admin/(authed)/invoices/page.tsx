@@ -25,7 +25,7 @@ export default async function InvoicesPage() {
 
   return (
     <div className="space-y-10">
-      <h1 className="font-display text-2xl font-medium italic text-charcoal">Invoices</h1>
+      <h1 className="font-display text-2xl font-medium text-charcoal">Invoices</h1>
       <InvoicesClient invoices={invoices} />
       <GstSummary invoices={invoices} />
     </div>

@@ -70,7 +70,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
       <div className="flex min-h-[60vh] items-center justify-center px-4">
         <div className="mx-auto max-w-md text-center">
           <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-earth-brown border-t-transparent" />
-          <h1 className="font-display text-2xl font-medium italic text-charcoal">
+          <h1 className="font-display text-2xl font-medium text-charcoal">
             Payment Processing
           </h1>
           <p className="mt-3 font-body text-sm text-charcoal/70">
@@ -109,7 +109,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           <p className="font-body text-xs uppercase tracking-widest text-muted-foreground">
             Booking Confirmed
           </p>
-          <h1 className="mt-2 font-display text-4xl font-medium italic text-charcoal">
+          <h1 className="mt-2 font-display text-4xl font-medium text-charcoal">
             See you in the forest!
           </h1>
           <p className="mt-3 font-body text-sm text-charcoal/70">

@@ -35,7 +35,7 @@ export default async function AdminDashboard() {
     <div className="space-y-6">
       {/* ── Page header ──────────────────────────────────────────────────── */}
       <div>
-        <h1 className="font-display italic text-3xl text-charcoal">Dashboard</h1>
+        <h1 className="font-display text-3xl text-charcoal">Dashboard</h1>
         <p className="mt-0.5 font-body text-sm text-charcoal/60">
           Live estate overview
         </p>

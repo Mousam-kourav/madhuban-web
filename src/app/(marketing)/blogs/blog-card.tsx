@@ -56,7 +56,7 @@ export function BlogCard({ post }: Props) {
         </p>
 
         {/* Title */}
-        <h3 className="font-display italic text-2xl text-[var(--color-charcoal)] leading-snug mb-2 group-hover:text-[var(--color-earth-brown)] transition-colors">
+        <h3 className="font-display text-2xl text-[var(--color-charcoal)] leading-snug mb-2 group-hover:text-[var(--color-earth-brown)] transition-colors">
           {post.title}
         </h3>
 

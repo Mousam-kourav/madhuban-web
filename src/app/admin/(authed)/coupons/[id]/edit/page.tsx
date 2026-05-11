@@ -39,7 +39,7 @@ export default async function EditCouponPage({ params }: { params: Promise<{ id:
         >
           ← Coupons
         </Link>
-        <h1 className="mt-2 font-display text-3xl font-medium italic text-charcoal">
+        <h1 className="mt-2 font-display text-3xl font-medium text-charcoal">
           Edit Coupon
         </h1>
         <p className="mt-1 font-mono text-sm font-semibold tracking-widest text-charcoal/60">

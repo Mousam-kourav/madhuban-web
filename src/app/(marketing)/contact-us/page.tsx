@@ -66,7 +66,7 @@ export default function ContactPage() {
           <p className="mb-3 font-body text-xs uppercase tracking-[0.25em] text-ivory/80">
             Madhuban Eco Retreat
           </p>
-          <h1 className="font-display text-4xl font-medium italic text-ivory md:text-6xl">
+          <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl">
             Get in Touch
           </h1>
           <p className="mt-3 max-w-xl font-body text-base text-ivory/90">
@@ -220,7 +220,7 @@ export default function ContactPage() {
           <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
             Weekend Getaway · Near Ratapani
           </p>
-          <h2 className="mb-4 font-display text-3xl font-medium italic text-ivory md:text-4xl">
+          <h2 className="mb-4 font-display text-3xl font-medium text-ivory md:text-4xl">
             Looking for a Digital Detox Stay?
           </h2>
           <p className="mx-auto mb-8 max-w-xl font-body text-base text-ivory/80">

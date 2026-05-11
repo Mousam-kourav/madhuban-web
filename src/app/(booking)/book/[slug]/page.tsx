@@ -76,7 +76,7 @@ export default async function BookCheckoutPage({ params, searchParams }: Props) 
           <p className="font-body text-xs uppercase tracking-widest text-muted-foreground">
             Booking
           </p>
-          <h1 className="font-display text-3xl font-medium italic text-charcoal md:text-4xl">
+          <h1 className="font-display text-3xl font-medium text-charcoal md:text-4xl">
             {room.name}
           </h1>
         </div>

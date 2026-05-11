@@ -183,7 +183,7 @@ export default function DayOutingPage() {
           <span className="mb-4 inline-block rounded-full bg-earth-brown/80 px-4 py-1 font-body text-xs font-medium uppercase tracking-[0.2em] text-ivory">
             {DAY_OUTING.hero.eyebrow}
           </span>
-          <h1 className="max-w-3xl font-display text-4xl font-medium italic text-ivory md:text-5xl lg:text-6xl">
+          <h1 className="max-w-3xl font-display text-4xl font-medium text-ivory md:text-5xl lg:text-6xl">
             {DAY_OUTING.hero.h1}
           </h1>
           <p className="mt-5 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
@@ -543,7 +543,7 @@ export default function DayOutingPage() {
           <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
             Available 9 AM – 6 PM daily
           </p>
-          <h2 className="mb-4 font-display text-3xl font-medium italic text-ivory md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-medium text-ivory md:text-5xl">
             Ready for Your Day Outing?
           </h2>
           <p className="mb-6 font-display text-4xl font-medium text-ivory/90 md:text-5xl">

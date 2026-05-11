@@ -366,7 +366,7 @@ export function SouvenirForm({ initial }: Props) {
       <div>
         <p className={labelCls}>Images</p>
         {!name.trim() && (
-          <p className="mb-3 font-body text-xs italic text-[var(--color-earth-brown)]">
+          <p className="mb-3 font-body text-xs text-[var(--color-earth-brown)]">
             Enter a product name above to enable image upload.
           </p>
         )}

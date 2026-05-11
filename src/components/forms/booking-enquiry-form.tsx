@@ -55,7 +55,7 @@ export function BookingEnquiryForm() {
   if (status === "success") {
     return (
       <div className="rounded-2xl border border-[#EAE5DC] bg-cream px-8 py-12 text-center">
-        <p className="font-display italic text-2xl text-earth-brown mb-3">Got it.</p>
+        <p className="font-display text-2xl text-earth-brown mb-3">Got it.</p>
         <p className="font-body text-sm text-charcoal/70 leading-relaxed">
           We&apos;ll reply within a working day with availability and next steps. For faster
           response, reach us on{" "}

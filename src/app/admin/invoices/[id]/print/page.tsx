@@ -50,7 +50,7 @@ export default async function InvoicePrintPage({ params }: Props) {
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .no-print { display: none !important; }
         }
-        body { font-family: 'DM Sans', system-ui, sans-serif; font-size: 13px; color: #2C2C2C; background: #fff; margin: 0; }
+        body { font-family: 'Lato', system-ui, sans-serif; font-size: 13px; color: #2C2C2C; background: #fff; margin: 0; }
         * { box-sizing: border-box; }
       `}</style>
 

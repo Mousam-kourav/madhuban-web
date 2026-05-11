@@ -28,7 +28,7 @@ export default async function PostsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-display italic text-4xl text-[var(--color-charcoal)] mb-1">
+          <h1 className="font-display text-4xl text-[var(--color-charcoal)] mb-1">
             Blog Posts
           </h1>
           <p className="font-body text-sm text-[var(--color-muted)]">
@@ -47,7 +47,7 @@ export default async function PostsPage() {
       {rows.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[var(--color-border)] p-16 text-center">
           <FileText className="w-8 h-8 text-[var(--color-muted)] mx-auto mb-4" />
-          <p className="font-display italic text-xl text-[var(--color-charcoal)] mb-2">
+          <p className="font-display text-xl text-[var(--color-charcoal)] mb-2">
             No posts yet
           </p>
           <p className="font-body text-sm text-[var(--color-muted)] mb-6">

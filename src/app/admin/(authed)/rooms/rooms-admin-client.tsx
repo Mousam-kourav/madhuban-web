@@ -53,7 +53,7 @@ function RoomTypesTab({ rooms, saving, onDragStart, onDrop, onQuickEdit }: RoomT
       <Card>
         <div className="py-12 text-center">
           <BedDouble className="mx-auto mb-4 h-8 w-8 text-charcoal/20" />
-          <p className="font-display text-lg italic text-charcoal/50">No rooms yet</p>
+          <p className="font-display text-lg text-charcoal/50">No rooms yet</p>
           <p className="mt-1 font-body text-sm text-charcoal/40">Create your first room to get started</p>
           <div className="mt-5">
             <Button href="/admin/rooms/new">
@@ -264,7 +264,7 @@ function SeasonalRulesTab() {
     <Card>
       <div className="py-10 text-center">
         <CalendarOff className="mx-auto mb-4 h-8 w-8 text-charcoal/20" />
-        <p className="font-display text-lg italic text-charcoal/50">Seasonal rules coming post-launch</p>
+        <p className="font-display text-lg text-charcoal/50">Seasonal rules coming post-launch</p>
         <p className="mx-auto mt-2 max-w-md font-body text-sm text-charcoal/40">
           Date-based price overrides and multipliers will be managed here using the{" "}
           <code className="font-mono text-xs">pricing_rules</code> table (columns:{" "}
@@ -489,7 +489,7 @@ export function RoomsAdminClient({ initialRooms }: { initialRooms: AdminRoom[] }
       {/* Page header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-medium italic text-charcoal">Rooms</h1>
+          <h1 className="font-display text-2xl font-medium text-charcoal">Rooms</h1>
           <p className="mt-0.5 font-body text-sm text-charcoal/50">
             {rooms.length} room type{rooms.length !== 1 ? "s" : ""}
             {" · "}

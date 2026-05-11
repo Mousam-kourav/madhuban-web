@@ -14,7 +14,7 @@ export default function NewCouponPage() {
         >
           ← Coupons
         </Link>
-        <h1 className="mt-2 font-display text-3xl font-medium italic text-charcoal">
+        <h1 className="mt-2 font-display text-3xl font-medium text-charcoal">
           New Coupon
         </h1>
       </div>

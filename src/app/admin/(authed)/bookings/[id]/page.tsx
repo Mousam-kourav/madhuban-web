@@ -312,7 +312,7 @@ export default async function BookingDetailPage({ params }: Props) {
           >
             ← All Reservations
           </Link>
-          <h1 className="mt-1 font-display text-2xl font-medium italic text-charcoal">
+          <h1 className="mt-1 font-display text-2xl font-medium text-charcoal">
             {booking.booking_ref}
           </h1>
           <p className="mt-0.5 font-body text-xs text-charcoal/50">
@@ -403,7 +403,7 @@ export default async function BookingDetailPage({ params }: Props) {
             </dl>
 
             {booking.special_requests && (
-              <blockquote className="mt-4 rounded-xl border-l-2 border-earth-brown/40 bg-cream/60 px-3 py-2 font-body text-sm italic text-charcoal/70">
+              <blockquote className="mt-4 rounded-xl border-l-2 border-earth-brown/40 bg-cream/60 px-3 py-2 font-body text-sm text-charcoal/70">
                 {booking.special_requests}
               </blockquote>
             )}
@@ -664,7 +664,7 @@ export default async function BookingDetailPage({ params }: Props) {
                         <span className="ml-1 font-mono">· {p.razorpay_payment_id ?? p.reference_number}</span>
                       )}
                     </p>
-                    {p.notes && <p className="mt-0.5 font-body text-xs text-charcoal/40 italic">{p.notes}</p>}
+                    {p.notes && <p className="mt-0.5 font-body text-xs text-charcoal/40">{p.notes}</p>}
                     {Number(p.refund_amount) > 0 && (
                       <p className="mt-0.5 font-body text-xs text-error">
                         Refunded ₹{fmtAmt(Number(p.refund_amount))}

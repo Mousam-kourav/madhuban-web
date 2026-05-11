@@ -78,7 +78,7 @@ export default async function SouvenirShopPage({
           <p className="mb-2 font-body text-xs font-semibold uppercase tracking-[0.2em] text-ivory/80">
             Madhuban Eco Retreat
           </p>
-          <h1 className="font-display text-4xl font-light italic text-ivory md:text-6xl">
+          <h1 className="font-display text-4xl font-light text-ivory md:text-6xl">
             Take Madhuban Home With You
           </h1>
           <p className="mx-auto mt-3 max-w-lg font-body text-sm text-ivory/85 md:text-base">

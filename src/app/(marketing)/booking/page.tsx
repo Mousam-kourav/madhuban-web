@@ -161,7 +161,7 @@ export default async function BookingPage() {
           <span className="mb-4 inline-block rounded-full bg-earth-brown/80 px-4 py-1 font-body text-xs font-medium uppercase tracking-[0.2em] text-ivory">
             Now Open for Bookings
           </span>
-          <h1 className="font-display text-4xl font-medium italic text-ivory md:text-5xl lg:text-6xl">
+          <h1 className="font-display text-4xl font-medium text-ivory md:text-5xl lg:text-6xl">
             Escape to Ratapani&apos;s<br className="hidden md:block" /> Premier Eco-Luxury Retreat
           </h1>
           <p className="mt-5 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
@@ -326,7 +326,7 @@ export default async function BookingPage() {
           <h2 className="mb-3 font-display text-3xl font-medium text-ivory md:text-4xl">
             Call for Instant Booking
           </h2>
-          <p className="mb-6 font-display text-4xl font-medium italic text-ivory/90 md:text-5xl">
+          <p className="mb-6 font-display text-4xl font-medium text-ivory/90 md:text-5xl">
             +91 9770558419
           </p>
           <a
@@ -433,7 +433,7 @@ export default async function BookingPage() {
           <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
             Madhuban Eco Retreat · Ratapani Tiger Reserve Belt
           </p>
-          <h2 className="mb-4 font-display text-3xl font-medium italic text-ivory md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-medium text-ivory md:text-5xl">
             Plan Your Stay at Madhuban
           </h2>
           <p className="mx-auto mb-8 max-w-xl font-body text-base text-ivory/80">

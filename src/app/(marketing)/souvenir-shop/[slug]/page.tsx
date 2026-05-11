@@ -157,7 +157,7 @@ export default async function SouvenirDetailPage({
 
               {/* Artisan credit */}
               {product.artisanCredit && (
-                <p className="mt-4 font-body text-sm italic text-charcoal/60">
+                <p className="mt-4 font-body text-sm text-charcoal/60">
                   Made by {product.artisanCredit}
                 </p>
               )}

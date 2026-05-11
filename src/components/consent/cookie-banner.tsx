@@ -194,7 +194,7 @@ function CustomizePanel({
             </p>
           </div>
           <span
-            className="font-body text-xs text-muted-foreground shrink-0 mt-0.5 italic"
+            className="font-body text-xs text-muted-foreground shrink-0 mt-0.5"
             aria-label="Always enabled"
           >
             Always on

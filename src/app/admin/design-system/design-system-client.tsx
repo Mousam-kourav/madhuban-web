@@ -64,7 +64,7 @@ export function DesignSystemClient() {
         <p className="font-body text-xs uppercase tracking-widest text-charcoal/40 mb-1">
           Internal · Design System
         </p>
-        <h1 className="font-display italic text-4xl text-charcoal">Component Library</h1>
+        <h1 className="font-display text-4xl text-charcoal">Component Library</h1>
         <p className="font-body text-sm text-charcoal/60 mt-1">
           Phase A1 — all variants, all states. Used as a regression baseline for A2-A8.
         </p>
@@ -76,9 +76,9 @@ export function DesignSystemClient() {
           <p className="font-display text-5xl text-charcoal">Display / H1</p>
           <p className="font-display text-4xl text-charcoal">Display / H2</p>
           <p className="font-display text-3xl text-charcoal">Display / H3</p>
-          <p className="font-display italic text-2xl text-charcoal">Display italic / H4</p>
+          <p className="font-display text-2xl text-charcoal">Display / H4</p>
           <hr className="border-admin-card-border" />
-          <p className="font-body text-base text-charcoal">Body regular — DM Sans 16px</p>
+          <p className="font-body text-base text-charcoal">Body regular — Lato 16px</p>
           <p className="font-body text-sm text-charcoal/60">Body small / muted — 14px</p>
           <p className="font-body text-xs uppercase tracking-widest text-charcoal/40">Label / eyebrow — 12px</p>
           <p className="font-body text-xs text-charcoal/60">Caption — helper text, hints, secondary info</p>

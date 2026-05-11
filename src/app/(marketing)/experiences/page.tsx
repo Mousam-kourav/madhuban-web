@@ -134,7 +134,7 @@ export default function ExperiencesPage() {
           <p className="mb-3 font-body text-xs uppercase tracking-[0.25em] text-ivory/80">
             Madhuban Eco Retreat
           </p>
-          <h1 className="font-display text-4xl font-medium italic text-ivory md:text-6xl lg:text-7xl">
+          <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl lg:text-7xl">
             Experience Life at Nature&#8217;s Rhythm
           </h1>
           <p className="mt-4 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
@@ -256,7 +256,7 @@ export default function ExperiencesPage() {
           <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
             Madhuban Eco Retreat · 60 km from Bhopal
           </p>
-          <h2 className="mb-4 font-display text-3xl font-medium italic text-ivory md:text-5xl">
+          <h2 className="mb-4 font-display text-3xl font-medium text-ivory md:text-5xl">
             Ready to Experience the Wild?
           </h2>
           <p className="mx-auto mb-8 max-w-xl font-body text-base text-ivory/80">

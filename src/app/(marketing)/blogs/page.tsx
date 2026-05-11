@@ -53,10 +53,10 @@ export default async function BlogsPage() {
         </picture>
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/60" />
         <div className="relative z-10 text-center px-4">
-          <p className="font-display italic text-2xl text-[var(--color-gold-accent)] mb-3">
+          <p className="font-display text-2xl text-[var(--color-gold-accent)] mb-3">
             Journal of the Earth
           </p>
-          <h1 className="font-display italic text-5xl md:text-6xl text-[var(--color-ivory)] leading-tight max-w-3xl">
+          <h1 className="font-display text-5xl md:text-6xl text-[var(--color-ivory)] leading-tight max-w-3xl">
             Stories From Nature,
             <br />
             Wellness &amp; Wilderness
@@ -92,7 +92,7 @@ export default async function BlogsPage() {
         <div className="max-w-7xl mx-auto">
           {posts.length === 0 ? (
             <div className="text-center py-24">
-              <p className="font-display italic text-3xl text-[var(--color-charcoal)]/40 mb-3">
+              <p className="font-display text-3xl text-[var(--color-charcoal)]/40 mb-3">
                 Stories are being gathered
               </p>
               <p className="font-body text-sm text-[var(--color-muted)]">

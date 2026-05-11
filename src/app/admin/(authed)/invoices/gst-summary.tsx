@@ -132,7 +132,7 @@ export function GstSummary({ invoices }: { invoices: InvoiceListRow[] }) {
 
       {/* ── Section header ─────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <h2 className="font-display text-xl font-medium italic text-charcoal">
+        <h2 className="font-display text-xl font-medium text-charcoal">
           GST Summary — Monthly Liabilities
         </h2>
         <div className="flex flex-wrap items-end gap-3">

@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadToR2 } from '@/lib/r2/upload';
-import { cropImage, imageMetadata } from '@/lib/images/crop';
+import { cropImage, imageMetadata, validateCropBounds } from '@/lib/images/crop';
 import { createNotification } from '@/lib/admin/notifications';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -131,6 +131,15 @@ export async function POST(request: NextRequest) {
     }
     const zoom = Number(formData.get('zoom') ?? 1);
     const rotation = Number(formData.get('rotation') ?? 0);
+
+    let sourceMeta: { width: number; height: number };
+    try {
+      sourceMeta = await imageMetadata(buffer);
+    } catch (err) {
+      return NextResponse.json({ error: `Unable to read image: ${(err as Error).message}` }, { status: 400 });
+    }
+    const boundsError = validateCropBounds(cropPixels, sourceMeta.width, sourceMeta.height);
+    if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });
 
     const originalExt = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
     const originalKey = `gallery/${category}/originals/${baseFilename}-${uid8()}.${originalExt}`;

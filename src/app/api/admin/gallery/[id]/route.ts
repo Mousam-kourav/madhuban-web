@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadToR2, deleteFromR2, downloadFromR2 } from '@/lib/r2/upload';
-import { cropImage, imageMetadata } from '@/lib/images/crop';
+import { cropImage, imageMetadata, validateCropBounds } from '@/lib/images/crop';
 import type { CropData, GalleryCategory, GalleryStatus, Json } from '@/lib/supabase/database.types';
 import { randomBytes } from 'crypto';
 
@@ -93,6 +93,15 @@ export async function PATCH(
     } catch (err) {
       return NextResponse.json({ error: `Failed to fetch original: ${(err as Error).message}` }, { status: 500 });
     }
+
+    let sourceMeta: { width: number; height: number };
+    try {
+      sourceMeta = await imageMetadata(originalBuffer);
+    } catch (err) {
+      return NextResponse.json({ error: `Unable to read image: ${(err as Error).message}` }, { status: 400 });
+    }
+    const boundsError = validateCropBounds(cropPixels, sourceMeta.width, sourceMeta.height);
+    if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });
 
     let croppedBuffer: Buffer;
     try {

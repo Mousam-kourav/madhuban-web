@@ -63,6 +63,12 @@ export async function imageMetadata(buffer: Buffer): Promise<{ width: number; he
 export const CROP_OUT_OF_BOUNDS_MESSAGE =
   'Crop region extends beyond image bounds. Please zoom in to fill the entire frame.';
 
+export const GALLERY_SOURCE_TOO_TALL_MESSAGE =
+  'This image is too tall. The gallery requires landscape photos (wider than tall, at least 4:3 ratio). Please rotate your phone sideways when taking the photo.';
+
+export const FEATURED_SOURCE_TOO_TALL_MESSAGE =
+  'Featured Experiences require wide landscape images (16:9 or wider, like a cinematic banner). This image is too tall. If you have a 4:3 landscape photo, upload it to the Gallery instead.';
+
 export function validateCropBounds(
   crop: CropArea,
   sourceWidth: number,
@@ -76,4 +82,12 @@ export function validateCropBounds(
     return CROP_OUT_OF_BOUNDS_MESSAGE;
   }
   return null;
+}
+
+export function isSourceTallerThanTarget(
+  sourceWidth: number,
+  sourceHeight: number,
+  targetAspect: number,
+): boolean {
+  return sourceWidth / sourceHeight < targetAspect;
 }

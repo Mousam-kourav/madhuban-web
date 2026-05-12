@@ -52,7 +52,7 @@ export function ImageCropper({
           onRotationChange={setRotation}
           onCropComplete={handleCropComplete}
           showGrid
-          objectFit="contain"
+          objectFit="cover"
         />
       </div>
 

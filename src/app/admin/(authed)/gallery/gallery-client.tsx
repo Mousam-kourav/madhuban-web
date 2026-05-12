@@ -21,6 +21,8 @@ const CATEGORIES: { value: GalleryCategory | 'all'; label: string; color: string
 ];
 
 const GALLERY_ASPECT = 4 / 3;
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 25 * 1024 * 1024;
 
 function getCategoryColor(category: string) {
   return CATEGORIES.find((c) => c.value === category)?.color ?? 'bg-gray-100 text-gray-700';
@@ -149,6 +151,14 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
     const isVideo = file.type.startsWith('video/');
     if (!isImage && !isVideo) {
       setUploadError('Only image or video files are supported.');
+      return;
+    }
+    if (isImage && file.size > MAX_IMAGE_BYTES) {
+      setUploadError('Image too large. Maximum size is 5 MB. Please compress and try again.');
+      return;
+    }
+    if (isVideo && file.size > MAX_VIDEO_BYTES) {
+      setUploadError('Video too large. Maximum size is 25 MB.');
       return;
     }
     const preview = URL.createObjectURL(file);

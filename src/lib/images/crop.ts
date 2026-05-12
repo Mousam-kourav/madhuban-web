@@ -59,3 +59,21 @@ export async function imageMetadata(buffer: Buffer): Promise<{ width: number; he
   if (!meta.width || !meta.height) throw new Error('Unable to read image dimensions');
   return { width: meta.width, height: meta.height };
 }
+
+export const CROP_OUT_OF_BOUNDS_MESSAGE =
+  'Crop region extends beyond image bounds. Please zoom in to fill the entire frame.';
+
+export function validateCropBounds(
+  crop: CropArea,
+  sourceWidth: number,
+  sourceHeight: number,
+): string | null {
+  const x = Math.round(crop.x);
+  const y = Math.round(crop.y);
+  const width = Math.round(crop.width);
+  const height = Math.round(crop.height);
+  if (x < 0 || y < 0 || x + width > sourceWidth || y + height > sourceHeight) {
+    return CROP_OUT_OF_BOUNDS_MESSAGE;
+  }
+  return null;
+}

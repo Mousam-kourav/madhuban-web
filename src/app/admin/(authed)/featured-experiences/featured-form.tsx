@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Loader2, Crop as CropIcon, Upload, X, AlertTriangle } from 'lucide-react';
 import { ImageCropper, type CropResult } from '@/components/admin/ImageCropper';
+import { readImageDimensions } from '@/lib/admin/read-image-dimensions';
 import type { FeaturedExperienceRow } from '@/lib/featured-experiences/queries';
 
 const FEATURED_ASPECT = 16 / 9;
@@ -58,7 +59,7 @@ export function FeaturedForm({ initial }: Props) {
     if (!slugTouched) setSlug(slugify(val));
   };
 
-  const handleFilePick = (f: File) => {
+  const handleFilePick = async (f: File) => {
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(f.type)) {
       setError('Use JPG, PNG, or WebP.');
       return;
@@ -67,6 +68,21 @@ export function FeaturedForm({ initial }: Props) {
       setError('File exceeds 5 MB limit.');
       return;
     }
+
+    let dims: { width: number; height: number };
+    try {
+      dims = await readImageDimensions(f);
+    } catch {
+      setError('Could not read image dimensions. Please try a different file.');
+      return;
+    }
+    if (dims.width / dims.height < FEATURED_ASPECT) {
+      setError(
+        'Featured Experiences require wide landscape images (16:9 or wider, like a cinematic banner). This image is too tall. If you have a 4:3 landscape photo, upload it to the Gallery instead.',
+      );
+      return;
+    }
+
     if (filePreview) URL.revokeObjectURL(filePreview);
     setFile(f);
     setFilePreview(URL.createObjectURL(f));

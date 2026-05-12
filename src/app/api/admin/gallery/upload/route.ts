@@ -5,7 +5,13 @@ import sharp from 'sharp';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { uploadToR2 } from '@/lib/r2/upload';
-import { cropImage, imageMetadata, validateCropBounds } from '@/lib/images/crop';
+import {
+  cropImage,
+  imageMetadata,
+  validateCropBounds,
+  isSourceTallerThanTarget,
+  GALLERY_SOURCE_TOO_TALL_MESSAGE,
+} from '@/lib/images/crop';
 import { createNotification } from '@/lib/admin/notifications';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
@@ -137,6 +143,9 @@ export async function POST(request: NextRequest) {
       sourceMeta = await imageMetadata(buffer);
     } catch (err) {
       return NextResponse.json({ error: `Unable to read image: ${(err as Error).message}` }, { status: 400 });
+    }
+    if (isSourceTallerThanTarget(sourceMeta.width, sourceMeta.height, CROP_ASPECT)) {
+      return NextResponse.json({ error: GALLERY_SOURCE_TOO_TALL_MESSAGE }, { status: 400 });
     }
     const boundsError = validateCropBounds(cropPixels, sourceMeta.width, sourceMeta.height);
     if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });

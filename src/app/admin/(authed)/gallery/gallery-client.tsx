@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { GalleryItemRow, GalleryCategory } from '@/lib/supabase/database.types';
 import { ImageCropper, type CropResult } from '@/components/admin/ImageCropper';
+import { readImageDimensions } from '@/lib/admin/read-image-dimensions';
 
 const CATEGORIES: { value: GalleryCategory | 'all'; label: string; color: string }[] = [
   { value: 'all', label: 'All Categories', color: '' },
@@ -146,7 +147,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
     setUploadError('');
   };
 
-  const handleFilePick = (file: File) => {
+  const handleFilePick = async (file: File) => {
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
     if (!isImage && !isVideo) {
@@ -161,6 +162,23 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
       setUploadError('Video too large. Maximum size is 25 MB.');
       return;
     }
+
+    if (isImage) {
+      let dims: { width: number; height: number };
+      try {
+        dims = await readImageDimensions(file);
+      } catch {
+        setUploadError('Could not read image dimensions. Please try a different file.');
+        return;
+      }
+      if (dims.width / dims.height < GALLERY_ASPECT) {
+        setUploadError(
+          'This image is too tall. The gallery requires landscape photos (wider than tall, at least 4:3 ratio). Please rotate your phone sideways when taking the photo.',
+        );
+        return;
+      }
+    }
+
     const preview = URL.createObjectURL(file);
     setDraft({
       file,

@@ -203,20 +203,44 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
       fd.append('rotation', String(draft.cropResult.rotation));
     }
 
+    let res: Response;
     try {
-      const res = await fetch('/api/admin/gallery/upload', { method: 'POST', body: fd });
-      const json = await res.json();
-      if (!res.ok) {
-        setUploadError(json.error ?? 'Upload failed');
-        setUploadStep('meta');
-        return;
-      }
+      res = await fetch('/api/admin/gallery/upload', { method: 'POST', body: fd });
+    } catch {
+      setUploadError('Network error. Check your connection.');
+      setUploadStep('meta');
+      return;
+    }
+
+    if (res.ok) {
       await reloadItems();
       closeUpload();
-    } catch {
-      setUploadError('Network error');
-      setUploadStep('meta');
+      return;
     }
+
+    let serverMessage: string | null = null;
+    try {
+      const json = (await res.json()) as { error?: unknown };
+      if (typeof json.error === 'string') serverMessage = json.error;
+    } catch {
+      // Platform-level errors (e.g. Next/Vercel 413) return non-JSON bodies.
+    }
+
+    let message: string;
+    if (res.status === 413) {
+      message = 'Image too large. Maximum size is 5 MB. Please compress and try again.';
+    } else if (res.status === 401 || res.status === 403) {
+      message = "You don't have permission to upload.";
+    } else if (res.status >= 500) {
+      message = 'Server error. Please try again.';
+    } else if (res.status === 400) {
+      message = serverMessage ?? 'Upload failed. Please check your input.';
+    } else {
+      message = serverMessage ?? `Upload failed (status ${res.status}).`;
+    }
+
+    setUploadError(message);
+    setUploadStep('meta');
   };
 
   // ── Edit + Re-crop ─────────────────────────────────────────────────────

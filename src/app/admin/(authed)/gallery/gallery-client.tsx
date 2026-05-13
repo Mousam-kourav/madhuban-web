@@ -43,7 +43,7 @@ function slugify(name: string): string {
     .slice(0, 60);
 }
 
-type UploadStep = 'pick' | 'crop' | 'meta' | 'submitting';
+type UploadStep = 'pick' | 'choose' | 'crop' | 'meta' | 'submitting';
 
 interface UploadDraft {
   file: File;
@@ -176,7 +176,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
       cropResult: null,
     });
     setUploadError('');
-    setUploadStep(isVideo ? 'meta' : 'crop');
+    setUploadStep(isVideo ? 'meta' : 'choose');
   };
 
   const handleCropComplete = useCallback((result: CropResult) => {
@@ -191,10 +191,6 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
     }
     if (!draft.category) {
       setUploadError('Category is required.');
-      return;
-    }
-    if (!draft.isVideo && !draft.cropResult) {
-      setUploadError('Crop the image before submitting.');
       return;
     }
 
@@ -546,6 +542,7 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-white px-6 py-4">
               <h2 className="font-display text-2xl text-[var(--color-charcoal)]">
                 {uploadStep === 'pick' && 'Upload to Gallery'}
+                {uploadStep === 'choose' && 'Crop or Upload As-Is?'}
                 {uploadStep === 'crop' && 'Crop Image (4:3)'}
                 {(uploadStep === 'meta' || uploadStep === 'submitting') && 'Add Details'}
               </h2>
@@ -572,11 +569,53 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                 </label>
               )}
 
+              {uploadStep === 'choose' && draft && (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-center rounded-xl bg-[var(--color-cream)] p-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={draft.preview}
+                      alt="Preview"
+                      className="max-h-[50vh] w-auto rounded-lg object-contain"
+                    />
+                  </div>
+                  <p className="text-center font-body text-sm text-[var(--color-muted)]">
+                    The gallery accepts any aspect ratio. Pick how you&rsquo;d like this image saved.
+                  </p>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <button
+                      onClick={() => {
+                        setDraft({ ...draft, cropResult: null });
+                        setUploadStep('meta');
+                      }}
+                      className="flex flex-col items-start gap-1 rounded-xl border-2 border-[var(--color-gold-accent)] bg-white p-4 text-left transition hover:bg-[var(--color-cream)]"
+                    >
+                      <span className="font-body text-sm font-semibold text-[var(--color-charcoal)]">Upload as-is</span>
+                      <span className="font-body text-xs text-[var(--color-muted)]">
+                        Keeps the original aspect ratio. Recommended for landscape and portrait photos alike.
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setUploadStep('crop')}
+                      className="flex flex-col items-start gap-1 rounded-xl border border-[var(--color-border)] bg-white p-4 text-left transition hover:bg-[var(--color-cream)]"
+                    >
+                      <span className="font-body text-sm font-semibold text-[var(--color-charcoal)]">Crop to 4:3</span>
+                      <span className="font-body text-xs text-[var(--color-muted)]">
+                        Manually pick a 4:3 region. Use this when you want tight control over framing.
+                      </span>
+                    </button>
+                  </div>
+                  <div className="flex justify-start">
+                    <button onClick={() => setUploadStep('pick')} className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50">Back</button>
+                  </div>
+                </div>
+              )}
+
               {uploadStep === 'crop' && draft && (
                 <>
                   <ImageCropper imageSrc={draft.preview} aspect={GALLERY_ASPECT} onComplete={handleCropComplete} />
                   <div className="mt-6 flex justify-end gap-3">
-                    <button onClick={() => setUploadStep('pick')} className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50">Back</button>
+                    <button onClick={() => setUploadStep('choose')} className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50">Back</button>
                     <button
                       onClick={() => setUploadStep('meta')}
                       disabled={!draft.cropResult}
@@ -658,10 +697,10 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
                   <div className="flex justify-end gap-3 pt-2">
                     {!draft.isVideo && (
                       <button
-                        onClick={() => setUploadStep('crop')}
+                        onClick={() => setUploadStep('choose')}
                         className="rounded-xl border border-[var(--color-border)] px-5 py-2.5 font-body text-sm hover:bg-gray-50"
                       >
-                        Back to Crop
+                        Back
                       </button>
                     )}
                     <button

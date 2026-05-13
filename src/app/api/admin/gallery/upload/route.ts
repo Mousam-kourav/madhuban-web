@@ -24,6 +24,7 @@ const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm'];
 const VALID_CATEGORIES: GalleryCategory[] = ['stays', 'dining', 'aranyashala', 'forest', 'events', 'behind-the-scenes'];
 const CROP_ASPECT = 4 / 3;
 const CROP_OUTPUT_WIDTH = 1600;
+const AS_IS_MAX_DIMENSION = 2400;
 
 let _limiter: Ratelimit | null = null;
 function getUploadLimiter(): Ratelimit | null {
@@ -130,9 +131,6 @@ export async function POST(request: NextRequest) {
 
   if (isImage) {
     const cropPixels = parseCropPixels(formData.get('croppedAreaPixels'));
-    if (!cropPixels) {
-      return NextResponse.json({ error: 'croppedAreaPixels is required for image uploads' }, { status: 400 });
-    }
     const zoom = Number(formData.get('zoom') ?? 1);
     const rotation = Number(formData.get('rotation') ?? 0);
 
@@ -142,37 +140,61 @@ export async function POST(request: NextRequest) {
     } catch (err) {
       return NextResponse.json({ error: `Unable to read image: ${(err as Error).message}` }, { status: 400 });
     }
-    const boundsError = validateCropBounds(cropPixels, sourceMeta.width, sourceMeta.height);
-    if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });
 
     const originalExt = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
     const originalKey = `gallery/${category}/originals/${baseFilename}-${uid8()}.${originalExt}`;
     const originalUrl = await uploadToR2({ key: originalKey, body: buffer, contentType: file.type });
 
-    let croppedBuffer: Buffer;
-    try {
-      croppedBuffer = await cropImage(buffer, cropPixels, {
-        aspectRatio: CROP_ASPECT,
-        outputWidth: CROP_OUTPUT_WIDTH,
-        quality: 82,
-      });
-    } catch (err) {
-      return NextResponse.json({ error: `Crop failed: ${(err as Error).message}` }, { status: 400 });
+    let displayBuffer: Buffer;
+    let cropData: CropData | null = null;
+
+    if (cropPixels) {
+      const boundsError = validateCropBounds(cropPixels, sourceMeta.width, sourceMeta.height);
+      if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });
+
+      try {
+        displayBuffer = await cropImage(buffer, cropPixels, {
+          aspectRatio: CROP_ASPECT,
+          outputWidth: CROP_OUTPUT_WIDTH,
+          quality: 82,
+        });
+      } catch (err) {
+        return NextResponse.json({ error: `Crop failed: ${(err as Error).message}` }, { status: 400 });
+      }
+
+      cropData = {
+        x: cropPixels.x,
+        y: cropPixels.y,
+        width: cropPixels.width,
+        height: cropPixels.height,
+        zoom: Number.isFinite(zoom) ? zoom : 1,
+        rotation: Number.isFinite(rotation) ? rotation : 0,
+      };
+    } else {
+      const longest = Math.max(sourceMeta.width, sourceMeta.height);
+      const pipeline = sharp(buffer).rotate();
+      if (longest > AS_IS_MAX_DIMENSION) {
+        pipeline.resize({
+          width: sourceMeta.width >= sourceMeta.height ? AS_IS_MAX_DIMENSION : undefined,
+          height: sourceMeta.height > sourceMeta.width ? AS_IS_MAX_DIMENSION : undefined,
+          fit: 'inside',
+          withoutEnlargement: true,
+        });
+      }
+      try {
+        displayBuffer = (await pipeline.webp({ quality: 82, effort: 6 }).toBuffer()) as Buffer;
+      } catch (err) {
+        return NextResponse.json({ error: `Encode failed: ${(err as Error).message}` }, { status: 400 });
+      }
     }
 
-    const croppedKey = `gallery/${category}/${baseFilename}-${uid8()}.webp`;
-    const croppedUrl = await uploadToR2({ key: croppedKey, body: croppedBuffer, contentType: 'image/webp' });
+    const displayKey = `gallery/${category}/${baseFilename}-${uid8()}.webp`;
+    const displayUrl = await uploadToR2({ key: displayKey, body: displayBuffer, contentType: 'image/webp' });
 
-    const meta = await imageMetadata(croppedBuffer).catch(() => ({ width: CROP_OUTPUT_WIDTH, height: Math.round(CROP_OUTPUT_WIDTH / CROP_ASPECT) }));
-
-    const cropData: CropData = {
-      x: cropPixels.x,
-      y: cropPixels.y,
-      width: cropPixels.width,
-      height: cropPixels.height,
-      zoom: Number.isFinite(zoom) ? zoom : 1,
-      rotation: Number.isFinite(rotation) ? rotation : 0,
-    };
+    const fallbackDims = cropPixels
+      ? { width: CROP_OUTPUT_WIDTH, height: Math.round(CROP_OUTPUT_WIDTH / CROP_ASPECT) }
+      : sourceMeta;
+    const meta = await imageMetadata(displayBuffer).catch(() => fallbackDims);
 
     const { data, error } = await supabase
       .from('gallery_items')
@@ -182,15 +204,15 @@ export async function POST(request: NextRequest) {
         caption,
         category,
         type: 'image',
-        r2_key: croppedKey,
-        r2_url: croppedUrl,
+        r2_key: displayKey,
+        r2_url: displayUrl,
         original_r2_key: originalKey,
         original_r2_url: originalUrl,
         crop_data: cropData,
         needs_review: false,
         width: meta.width,
         height: meta.height,
-        file_size_bytes: croppedBuffer.length,
+        file_size_bytes: displayBuffer.length,
         mime_type: 'image/webp',
         sort_order: isNaN(sortOrder) ? 0 : sortOrder,
         status,

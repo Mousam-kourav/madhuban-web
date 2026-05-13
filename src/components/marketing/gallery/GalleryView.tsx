@@ -259,15 +259,22 @@ export function GalleryView({ items }: { items: GalleryItemRow[] }) {
                     </div>
                   </div>
                 ) : (
-                  <div
-                    className="relative overflow-hidden"
-                    style={{ aspectRatio: item.width && item.height ? `${item.width}/${item.height}` : '4/3' }}
-                  >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-charcoal/5">
+                    {/* Blurred fill: hides empty bands when the image isn't 4:3 */}
+                    <Image
+                      src={item.thumbnail_url ?? item.r2_url}
+                      alt=""
+                      fill
+                      aria-hidden="true"
+                      className="scale-110 object-cover opacity-80 blur-2xl"
+                      sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1100px) 33vw, 25vw"
+                    />
+                    {/* Foreground: full image, never cropped */}
                     <Image
                       src={item.thumbnail_url ?? item.r2_url}
                       alt={item.alt_text || item.filename}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain transition-transform duration-500 group-hover:scale-105"
                       sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1100px) 33vw, 25vw"
                     />
                     <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-black/50 via-transparent to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">

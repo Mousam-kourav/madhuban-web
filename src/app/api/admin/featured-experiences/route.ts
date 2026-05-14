@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { uploadToR2 } from '@/lib/r2/upload';
+import { downloadFromR2, r2PublicUrl, uploadToR2 } from '@/lib/r2/upload';
 import {
   cropImage,
   imageMetadata,
@@ -17,9 +17,8 @@ import { randomBytes } from 'crypto';
 
 const FEATURED_ASPECT = 16 / 9;
 const FEATURED_OUTPUT_WIDTH = 1920;
-
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const ctaLinkSchema = z
   .string()
@@ -29,7 +28,15 @@ const ctaLinkSchema = z
     'cta_link should start with / (internal) or https:// (external).',
   );
 
+const cropPixelsSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  width: z.number().positive(),
+  height: z.number().positive(),
+});
+
 const createSchema = z.object({
+  r2Key: z.string().min(1),
   slug: z.string().min(1).max(120),
   title: z.string().min(1).max(120),
   description: z.string().min(1).max(200),
@@ -37,6 +44,11 @@ const createSchema = z.object({
   cta_link: ctaLinkSchema,
   sort_order: z.coerce.number().int().default(0),
   status: z.enum(['published', 'draft']).default('draft'),
+  mimeType: z.string().min(1),
+  fileSize: z.number().positive(),
+  croppedAreaPixels: cropPixelsSchema,
+  zoom: z.number().optional(),
+  rotation: z.number().optional(),
 });
 
 function slugify(name: string): string {
@@ -55,88 +67,66 @@ function uid8(): string {
   return randomBytes(4).toString('hex');
 }
 
-function parseCropPixels(raw: FormDataEntryValue | null): { x: number; y: number; width: number; height: number } | null {
-  if (typeof raw !== 'string' || !raw.trim()) return null;
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const x = Number(parsed.x);
-    const y = Number(parsed.y);
-    const width = Number(parsed.width);
-    const height = Number(parsed.height);
-    if ([x, y, width, height].some((n) => !Number.isFinite(n)) || width <= 0 || height <= 0) return null;
-    return { x, y, width, height };
-  } catch {
-    return null;
-  }
-}
-
 export async function POST(request: NextRequest) {
   const auth = await assertRole('admin');
   if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  let formData: FormData;
+  let raw: unknown;
   try {
-    formData = await request.formData();
+    raw = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
-
-  const file = formData.get('file');
-  if (!(file instanceof File)) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return NextResponse.json({ error: 'Use JPG, PNG, or WebP.' }, { status: 400 });
-  }
-  if (file.size > MAX_IMAGE_BYTES) {
-    return NextResponse.json({ error: 'File exceeds 5 MB limit' }, { status: 400 });
-  }
-
-  const raw = {
-    slug: formData.get('slug')?.toString().trim() ?? '',
-    title: formData.get('title')?.toString().trim() ?? '',
-    description: formData.get('description')?.toString().trim() ?? '',
-    cta_label: formData.get('cta_label')?.toString().trim() ?? '',
-    cta_link: formData.get('cta_link')?.toString().trim() ?? '',
-    sort_order: formData.get('sort_order')?.toString() ?? '0',
-    status: (formData.get('status')?.toString() ?? 'draft'),
-  };
-
   const parsed = createSchema.safeParse(raw);
   if (!parsed.success) {
     const first = parsed.error.issues[0];
     return NextResponse.json({ error: first?.message ?? 'Invalid input' }, { status: 400 });
   }
   const input = parsed.data;
+
+  if (!ALLOWED_IMAGE_TYPES.includes(input.mimeType)) {
+    return NextResponse.json({ error: 'Use JPG, PNG, or WebP.' }, { status: 400 });
+  }
+  if (input.fileSize > MAX_IMAGE_BYTES) {
+    return NextResponse.json({ error: 'File exceeds 5 MB limit' }, { status: 400 });
+  }
+
   const slug = slugify(input.slug || input.title);
   if (!slug) return NextResponse.json({ error: 'Slug could not be derived' }, { status: 400 });
 
-  const cropPixels = parseCropPixels(formData.get('croppedAreaPixels'));
-  if (!cropPixels) return NextResponse.json({ error: 'croppedAreaPixels is required' }, { status: 400 });
-  const zoom = Number(formData.get('zoom') ?? 1);
-  const rotation = Number(formData.get('rotation') ?? 0);
+  // Belt-and-suspenders: ensure r2Key was minted under the featured-experiences originals path.
+  if (!input.r2Key.startsWith('featured-experiences/') || !input.r2Key.includes('/originals/')) {
+    return NextResponse.json({ error: 'r2Key is not a valid featured-experience original' }, { status: 400 });
+  }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  const originalKey = input.r2Key;
+  const originalUrl = r2PublicUrl(originalKey);
+
+  let originalBuffer: Buffer;
+  try {
+    originalBuffer = await downloadFromR2(originalKey);
+  } catch (err) {
+    return NextResponse.json(
+      { error: `Failed to fetch uploaded original: ${(err as Error).message}` },
+      { status: 500 },
+    );
+  }
 
   let sourceMeta: { width: number; height: number };
   try {
-    sourceMeta = await imageMetadata(buffer);
+    sourceMeta = await imageMetadata(originalBuffer);
   } catch (err) {
     return NextResponse.json({ error: `Unable to read image: ${(err as Error).message}` }, { status: 400 });
   }
   if (isSourceTallerThanTarget(sourceMeta.width, sourceMeta.height, FEATURED_ASPECT)) {
     return NextResponse.json({ error: FEATURED_SOURCE_TOO_TALL_MESSAGE }, { status: 400 });
   }
-  const boundsError = validateCropBounds(cropPixels, sourceMeta.width, sourceMeta.height);
+  const boundsError = validateCropBounds(input.croppedAreaPixels, sourceMeta.width, sourceMeta.height);
   if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });
 
-  // Upload original
-  const originalExt = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
-  const originalKey = `featured-experiences/${slug}/originals/${slug}-${uid8()}.${originalExt}`;
-  const originalUrl = await uploadToR2({ key: originalKey, body: buffer, contentType: file.type });
-
-  // Crop + upload cropped
   let croppedBuffer: Buffer;
   try {
-    croppedBuffer = await cropImage(buffer, cropPixels, {
+    croppedBuffer = await cropImage(originalBuffer, input.croppedAreaPixels, {
       aspectRatio: FEATURED_ASPECT,
       outputWidth: FEATURED_OUTPUT_WIDTH,
       quality: 82,
@@ -148,12 +138,12 @@ export async function POST(request: NextRequest) {
   const croppedUrl = await uploadToR2({ key: croppedKey, body: croppedBuffer, contentType: 'image/webp' });
 
   const cropData: CropData = {
-    x: cropPixels.x,
-    y: cropPixels.y,
-    width: cropPixels.width,
-    height: cropPixels.height,
-    zoom: Number.isFinite(zoom) ? zoom : 1,
-    rotation: Number.isFinite(rotation) ? rotation : 0,
+    x: input.croppedAreaPixels.x,
+    y: input.croppedAreaPixels.y,
+    width: input.croppedAreaPixels.width,
+    height: input.croppedAreaPixels.height,
+    zoom: input.zoom ?? 1,
+    rotation: input.rotation ?? 0,
   };
 
   const supabase = createAdminClient();

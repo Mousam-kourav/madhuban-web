@@ -43,6 +43,22 @@ function slugify(name: string): string {
     .slice(0, 60);
 }
 
+function readVideoDimensions(file: File): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    const cleanup = () => URL.revokeObjectURL(video.src);
+    video.onloadedmetadata = () => {
+      const w = video.videoWidth || 0;
+      const h = video.videoHeight || 0;
+      cleanup();
+      resolve(w && h ? { width: w, height: h } : null);
+    };
+    video.onerror = () => { cleanup(); resolve(null); };
+    video.src = URL.createObjectURL(file);
+  });
+}
+
 type UploadStep = 'pick' | 'choose' | 'crop' | 'meta' | 'submitting';
 
 interface UploadDraft {
@@ -196,23 +212,88 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
 
     setUploadStep('submitting');
     setUploadError('');
-    const fd = new FormData();
-    fd.append('file', draft.file);
-    fd.append('filename', draft.filename);
-    fd.append('alt_text', draft.alt_text);
-    fd.append('caption', draft.caption);
-    fd.append('category', draft.category);
-    fd.append('sort_order', draft.sort_order);
-    fd.append('status', draft.status);
-    if (draft.cropResult) {
-      fd.append('croppedAreaPixels', JSON.stringify(draft.cropResult.pixels));
-      fd.append('zoom', String(draft.cropResult.zoom));
-      fd.append('rotation', String(draft.cropResult.rotation));
+
+    // Step 1: ask server for a presigned PUT URL.
+    let presignRes: Response;
+    try {
+      presignRes = await fetch('/api/admin/gallery/presign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: draft.filename,
+          mimeType: draft.file.type,
+          fileSize: draft.file.size,
+          category: draft.category,
+        }),
+      });
+    } catch {
+      setUploadError('Network error. Check your connection.');
+      setUploadStep('meta');
+      return;
     }
+    if (!presignRes.ok) {
+      const json = await presignRes.json().catch(() => ({} as { error?: string }));
+      setUploadError(
+        typeof json?.error === 'string'
+          ? json.error
+          : `Failed to prepare upload (status ${presignRes.status}).`,
+      );
+      setUploadStep('meta');
+      return;
+    }
+    const { uploadUrl, r2Key } = (await presignRes.json()) as { uploadUrl: string; r2Key: string };
+
+    // Step 2: PUT the file body directly to R2 (bypasses Vercel body limit).
+    let putRes: Response;
+    try {
+      putRes = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': draft.file.type },
+        body: draft.file,
+      });
+    } catch {
+      setUploadError('Upload to storage failed. Check your connection.');
+      setUploadStep('meta');
+      return;
+    }
+    if (!putRes.ok) {
+      setUploadError(`Upload to storage failed (status ${putRes.status}).`);
+      setUploadStep('meta');
+      return;
+    }
+
+    // For videos, grab dimensions client-side so the DB row has width/height.
+    let videoDims: { width: number; height: number } | null = null;
+    if (draft.isVideo) {
+      videoDims = await readVideoDimensions(draft.file);
+    }
+
+    // Step 3: POST metadata referencing the uploaded r2Key.
+    const metadata = {
+      r2Key,
+      filename: draft.filename,
+      alt_text: draft.alt_text,
+      caption: draft.caption || null,
+      category: draft.category,
+      sort_order: parseInt(draft.sort_order, 10) || 0,
+      status: draft.status,
+      type: draft.isVideo ? 'video' : 'image',
+      mimeType: draft.file.type,
+      fileSize: draft.file.size,
+      width: videoDims?.width ?? null,
+      height: videoDims?.height ?? null,
+      croppedAreaPixels: draft.cropResult?.pixels ?? null,
+      zoom: draft.cropResult?.zoom,
+      rotation: draft.cropResult?.rotation,
+    };
 
     let res: Response;
     try {
-      res = await fetch('/api/admin/gallery/upload', { method: 'POST', body: fd });
+      res = await fetch('/api/admin/gallery/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(metadata),
+      });
     } catch {
       setUploadError('Network error. Check your connection.');
       setUploadStep('meta');
@@ -230,16 +311,14 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
       const json = (await res.json()) as { error?: unknown };
       if (typeof json.error === 'string') serverMessage = json.error;
     } catch {
-      // Platform-level errors (e.g. Next/Vercel 413) return non-JSON bodies.
+      // Non-JSON bodies (rare now that file body no longer flows through this route).
     }
 
     let message: string;
-    if (res.status === 413) {
-      message = 'Image too large. Maximum size is 5 MB. Please compress and try again.';
-    } else if (res.status === 401 || res.status === 403) {
+    if (res.status === 401 || res.status === 403) {
       message = "You don't have permission to upload.";
     } else if (res.status >= 500) {
-      message = 'Server error. Please try again.';
+      message = serverMessage ?? 'Server error. Please try again.';
     } else if (res.status === 400) {
       message = serverMessage ?? 'Upload failed. Please check your input.';
     } else {

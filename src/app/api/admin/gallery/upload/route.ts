@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import sharp from 'sharp';
 import { assertRole } from '@/lib/admin/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { uploadToR2 } from '@/lib/r2/upload';
+import { downloadFromR2, r2PublicUrl, uploadToR2 } from '@/lib/r2/upload';
 import {
   cropImage,
   imageMetadata,
@@ -56,19 +56,34 @@ function uid8(): string {
   return randomBytes(4).toString('hex');
 }
 
-function parseCropPixels(raw: FormDataEntryValue | null): { x: number; y: number; width: number; height: number } | null {
-  if (typeof raw !== 'string' || !raw.trim()) return null;
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const x = Number(parsed.x);
-    const y = Number(parsed.y);
-    const width = Number(parsed.width);
-    const height = Number(parsed.height);
-    if ([x, y, width, height].some((n) => !Number.isFinite(n)) || width <= 0 || height <= 0) return null;
-    return { x, y, width, height };
-  } catch {
-    return null;
-  }
+interface CropPixels { x: number; y: number; width: number; height: number }
+function parseCropPixels(raw: unknown): CropPixels | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const obj = raw as Record<string, unknown>;
+  const x = Number(obj.x);
+  const y = Number(obj.y);
+  const width = Number(obj.width);
+  const height = Number(obj.height);
+  if ([x, y, width, height].some((n) => !Number.isFinite(n)) || width <= 0 || height <= 0) return null;
+  return { x, y, width, height };
+}
+
+interface MetadataPayload {
+  r2Key: string;
+  filename: string;
+  alt_text: string;
+  caption?: string | null;
+  category: GalleryCategory;
+  sort_order?: number;
+  status?: 'published' | 'draft';
+  type: 'image' | 'video';
+  mimeType: string;
+  fileSize: number;
+  width?: number | null;
+  height?: number | null;
+  croppedAreaPixels?: CropPixels | null;
+  zoom?: number;
+  rotation?: number;
 }
 
 export async function POST(request: NextRequest) {
@@ -82,68 +97,89 @@ export async function POST(request: NextRequest) {
     if (!success) return NextResponse.json({ error: 'Rate limit exceeded' }, { status: 429 });
   }
 
-  let formData: FormData;
+  let raw: unknown;
   try {
-    formData = await request.formData();
+    raw = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
+  const input = raw as Partial<MetadataPayload>;
 
-  const file = formData.get('file');
-  if (!(file instanceof File)) return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+  const r2Key = typeof input.r2Key === 'string' ? input.r2Key.trim() : '';
+  if (!r2Key) return NextResponse.json({ error: 'r2Key is required' }, { status: 400 });
 
-  const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
-  const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
+  const type = input.type === 'image' || input.type === 'video' ? input.type : null;
+  if (!type) return NextResponse.json({ error: 'type must be image or video' }, { status: 400 });
+
+  const mimeType = typeof input.mimeType === 'string' ? input.mimeType : '';
+  const isImage = type === 'image' && ALLOWED_IMAGE_TYPES.includes(mimeType);
+  const isVideo = type === 'video' && ALLOWED_VIDEO_TYPES.includes(mimeType);
   if (!isImage && !isVideo) {
-    return NextResponse.json({ error: 'File type not allowed. Use JPG, PNG, WebP, MP4, or WebM.' }, { status: 400 });
+    return NextResponse.json({ error: 'mimeType does not match a supported type' }, { status: 400 });
   }
 
+  const fileSize = typeof input.fileSize === 'number' ? input.fileSize : NaN;
+  if (!Number.isFinite(fileSize) || fileSize <= 0) {
+    return NextResponse.json({ error: 'fileSize is required' }, { status: 400 });
+  }
   const maxBytes = isImage ? MAX_IMAGE_BYTES : MAX_VIDEO_BYTES;
-  if (file.size > maxBytes) {
+  if (fileSize > maxBytes) {
     const limitMB = isImage ? 5 : 25;
     return NextResponse.json({ error: `File exceeds ${limitMB} MB limit` }, { status: 400 });
   }
 
-  const rawCategory = formData.get('category');
-  const category = typeof rawCategory === 'string' ? (rawCategory.trim() as GalleryCategory) : null;
+  const category = typeof input.category === 'string' ? (input.category.trim() as GalleryCategory) : null;
   if (!category || !VALID_CATEGORIES.includes(category)) {
     return NextResponse.json({ error: 'category is required' }, { status: 400 });
   }
 
-  const rawAlt = formData.get('alt_text');
-  const altText = typeof rawAlt === 'string' ? rawAlt.trim() : '';
+  // Belt-and-suspenders: ensure r2Key was minted for this category by /presign.
+  const expectedPrefix = isImage ? `gallery/${category}/originals/` : `gallery/${category}/`;
+  if (!r2Key.startsWith(expectedPrefix)) {
+    return NextResponse.json({ error: 'r2Key does not match category' }, { status: 400 });
+  }
+
+  const altText = typeof input.alt_text === 'string' ? input.alt_text.trim() : '';
   if (altText.length < 10) {
     return NextResponse.json({ error: 'alt_text must be at least 10 characters' }, { status: 400 });
   }
 
-  const rawFilename = formData.get('filename');
-  const baseFilename = typeof rawFilename === 'string' && rawFilename.trim()
-    ? slugifyFilename(rawFilename.trim())
-    : slugifyFilename(file.name);
-  const caption = typeof formData.get('caption') === 'string' ? (formData.get('caption') as string).trim() || null : null;
-  const rawSort = formData.get('sort_order');
-  const sortOrder = typeof rawSort === 'string' && rawSort.trim() ? parseInt(rawSort, 10) : 0;
-  const rawStatus = formData.get('status');
-  const status = rawStatus === 'draft' ? 'draft' : 'published';
+  const baseFilename = typeof input.filename === 'string' && input.filename.trim()
+    ? slugifyFilename(input.filename.trim())
+    : slugifyFilename(r2Key.split('/').pop() ?? 'upload');
+  const caption = typeof input.caption === 'string' && input.caption.trim() ? input.caption.trim() : null;
+  const sortOrder = typeof input.sort_order === 'number' && Number.isFinite(input.sort_order)
+    ? Math.trunc(input.sort_order)
+    : 0;
+  const status: 'published' | 'draft' = input.status === 'draft' ? 'draft' : 'published';
 
-  const buffer = Buffer.from(await file.arrayBuffer());
   const supabase = createAdminClient();
 
   if (isImage) {
-    const cropPixels = parseCropPixels(formData.get('croppedAreaPixels'));
-    const zoom = Number(formData.get('zoom') ?? 1);
-    const rotation = Number(formData.get('rotation') ?? 0);
+    const cropPixels = parseCropPixels(input.croppedAreaPixels);
+    const zoom = Number(input.zoom ?? 1);
+    const rotation = Number(input.rotation ?? 0);
+
+    // Original is already in R2 (uploaded directly by browser via presigned URL).
+    const originalKey = r2Key;
+    const originalUrl = r2PublicUrl(originalKey);
+
+    let originalBuffer: Buffer;
+    try {
+      originalBuffer = await downloadFromR2(originalKey);
+    } catch (err) {
+      return NextResponse.json(
+        { error: `Failed to fetch uploaded original: ${(err as Error).message}` },
+        { status: 500 },
+      );
+    }
 
     let sourceMeta: { width: number; height: number };
     try {
-      sourceMeta = await imageMetadata(buffer);
+      sourceMeta = await imageMetadata(originalBuffer);
     } catch (err) {
       return NextResponse.json({ error: `Unable to read image: ${(err as Error).message}` }, { status: 400 });
     }
-
-    const originalExt = file.name.split('.').pop()?.toLowerCase() ?? 'bin';
-    const originalKey = `gallery/${category}/originals/${baseFilename}-${uid8()}.${originalExt}`;
-    const originalUrl = await uploadToR2({ key: originalKey, body: buffer, contentType: file.type });
 
     let displayBuffer: Buffer;
     let cropData: CropData | null = null;
@@ -153,7 +189,7 @@ export async function POST(request: NextRequest) {
       if (boundsError) return NextResponse.json({ error: boundsError }, { status: 400 });
 
       try {
-        displayBuffer = await cropImage(buffer, cropPixels, {
+        displayBuffer = await cropImage(originalBuffer, cropPixels, {
           aspectRatio: CROP_ASPECT,
           outputWidth: CROP_OUTPUT_WIDTH,
           quality: 82,
@@ -172,7 +208,7 @@ export async function POST(request: NextRequest) {
       };
     } else {
       const longest = Math.max(sourceMeta.width, sourceMeta.height);
-      const pipeline = sharp(buffer).rotate();
+      const pipeline = sharp(originalBuffer).rotate();
       if (longest > AS_IS_MAX_DIMENSION) {
         pipeline.resize({
           width: sourceMeta.width >= sourceMeta.height ? AS_IS_MAX_DIMENSION : undefined,
@@ -214,7 +250,7 @@ export async function POST(request: NextRequest) {
         height: meta.height,
         file_size_bytes: displayBuffer.length,
         mime_type: 'image/webp',
-        sort_order: isNaN(sortOrder) ? 0 : sortOrder,
+        sort_order: sortOrder,
         status,
         uploaded_by: auth.user.email ?? 'admin',
       })
@@ -236,20 +272,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data, { status: 201 });
   }
 
-  // Video path — no cropping; original and "display" point to the same upload.
-  const videoExt = file.name.split('.').pop()?.toLowerCase() ?? (file.type === 'video/mp4' ? 'mp4' : 'webm');
-  const videoKey = `gallery/${category}/${baseFilename}-${uid8()}.${videoExt}`;
-  const videoUrl = await uploadToR2({ key: videoKey, body: buffer, contentType: file.type });
-
-  let videoWidth: number | null = null;
-  let videoHeight: number | null = null;
-  try {
-    const meta = await sharp(buffer).metadata();
-    videoWidth = meta.width ?? null;
-    videoHeight = meta.height ?? null;
-  } catch {
-    // Sharp can't read video metadata — leave dimensions null.
-  }
+  // Video path — original and display point to the same uploaded object.
+  const videoKey = r2Key;
+  const videoUrl = r2PublicUrl(videoKey);
+  const videoWidth = typeof input.width === 'number' && Number.isFinite(input.width) ? Math.trunc(input.width) : null;
+  const videoHeight = typeof input.height === 'number' && Number.isFinite(input.height) ? Math.trunc(input.height) : null;
 
   const { data, error } = await supabase
     .from('gallery_items')
@@ -267,9 +294,9 @@ export async function POST(request: NextRequest) {
       needs_review: false,
       width: videoWidth,
       height: videoHeight,
-      file_size_bytes: file.size,
-      mime_type: file.type,
-      sort_order: isNaN(sortOrder) ? 0 : sortOrder,
+      file_size_bytes: fileSize,
+      mime_type: mimeType,
+      sort_order: sortOrder,
       status,
       uploaded_by: auth.user.email ?? 'admin',
     })

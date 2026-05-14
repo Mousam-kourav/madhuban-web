@@ -112,20 +112,59 @@ export function FeaturedForm({ initial }: Props) {
           setSaving(false);
           return;
         }
-        const fd = new FormData();
-        fd.append('file', file);
-        fd.append('slug', slug || slugify(title));
-        fd.append('title', title.trim());
-        fd.append('description', description.trim());
-        fd.append('cta_label', ctaLabel.trim());
-        fd.append('cta_link', ctaLink.trim());
-        fd.append('sort_order', sortOrder);
-        fd.append('status', status);
-        fd.append('croppedAreaPixels', JSON.stringify(cropResult.pixels));
-        fd.append('zoom', String(cropResult.zoom));
-        fd.append('rotation', String(cropResult.rotation));
+        const effectiveSlug = slug || slugify(title);
 
-        const res = await fetch('/api/admin/featured-experiences', { method: 'POST', body: fd });
+        // Step 1: presign
+        const presignRes = await fetch('/api/admin/featured-experiences/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            filename: file.name,
+            slug: effectiveSlug,
+            mimeType: file.type,
+            fileSize: file.size,
+          }),
+        });
+        if (!presignRes.ok) {
+          const j = await presignRes.json().catch(() => ({} as { error?: string }));
+          setError(j?.error ?? `Failed to prepare upload (status ${presignRes.status}).`);
+          setSaving(false);
+          return;
+        }
+        const { uploadUrl, r2Key } = (await presignRes.json()) as { uploadUrl: string; r2Key: string };
+
+        // Step 2: PUT directly to R2
+        const putRes = await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
+        if (!putRes.ok) {
+          setError(`Upload to storage failed (status ${putRes.status}).`);
+          setSaving(false);
+          return;
+        }
+
+        // Step 3: POST metadata
+        const res = await fetch('/api/admin/featured-experiences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            r2Key,
+            slug: effectiveSlug,
+            title: title.trim(),
+            description: description.trim(),
+            cta_label: ctaLabel.trim(),
+            cta_link: ctaLink.trim(),
+            sort_order: parseInt(sortOrder, 10) || 0,
+            status,
+            mimeType: file.type,
+            fileSize: file.size,
+            croppedAreaPixels: cropResult.pixels,
+            zoom: cropResult.zoom,
+            rotation: cropResult.rotation,
+          }),
+        });
         const json = await res.json();
         if (!res.ok) { setError(json.error ?? 'Save failed'); setSaving(false); return; }
         router.push('/admin/featured-experiences');

@@ -563,14 +563,26 @@ export function GalleryClient({ initialItems }: { initialItems: GalleryItemRow[]
 
                 <div className={`relative overflow-hidden bg-warm-beige/30 ${item.type === 'video' ? 'aspect-video' : 'aspect-[4/3]'}`}>
                   {item.r2_url ? (
-                    <Image src={item.thumbnail_url ?? item.r2_url} alt={item.alt_text} fill sizes="(max-width:640px) 50vw,25vw" className="object-cover" />
+                    item.type === 'video' ? (
+                      // #t=0.5 media fragment: browsers paint the frame at 0.5s as the natural poster — free thumbnail without ffmpeg
+                      <video
+                        src={`${item.r2_url}#t=0.5`}
+                        poster={item.thumbnail_url ?? undefined}
+                        preload="metadata"
+                        muted
+                        playsInline
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Image src={item.thumbnail_url ?? item.r2_url} alt={item.alt_text} fill sizes="(max-width:640px) 50vw,25vw" className="object-cover" />
+                    )
                   ) : (
                     <div className="flex h-full items-center justify-center"><Images className="h-8 w-8 text-[var(--color-muted)]" /></div>
                   )}
                   {item.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <Play className="h-8 w-8 text-white drop-shadow" />
-                    </div>
+                    <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 font-body text-[10px] font-medium text-white backdrop-blur-sm">
+                      <Play className="h-3 w-3 fill-white" aria-hidden="true" /> Video
+                    </span>
                   )}
                   {item.status === 'draft' && (
                     <span className="absolute right-2 top-2 rounded-full bg-gray-700/80 px-2 py-0.5 font-body text-[10px] text-white">Draft</span>

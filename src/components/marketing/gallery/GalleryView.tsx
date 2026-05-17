@@ -109,8 +109,11 @@ function Lightbox({
         {item.type === 'video' ? (
           <video
             src={item.r2_url}
+            poster={item.thumbnail_url ?? undefined}
             controls
             autoPlay
+            playsInline
+            preload="metadata"
             className="max-h-[80vh] max-w-full rounded-lg"
           />
         ) : (
@@ -241,19 +244,18 @@ export function GalleryView({ items }: { items: GalleryItemRow[] }) {
               >
                 {item.type === 'video' ? (
                   <div className="relative aspect-video bg-charcoal">
-                    {item.thumbnail_url ? (
-                      <Image
-                        src={item.thumbnail_url}
-                        alt={item.alt_text || item.filename}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        sizes="(max-width: 480px) 100vw, (max-width: 768px) 50vw, (max-width: 1100px) 33vw, 25vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Play className="h-12 w-12 text-white/60" />
-                      </div>
-                    )}
+                    {/* #t=0.5 media fragment: browsers paint the frame at 0.5s as the natural poster — free thumbnail without ffmpeg */}
+                    <video
+                      src={`${item.r2_url}#t=0.5`}
+                      poster={item.thumbnail_url ?? undefined}
+                      preload="metadata"
+                      muted
+                      playsInline
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 font-body text-[10px] font-medium text-white backdrop-blur-sm">
+                      <Play className="h-3 w-3 fill-white" aria-hidden="true" /> Video
+                    </span>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                       <Play className="h-10 w-10 text-white" />
                     </div>

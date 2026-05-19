@@ -846,7 +846,7 @@ export function RoomEditor({ room, initialFaqs }: Props) {
               onChange={(e) => { setSeoTitle(e.target.value); scheduleAutoSave(); }}
               onBlur={() => { void save(); }}
               className={INPUT}
-              placeholder={`${name} | Madhuban Eco Retreat`}
+              placeholder={name || 'e.g. Safari Tent'}
             />
           </Field>
           <Field label={`SEO Description (${seoDesc.length}/160)`} htmlFor="r-seo-desc">

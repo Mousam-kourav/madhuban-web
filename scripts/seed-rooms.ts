@@ -64,7 +64,7 @@ async function seed() {
         gallery: room.gallery,
         is_active: true,
         sort_order: index,
-        seo_title: `${room.name} | Madhuban Eco Retreat`,
+        seo_title: room.name,
         seo_description: room.tagline,
       })
       .eq("slug", room.slug)

@@ -90,6 +90,18 @@ const nextConfig: NextConfig = {
       { source: '/icon-boxes', destination: '/', permanent: true },
       { source: '/quisque-velit-nisi', destination: '/', permanent: true },
       { source: '/hotel-includes/wi-fi', destination: '/', permanent: true },
+
+      // ── Phase 12.B.2 — legacy URL coverage (audit SEO-T1-003, SEO-T1-004) ──
+      // 8 OLD URLs indexed by Google but with no NEW route or redirect coverage.
+      // Estimated ~3,478 quarterly impressions preserved.
+      { source: '/hotels/madhuban-eco-retreat', destination: '/', permanent: true },
+      { source: '/hotels/madhuban-eco-retreat/', destination: '/', permanent: true },
+      { source: '/blogs/madhuban-eco-retreat-complete-guide', destination: '/about-us', permanent: true },
+      { source: '/about/story', destination: '/about-us', permanent: true },
+      { source: '/about/eco-philosophy', destination: '/about-us', permanent: true },
+      { source: '/home', destination: '/', permanent: true },
+      { source: '/contact', destination: '/contact-us', permanent: true },
+      { source: '/contact/', destination: '/contact-us', permanent: true },
     ];
   },
 };

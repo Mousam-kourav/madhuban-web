@@ -43,3 +43,6 @@ next-env.d.ts
 .env.production
 .claude/
 .dev-log.txt
+
+# audit working data (GSC CSV exports — re-export as needed)
+/audit-inputs/

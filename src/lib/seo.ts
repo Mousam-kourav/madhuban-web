@@ -6,7 +6,11 @@ const SITE_NAME = 'Madhuban Eco Retreat';
 const DEFAULT_OG_IMAGE = `${R2_BASE}/branding/logo/madhuban-logo-full-md.webp`;
 
 interface BuildMetadataInput {
-  /** Page-specific title. Brand suffix is appended automatically. Keep ≤38 chars so full title stays ≤60. */
+  /**
+   * Page-specific title. Pass clean (no brand suffix) — the root layout's title
+   * template appends " — Madhuban Eco Retreat" once. Keep ≤38 chars so the full
+   * rendered title stays ≤60.
+   */
   title: string;
   description: string;
   /** URL path, e.g. '/stay/safari-tent'. Used to build canonical URL and OG url. */
@@ -16,8 +20,9 @@ interface BuildMetadataInput {
   /** When true, emits robots: noindex, nofollow. Use for admin, booking/payment, staging. */
   noIndex?: boolean;
   /**
-   * When set, used as the full <title> verbatim — no brand suffix appended.
-   * Use only for pages whose exact title is already indexed (e.g. homepage).
+   * When set, used as the full <title> verbatim — root layout's template is
+   * bypassed via Next.js's `{ absolute }` form. Use for pages whose exact title
+   * is already indexed (e.g. homepage) or that need a custom brand placement.
    */
   titleOverride?: string;
   /** Optional keywords for the page. Passed through to Next.js metadata. */
@@ -49,11 +54,10 @@ export function buildMetadata({
 }: BuildMetadataInput): Metadata {
   const canonical = `${BASE_URL}${path}`;
   const image = ogImage ?? DEFAULT_OG_IMAGE;
-  const fullTitle = titleOverride ?? `${title} — ${SITE_NAME}`;
 
   return {
     metadataBase: new URL(BASE_URL),
-    title: fullTitle,
+    title: titleOverride ? { absolute: titleOverride } : title,
     description,
     ...(keywords?.length && { keywords }),
     alternates: {

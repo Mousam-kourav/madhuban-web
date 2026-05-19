@@ -36,9 +36,9 @@ const SOCIAL_LINKS = [
 
 function FooterHeading({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="text-sm font-semibold uppercase tracking-widest text-earth-brown mb-4">
+    <h2 className="text-sm font-semibold uppercase tracking-widest text-earth-brown mb-4">
       {children}
-    </h3>
+    </h2>
   );
 }
 

@@ -44,7 +44,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: post.meta_description ?? post.excerpt ?? post.title,
     path: `/blogs/${post.slug}`,
     ogImage: post.cover_image_url ?? undefined,
-    titleOverride: post.seo_title ?? undefined,
   });
 }
 

@@ -255,9 +255,9 @@ export default function AranyashalaPage() {
                 key={pillar.title}
                 className="rounded-2xl border border-border bg-white p-6 text-center shadow-sm"
               >
-                <h3 className="font-display text-xl font-medium text-charcoal">
+                <h2 className="font-display text-xl font-medium text-charcoal">
                   {pillar.title}
-                </h3>
+                </h2>
                 <p className="mt-2 font-body text-sm leading-relaxed text-charcoal/70">
                   {pillar.description}
                 </p>

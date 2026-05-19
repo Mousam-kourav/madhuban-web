@@ -67,7 +67,7 @@ export default function RootLayout({
       <head>
         <link
           rel="preconnect"
-          href="https://pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev"
+          href="https://pub-988c0a6b938742458b908a7a49295f61.r2.dev"
           crossOrigin="anonymous"
         />
         <link rel="preconnect" href="https://checkout.razorpay.com" />

@@ -90,6 +90,20 @@ const nextConfig: NextConfig = {
       { source: '/icon-boxes', destination: '/', permanent: true },
       { source: '/quisque-velit-nisi', destination: '/', permanent: true },
       { source: '/hotel-includes/wi-fi', destination: '/', permanent: true },
+
+      // ── Phase 12.B.2 — legacy URL coverage (audit SEO-T1-003, SEO-T1-004) ──
+      // 6 OLD URLs indexed by Google but with no NEW route or redirect coverage.
+      // Estimated ~3,478 quarterly impressions preserved. Trailing-slash variants
+      // are intentionally omitted — Next.js auto-strips trailing slashes before
+      // custom redirects fire, so /contact/ and /hotels/madhuban-eco-retreat/
+      // still reach destinations via the non-trailing rules below (2-hop, same
+      // as existing /rooms/ behavior).
+      { source: '/hotels/madhuban-eco-retreat', destination: '/', permanent: true },
+      { source: '/blogs/madhuban-eco-retreat-complete-guide', destination: '/about-us', permanent: true },
+      { source: '/about/story', destination: '/about-us', permanent: true },
+      { source: '/about/eco-philosophy', destination: '/about-us', permanent: true },
+      { source: '/home', destination: '/', permanent: true },
+      { source: '/contact', destination: '/contact-us', permanent: true },
     ];
   },
 };

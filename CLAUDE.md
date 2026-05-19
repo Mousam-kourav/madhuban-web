@@ -1157,7 +1157,7 @@ PR #18 was merged on GitHub with only the first commit. The fix commit (hero ima
 
 - No admin CMS for experiences — content changes require editing `experiences.ts` directly.
 - Gallery shows 1 image per experience until dedicated photos are uploaded to R2 (`/experiences/{slug}/gallery-{n}-{800,1280}.{webp,jpg}`). Source images on old R2 bucket at `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/`.
-- **⚠️ BLOCKING for launch — Experience banner image:** Index page hero (`experiences/banner/hero-{800,1280}.{webp,jpg}`) not yet uploaded to new R2. Phase 9b applied a temporary fallback using the forest-walks card image. Must upload the proper banner before launch. Source: `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/banner/`. Target: `pub-988c0a6b938742458b908a7a49295f61.r2.dev/experiences/banner/hero-{800,1280}.{webp,jpg}`.
+- **Phase 12.F.1 polish (not launch-blocking) — Experience banner image:** Index page hero uses a temporary fallback (the forest-walks card image, landscape-friendly) which is acceptable for launch. A dedicated banner at `experiences/banner/hero-{800,1280}.{webp,jpg}` would be ideal but is gated on Mousam providing the asset — the OLD R2 source path `pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/banner/` no longer resolves (404 on all variants, verified Phase 12.B.3). When the asset is available, upload to `pub-988c0a6b938742458b908a7a49295f61.r2.dev/experiences/banner/hero-{800,1280}.{webp,jpg}` and update `src/app/(marketing)/experiences/page.tsx:69-72`.
 
 *Last updated: 2026-04-29 — Version 1.5 — Phase 8 complete; §27 added (experiences pages)*
 

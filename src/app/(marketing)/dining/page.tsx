@@ -114,7 +114,7 @@ export default function DiningPage() {
           <p className="mb-3 font-body text-xs font-semibold uppercase tracking-[0.2em] text-ivory/80">
             {DINING.hero.eyebrow}
           </p>
-          <h1 className="font-display text-5xl font-light text-ivory md:text-6xl lg:text-7xl">
+          <h1 className="font-display text-4xl font-light text-ivory md:text-6xl lg:text-7xl break-words">
             {DINING.hero.title}
           </h1>
           <p className="mx-auto mt-4 max-w-xl font-body text-base text-ivory/90 md:text-lg">

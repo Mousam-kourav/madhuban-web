@@ -99,7 +99,7 @@ export default async function AttractionDetailPage({
             <p className="text-xs uppercase tracking-[0.2em] font-body font-medium text-gold-accent mb-3">
               {attraction.tags.join(' · ')}
             </p>
-            <h1 className="text-5xl md:text-7xl font-display font-light text-cream leading-tight mb-4">
+            <h1 className="text-4xl md:text-7xl font-display font-light text-cream leading-tight mb-4 break-words">
               {attraction.name}
             </h1>
             <p className="max-w-2xl text-lg md:text-xl font-body text-cream/90">

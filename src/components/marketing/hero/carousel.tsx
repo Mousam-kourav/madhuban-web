@@ -122,7 +122,7 @@ export function HeroCarousel() {
       {/* Text overlay — bottom-center mobile, bottom-left desktop */}
       <div className="absolute inset-0 z-30 flex items-end pb-16 md:pb-20 px-4 md:px-6 lg:px-8">
         <div className="w-full text-center md:text-left md:max-w-[720px]">
-          <h1 className="font-display text-5xl md:text-7xl font-medium text-ivory leading-tight mb-4">
+          <h1 className="font-display text-4xl md:text-7xl font-medium text-ivory leading-tight mb-4 break-words">
             Connect With{' '}
             <br className="hidden lg:block" aria-hidden="true" />
             Wildlife &amp; Nature

@@ -32,7 +32,7 @@ export default function NearbyAttractionsPage() {
       <Seo schemas={[attractionItemList(ATTRACTIONS, heroImage)]} />
 
       {/* ── Hero (typography only) ───────────────────────────────────────── */}
-      <section aria-labelledby="hero-heading" className="bg-cream py-32 md:py-40 text-center px-4">
+      <section aria-labelledby="hero-heading" className="bg-cream py-20 md:py-28 text-center px-4">
         <p className="text-xs uppercase tracking-[0.2em] font-body font-medium text-gold-accent mb-6">
           Beyond Madhuban
         </p>
@@ -46,7 +46,7 @@ export default function NearbyAttractionsPage() {
 
         <h1
           id="hero-heading"
-          className="text-5xl md:text-7xl font-display font-light text-charcoal mb-6 leading-tight"
+          className="text-4xl md:text-7xl font-display font-light text-charcoal mb-6 leading-tight break-words"
         >
           Where the Forest Opens into History
         </h1>

@@ -56,7 +56,7 @@ export default async function BlogsPage() {
           <p className="font-display text-2xl text-[var(--color-gold-accent)] mb-3">
             Journal of the Earth
           </p>
-          <h1 className="font-display text-5xl md:text-6xl text-[var(--color-ivory)] leading-tight max-w-3xl">
+          <h1 className="font-display text-4xl md:text-6xl text-[var(--color-ivory)] leading-tight max-w-3xl break-words">
             Stories From Nature,
             <br />
             Wellness &amp; Wilderness

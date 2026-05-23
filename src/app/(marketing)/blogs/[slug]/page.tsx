@@ -94,7 +94,7 @@ export default async function BlogDetailPage({ params }: Props) {
             {post.category && post.published_at ? " · " : ""}
             {formatDate(post.published_at)}
           </p>
-          <h1 className="font-display text-5xl md:text-6xl text-[var(--color-ivory)] leading-tight mb-6">
+          <h1 className="font-display text-4xl md:text-6xl text-[var(--color-ivory)] leading-tight mb-6 break-words">
             {post.title}
           </h1>
           {post.author_name && (

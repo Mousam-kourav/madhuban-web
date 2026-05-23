@@ -1,10 +1,9 @@
-// TODO: Editorial pass post-launch. Live content has keyword-stuffed phrasing
-// preserved per CLAUDE.md §10.3 client decision. Do not rewrite during code rebuild.
+// Brand register decision (Soulful Premium Hybrid) and Direction Document v1.1 lift the original §10.3 constraint for editorial rewrites. Future copy changes proceed through architect-approved kickoffs.
 
 export const HERO_COPY = {
   h1: 'Connect With Wildlife & Nature',
   subhead:
-    'Experience eco-luxury living amid the serene wilderness of Ratapani Tiger Reserve at Madhuban Eco Retreat — a peaceful forest stay offering sustainable comfort and mindful escapes.',
+    'Twenty acres of teak forest at the edge of Ratapani Tiger Reserve, two hours from Bhopal.',
   ctaPrimary: { label: 'Book Your Stay', href: '/booking' },
   ctaSecondary: { label: 'Explore Experiences', href: '/experiences' },
 } as const;

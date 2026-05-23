@@ -65,7 +65,7 @@ export function Header() {
               <span className="text-base md:text-lg font-bold text-charcoal tracking-tight">
                 Madhuban Eco Retreat
               </span>
-              <span className="text-[10px] md:text-xs font-normal text-earth-brown/70 tracking-wide">
+              <span className="hidden md:block text-[10px] md:text-xs font-normal text-earth-brown/70 tracking-wide">
                 Ratapani Tiger Reserve, Bhopal, Madhya Pradesh, India
               </span>
             </div>

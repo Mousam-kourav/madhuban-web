@@ -188,9 +188,9 @@ export function ReviewClient({ slug }: ReviewClientProps) {
           Cancellation Policy
         </h2>
         <ul className="space-y-1.5 font-body text-xs text-charcoal/70">
-          <li>7 or more days before check-in: 90% refund</li>
+          <li>7 or more days before check-in: 100% refund (free cancellation)</li>
           <li>3 to 7 days before check-in: 50% refund</li>
-          <li>Less than 3 days: no refund</li>
+          <li>Less than 3 days or no-show: no refund</li>
         </ul>
       </section>
 

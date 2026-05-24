@@ -44,9 +44,9 @@ export const BUSINESS = {
     'https://www.quora.com/profile/Madhuban-Eco-Retreat',
   ],
 
-  /** Cancellation policy — mirrors lib/bookings/refund.ts thresholds. Keep in sync. */
+  /** Cancellation policy — surfaced in UI copy, terms, review step, and FAQ schema. */
   cancellationPolicy: {
-    sevenPlusDays: '90% refund',
+    sevenPlusDays: '100% refund (free cancellation)',
     threeToSevenDays: '50% refund',
     lessThanThreeDays: 'No refund',
     noShow: 'No refund',

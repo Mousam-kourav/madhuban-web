@@ -2,8 +2,16 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Check } from "lucide-react";
 import type { PricingBreakdown, GuestDetails } from "@/lib/booking/types";
 import { formatPrice } from "@/lib/utils";
+
+const TRUST_BADGES = [
+  "Best rate, guaranteed",
+  "No booking fees, ever",
+  "Free cancellation up to 7 days before arrival",
+  "Instant confirmation by email",
+] as const;
 
 interface CheckoutFormProps {
   slug: string;
@@ -328,6 +336,30 @@ export function CheckoutForm({
               </button>
             </div>
           </div>
+
+          {/* Why book direct? — trust block above Continue (BOOKING audit) */}
+          <aside
+            aria-label="Why book direct"
+            className="rounded-xl border border-earth-brown/10 bg-warm-beige p-5"
+          >
+            <p className="font-body text-xs font-semibold uppercase tracking-widest text-earth-brown/80">
+              Why book direct?
+            </p>
+            <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 lg:grid-cols-4">
+              {TRUST_BADGES.map((badge) => (
+                <li
+                  key={badge}
+                  className="flex items-start gap-2 font-body text-sm font-medium text-earth-brown"
+                >
+                  <Check
+                    className="mt-0.5 h-4 w-4 shrink-0 text-earth-brown"
+                    aria-hidden="true"
+                  />
+                  <span>{badge}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
         </div>
 
         {/* ── Right column: price summary ───────────────────────────── */}

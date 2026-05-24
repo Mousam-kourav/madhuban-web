@@ -46,7 +46,7 @@ export function MobileStickyBar({ pricePerNight, slug }: MobileStickyBarProps) {
       <Link
         href={`/book/${slug}`}
         tabIndex={visible ? 0 : -1}
-        className="inline-flex h-10 items-center justify-center rounded-lg bg-ivory px-5 font-body text-sm font-medium text-earth-brown transition-colors duration-200 hover:bg-ivory/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ivory focus-visible:ring-offset-2"
+        className="inline-flex h-12 items-center justify-center rounded-lg bg-ivory px-5 font-body text-sm font-medium text-earth-brown transition-colors duration-200 hover:bg-ivory/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ivory focus-visible:ring-offset-2"
       >
         Book Now
       </Link>

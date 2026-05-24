@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import type { PricingBreakdown, GuestDetails } from "@/lib/booking/types";
 import { formatPrice } from "@/lib/utils";
 
@@ -76,6 +76,9 @@ export function CheckoutForm({
   // Form errors
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({});
   const [submitting, setSubmitting] = useState(false);
+
+  // Mobile sticky-bar expanded breakdown panel (only used on <lg viewports)
+  const [mobilePriceExpanded, setMobilePriceExpanded] = useState(false);
 
   const fetchPrice = useCallback(async () => {
     if (!checkIn || !checkOut || checkOut <= checkIn) return;
@@ -155,7 +158,7 @@ export function CheckoutForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+      <div className="grid grid-cols-1 gap-8 pb-36 lg:grid-cols-[1fr_360px] lg:pb-0">
         {/* ── Left column: details form ─────────────────────────────── */}
         <div className="space-y-6">
           {/* Stay dates */}
@@ -362,8 +365,8 @@ export function CheckoutForm({
           </aside>
         </div>
 
-        {/* ── Right column: price summary ───────────────────────────── */}
-        <div className="space-y-4">
+        {/* ── Right column: price summary (desktop only) ────────────── */}
+        <div className="hidden space-y-4 lg:block">
           <div className="sticky top-24 rounded-xl border border-border bg-card p-6 shadow-sm">
             <h2 className="font-display text-xl font-medium text-charcoal">
               Price Summary
@@ -449,6 +452,80 @@ export function CheckoutForm({
               No payment charged yet. Review on the next step.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* ── Mobile sticky bottom bar: Continue + collapsible price ─── */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-ivory shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.18)] lg:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        {/* Expanded breakdown panel (above the compact row) */}
+        {mobilePriceExpanded && pricing && (
+          <div
+            id="mobile-price-breakdown"
+            className="border-b border-border bg-warm-beige/40 px-4 py-3"
+          >
+            <div className="space-y-2 font-body text-sm">
+              <div className="flex justify-between text-charcoal/70">
+                <span>
+                  &#8377;{formatPrice(pricing.pricePerNight)} × {pricing.nights}{" "}
+                  night{pricing.nights > 1 ? "s" : ""}
+                </span>
+                <span>&#8377;{formatPrice(pricing.baseNightlyTotal)}</span>
+              </div>
+              {pricing.discountAmount > 0 && (
+                <div className="flex justify-between text-moss-green">
+                  <span>Coupon ({pricing.couponCode})</span>
+                  <span>−&#8377;{formatPrice(pricing.discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-charcoal/70">
+                <span>GST ({pricing.gstRate}%)</span>
+                <span>&#8377;{formatPrice(pricing.gstAmount)}</span>
+              </div>
+              <p className="pt-1 text-xs text-charcoal/60">
+                Full payment now. No balance at check-in.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Compact row: Continue on top, tappable total below */}
+        <div className="space-y-2 px-4 py-3">
+          <button
+            type="submit"
+            disabled={submitting || loadingPrice || !pricing}
+            className="inline-flex h-12 w-full items-center justify-center rounded-lg bg-earth-brown font-body text-sm font-medium text-ivory transition-colors duration-200 hover:bg-earth-brown/90 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
+          >
+            {submitting ? "Please wait…" : "Continue to Review"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMobilePriceExpanded((v) => !v)}
+            aria-expanded={mobilePriceExpanded}
+            aria-controls="mobile-price-breakdown"
+            disabled={!pricing}
+            className="flex w-full items-center justify-between rounded-lg px-1 py-1 font-body text-sm text-charcoal disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown"
+          >
+            <span className="flex items-center gap-1.5 text-charcoal/70">
+              Total
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  mobilePriceExpanded ? "rotate-180" : ""
+                }`}
+                aria-hidden="true"
+              />
+            </span>
+            <span className="font-semibold text-charcoal">
+              {loadingPrice
+                ? "Calculating…"
+                : pricing
+                ? `₹${formatPrice(pricing.totalAmount)}`
+                : "—"}
+            </span>
+          </button>
         </div>
       </div>
     </form>

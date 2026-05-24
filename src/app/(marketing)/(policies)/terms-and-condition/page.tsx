@@ -85,14 +85,23 @@ export default function TermsAndConditionPage() {
               <ul>
                 <li>Written notice is required to cancel bookings.</li>
                 <li>
-                  Refunds, if eligible, will be processed through the original payment method as
-                  per policy timelines.
+                  Refunds, when eligible, are processed to the original payment method within
+                  5&ndash;7 business days of cancellation.
                 </li>
               </ul>
-              <p>
-                For detailed cancellation terms including the refund percentage applicable by days
-                before check-in, please contact us directly or refer to your booking confirmation.
-              </p>
+              <p>Refund schedule by notice period:</p>
+              <ul>
+                <li>
+                  <strong>7 or more days before check-in:</strong> Full refund (100%, free
+                  cancellation)
+                </li>
+                <li>
+                  <strong>3 to 7 days before check-in:</strong> 50% refund
+                </li>
+                <li>
+                  <strong>Less than 3 days before check-in or no-show:</strong> No refund
+                </li>
+              </ul>
             </PolicySection>
 
             <PolicySection title="4. Guest Conduct &amp; Safety">

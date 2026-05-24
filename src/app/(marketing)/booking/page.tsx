@@ -98,7 +98,7 @@ const FAQS = [
   {
     question: "What's the cancellation policy?",
     answer:
-      'Cancellations 7 or more days before check-in receive a 90% refund. 3–7 days before: 50% refund. Less than 3 days or no-show: no refund. Full details at madhubanecoretreat.com/terms-and-condition.',
+      'Free cancellation up to 7 days before arrival — you receive a 100% refund. 3–7 days before check-in: 50% refund. Less than 3 days or no-show: no refund. Full details at madhubanecoretreat.com/terms-and-condition.',
   },
   {
     question: 'Are there safari options near Madhuban Eco Retreat?',

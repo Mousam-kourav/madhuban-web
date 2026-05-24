@@ -78,7 +78,7 @@ export function Header() {
           <div className="flex items-center gap-2 shrink-0">
             {/* Book Now — desktop */}
             <Button
-              render={<Link href="/booking" />}
+              render={<Link href="/stay" />}
               size="default"
               className="hidden lg:inline-flex"
             >
@@ -87,7 +87,7 @@ export function Header() {
 
             {/* Book — mobile compact */}
             <Button
-              render={<Link href="/booking" />}
+              render={<Link href="/stay" />}
               size="sm"
               className="lg:hidden"
             >

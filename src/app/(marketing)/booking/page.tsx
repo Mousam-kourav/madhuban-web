@@ -1,99 +1,100 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { TreePine, Compass, UtensilsCrossed, Phone, ChevronDown } from 'lucide-react';
+import { Check, Search, CalendarCheck, CreditCard, MailCheck, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 import { buildMetadata } from '@/lib/seo';
 import { Seo } from '@/components/ui/seo';
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
-import { Heading } from '@/components/ui/heading';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
-import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/card';
+import { IconWhatsApp } from '@/components/ui/social-icons';
 import { lodgingBusiness } from '@/lib/schema/lodging-business';
 import { faqPage } from '@/lib/schema/faq-page';
 import { breadcrumbList } from '@/lib/schema/breadcrumb-list';
-import { getRooms } from '@/lib/rooms/queries';
-import { dbRoomToRoom } from '@/lib/rooms/mapper';
-import type { Room } from '@/lib/content/rooms';
-import { formatPrice } from '@/lib/utils';
-import { WhatsAppLeadForm } from '@/components/booking/whatsapp-lead-form';
-
-// SEO — exact title + description preserved from old site (page ranks in Google)
-export const metadata: Metadata = buildMetadata({
-  title: 'Book',
-  titleOverride: 'Book Madhuban Eco Retreat | Hotel Near Ratapani Jungle',
-  description:
-    'Book Madhuban Eco Retreat near Ratapani Wildlife Sanctuary. Check resort price, availability & secure your eco-friendly jungle stay today!',
-  path: '/booking',
-  ogImage: `${process.env.NEXT_PUBLIC_R2_BASE ?? ''}/home/hero/hero-aerial-sunset-1280.webp`,
-  keywords: [
-    'Book resort near ratapani jungle',
-    'Ratapani resort price',
-    'Madhuban Eco Retreat price',
-    'Ratapani resort booking',
-    'Book hotel near ratapani jungle lodge',
-    'Hotels near Ratapani Wildlife Sanctuary',
-    'Book hotel near ratapani for family',
-    'Hotel in Ratapani online booking',
-  ],
-});
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
-// R2 path reuses existing hero image — no new upload needed
+const PHONE_DISPLAY = '+91 9770558419';
+const PHONE_TEL = '+919770558419';
+const WHATSAPP_URL = `https://wa.me/919770558419?text=${encodeURIComponent(
+  "Hi, I have a question about booking at Madhuban Eco Retreat.",
+)}`;
+
+export const metadata: Metadata = buildMetadata({
+  title: 'Book',
+  titleOverride: 'Book Madhuban Eco Retreat — Direct Booking, Best Rate',
+  description:
+    'Reserve your stay at Madhuban Eco Retreat in Ratapani. Direct online booking, best rate guaranteed, no booking fees. Two hours from Bhopal.',
+  path: '/booking',
+  ogImage: `${R2_BASE}/home/hero/hero-aerial-sunset-1280.webp`,
+  keywords: [
+    'book resort near ratapani jungle',
+    'ratapani resort price',
+    'madhuban eco retreat price',
+    'ratapani resort booking',
+    'book hotel near ratapani jungle lodge',
+    'hotels near ratapani wildlife sanctuary',
+    'book hotel near ratapani for family',
+    'hotel in ratapani online booking',
+  ],
+});
+
 const HERO_IMAGE = {
   src: `${R2_BASE}/home/hero/hero-aerial-sunset-1280.webp`,
   alt: 'Aerial view of Madhuban Eco Retreat at sunset, with forested hills of Ratapani Tiger Reserve in the distance',
 };
 
-// Old-site SEO subtitle for each room slug — preserved verbatim
-const ROOM_SEO_SUBTITLES: Record<string, string> = {
-  'safari-tent': 'Ratapani Resort Safari Stay',
-  'mud-house-1': 'Traditional Jungle Resort Mud House',
-  'mud-house-2': 'Traditional Jungle Resort Mud House',
-  'pool-side-villa': 'Resort with Swimming Pool Villa',
-  'glamping-tents': 'Luxury Jungle Camp Glamping',
-  'camping-tent': 'Nature Forest Resort Camping',
-};
+const TRUST_BADGES = [
+  'Best rate guaranteed',
+  'No booking fees',
+  'Free cancellation 7+ days',
+] as const;
 
-const HIGHLIGHTS = [
+const STEPS = [
   {
-    icon: TreePine,
-    title: 'Teak Forest Views',
-    body: 'Wake up to the sounds of the jungle in our premium cottages nestled within ancient teak trees.',
+    icon: Search,
+    title: 'Browse',
+    body: 'Choose from six accommodations on the Stay page — safari tents, mud houses, glamping, and a poolside villa.',
   },
   {
-    icon: Compass,
-    title: 'Wildlife Safaris',
-    body: 'Guided excursions into the Ratapani Tiger Reserve led by expert naturalists and forest guards.',
+    icon: CalendarCheck,
+    title: 'Select dates',
+    body: 'Check availability for your travel window and pick the room that fits your group.',
   },
   {
-    icon: UtensilsCrossed,
-    title: 'Farm-to-Table',
-    body: 'Authentic local flavors prepared with organic ingredients sourced from nearby tribal villages.',
+    icon: CreditCard,
+    title: 'Pay securely',
+    body: 'Razorpay-powered checkout — UPI, cards, and net banking. Your card details stay with Razorpay.',
+  },
+  {
+    icon: MailCheck,
+    title: 'Confirmed',
+    body: 'Instant confirmation by email with your booking reference and check-in details.',
   },
 ] as const;
 
+// FAQ for FAQPage schema only — not rendered in the UI. Preserves
+// rich-snippet eligibility for long-tail Ratapani/Bhopal queries.
 const FAQS = [
   {
     question: "What's the price of a stay at Madhuban Eco Retreat?",
     answer:
-      'Room rates start from ₹2,500/night (Camping Tent) up to ₹12,000/night (Safari Tent or Pool Side Villa), all inclusive of GST. Prices vary by room type and season. Use the WhatsApp enquiry form on this page to receive a personalised quote.',
+      'Room rates start from ₹2,500/night (Camping Tent) up to ₹12,000/night (Safari Tent or Pool Side Villa), all inclusive of GST. Prices vary by room type and season. Browse rooms and live availability at madhubanecoretreat.com/stay.',
   },
   {
     question: 'How do I book a hotel near Ratapani Wildlife Sanctuary?',
     answer:
-      "You can book online at madhubanecoretreat.com — browse accommodations at /stay, pick your room, and use the booking widget. For faster service, WhatsApp us on +91 9770558419 and we'll confirm your dates directly.",
+      "Book directly online at madhubanecoretreat.com — browse accommodations at /stay, pick your room and dates, and pay securely via Razorpay. You receive instant confirmation by email. For questions, WhatsApp +91 9770558419.",
   },
   {
     question: 'Is Madhuban Eco Retreat suitable for family bookings?',
     answer:
-      'Absolutely. All rooms welcome families. The Pool Side Villa comfortably fits 2 adults + 2 children. Guided forest walks and recreational activities are designed for all age groups — children, seniors, and beginners alike.',
+      'Yes. All rooms welcome families. The Pool Side Villa comfortably fits 2 adults + 2 children. Guided forest walks and recreational activities are designed for all ages — children, seniors, and beginners alike.',
   },
   {
     question: 'How far is Madhuban from Bhopal?',
     answer:
-      'Madhuban Eco Retreat is approximately 60 km from Bhopal city, near Rehti, Sehore district. The drive takes roughly 1.5 to 2 hours depending on route and traffic.',
+      'Madhuban Eco Retreat is approximately 60 km from Bhopal city, near Rehti, Sehore district. The drive takes 1.5 to 2 hours depending on route and traffic.',
   },
   {
     question: "What's the cancellation policy?",
@@ -119,29 +120,21 @@ const breadcrumbSchema = breadcrumbList({
   ],
 });
 
-export default async function BookingPage() {
-  let rooms: Room[] = [];
-  try {
-    const dbRooms = await getRooms();
-    rooms = dbRooms.map((r) => dbRoomToRoom(r, []));
-  } catch {
-    rooms = [];
-  }
-
+export default function BookingPage() {
   return (
     <>
       <Seo
         schemas={[
           lodgingBusiness(),
-          faqPage({ items: FAQS.map((f) => ({ question: f.question, answer: f.answer })) }),
           breadcrumbSchema,
+          faqPage({ items: FAQS.map((f) => ({ question: f.question, answer: f.answer })) }),
         ]}
       />
 
       {/* ── 1. Hero ──────────────────────────────────────────────────────────── */}
       <section
-        aria-label="Book Madhuban Eco Retreat hero"
-        className="relative h-[75svh] min-h-[420px] overflow-hidden"
+        aria-label="Reserve your stay at Madhuban Eco Retreat"
+        className="relative h-[75svh] min-h-[480px] overflow-hidden"
       >
         <Image
           src={HERO_IMAGE.src}
@@ -157,16 +150,41 @@ export default async function BookingPage() {
           aria-hidden="true"
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          {/* Status banner eyebrow */}
           <span className="mb-4 inline-block rounded-full bg-earth-brown/80 px-4 py-1 font-body text-xs font-medium uppercase tracking-[0.2em] text-ivory">
-            Now Open for Bookings
+            Direct Booking
           </span>
-          <h1 className="font-display text-4xl font-medium text-ivory md:text-5xl lg:text-6xl">
-            Escape to Ratapani&apos;s<br className="hidden md:block" /> Premier Eco-Luxury Retreat
+          <h1 className="max-w-3xl font-display text-4xl font-medium text-ivory md:text-5xl lg:text-6xl">
+            Reserve your stay
           </h1>
           <p className="mt-5 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
-            Experience nature like never before. Immerse yourself in the heart of the Tiger Reserve,
-            just 1 hour from the bustle of Bhopal.
+            Direct bookings. Best rate guaranteed. Free cancellation up to 7 days before arrival.
+          </p>
+
+          {/* Trust strip */}
+          <ul
+            role="list"
+            aria-label="Booking guarantees"
+            className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-2"
+          >
+            {TRUST_BADGES.map((label) => (
+              <li
+                key={label}
+                className="inline-flex items-center gap-1.5 rounded-full bg-ivory/10 px-3 py-1 font-body text-xs font-medium text-ivory backdrop-blur-sm ring-1 ring-ivory/30"
+              >
+                <Check className="h-3.5 w-3.5" aria-hidden="true" strokeWidth={2.5} />
+                {label}
+              </li>
+            ))}
+          </ul>
+
+          <Link
+            href="/stay"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-md bg-earth-brown px-8 font-body text-sm font-medium text-ivory transition hover:bg-earth-brown/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          >
+            Browse rooms and book online
+          </Link>
+          <p className="mt-3 font-body text-xs text-ivory/70">
+            Direct online booking saves time and prevents back-and-forth.
           </p>
         </div>
       </section>
@@ -178,284 +196,152 @@ export default async function BookingPage() {
         </Container>
       </div>
 
-      {/* ── 2. WhatsApp Lead Form ────────────────────────────────────────────── */}
-      <Section className="bg-cream" label="Book your stay">
+      {/* ── 2. What to expect ────────────────────────────────────────────────── */}
+      <Section className="bg-cream" label="What to expect when you book">
         <Container>
-          <div className="mx-auto max-w-lg">
-            <div className="text-center mb-8">
-              <Heading
-                as="h2"
-                text="Plan Your Nature Getaway"
-                subheading="Fill in the details below to receive a personalized quote."
-              />
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-display text-3xl font-medium leading-tight text-charcoal md:text-4xl">
+              What to expect
+            </h2>
+            <div className="my-5 flex items-center justify-center gap-3" aria-hidden="true">
+              <span className="block h-px w-8 bg-earth-brown" />
+              <span className="block size-1.5 rotate-45 bg-earth-brown" />
+              <span className="block h-px w-8 bg-earth-brown" />
             </div>
-            <div className="rounded-2xl border border-border bg-white p-6 shadow-sm md:p-8">
-              <WhatsAppLeadForm />
-            </div>
-            <p className="mt-4 text-center font-body text-xs text-charcoal/50">
-              Prefer a form?{' '}
-              <Link href="/enquire" className="text-earth-brown underline underline-offset-2 hover:no-underline">
-                Use our booking enquiry form
-              </Link>
-              .
+            <p className="font-body text-base leading-relaxed text-charcoal/70">
+              Four simple steps from browsing to confirmation. Most guests complete a booking in
+              under three minutes.
             </p>
+          </div>
+
+          <ol
+            role="list"
+            className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {STEPS.map(({ icon: Icon, title, body }, i) => (
+              <li
+                key={title}
+                className="relative rounded-2xl border border-border bg-white p-6 shadow-sm"
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-earth-brown/10"
+                  >
+                    <Icon className="h-5 w-5 text-earth-brown" strokeWidth={1.75} />
+                  </span>
+                  <p className="font-body text-xs font-semibold uppercase tracking-[0.15em] text-earth-brown/70">
+                    Step {i + 1}
+                  </p>
+                </div>
+                <h3 className="mb-2 font-display text-xl font-medium text-charcoal">{title}</h3>
+                <p className="font-body text-sm leading-relaxed text-charcoal/70">{body}</p>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/stay"
+              className="inline-flex h-12 items-center justify-center rounded-md bg-earth-brown px-8 font-body text-sm font-medium text-ivory transition hover:bg-earth-brown/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
+            >
+              Browse rooms and book online
+            </Link>
           </div>
         </Container>
       </Section>
 
-      {/* ── 3. Reconnect with Wilderness ─────────────────────────────────────── */}
-      <Section className="bg-warm-beige/20" label="Reconnect with wilderness">
+      {/* ── 3. Need to talk to us first? ─────────────────────────────────────── */}
+      <Section className="bg-warm-beige/30" label="Contact options before booking">
         <Container>
-          <Heading
-            as="h2"
-            text="Reconnect with Wilderness"
-            className="mb-12"
-          />
-          <ul
-            role="list"
-            className="grid grid-cols-1 gap-6 md:grid-cols-3"
-          >
-            {HIGHLIGHTS.map(({ icon: Icon, title, body }) => (
-              <li key={title}>
-                <article className="flex h-full flex-col items-center rounded-[16px] border border-border bg-white p-8 text-center shadow-sm">
-                  <span className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-earth-brown/10">
-                    <Icon className="h-6 w-6 text-earth-brown" aria-hidden="true" />
-                  </span>
-                  <h3 className="mb-3 font-display text-xl font-medium text-charcoal">{title}</h3>
-                  <p className="font-body text-sm leading-relaxed text-charcoal/70">{body}</p>
-                </article>
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </Section>
-
-      {/* ── 4. Luxury Stays — Room Grid ──────────────────────────────────────── */}
-      <Section className="bg-white" label="Luxury stays at Madhuban">
-        <Container>
-          <Heading
-            as="h2"
-            text="Luxury Stays"
-            subheading="Experience the Eco-friendly Accommodations at Madhuban Eco Retreat"
-            className="mb-12"
-          />
-
-          {rooms.length > 0 ? (
-            <ul
-              role="list"
-              className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
-            >
-              {rooms.map((room, index) => (
-                <li key={room.slug}>
-                  <article
-                    aria-labelledby={`bk-room-${room.slug}`}
-                    className="h-full"
-                  >
-                    <Card className="h-full overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-md">
-                      <div className="relative aspect-[3/2] overflow-hidden bg-warm-beige/20">
-                        <Image
-                          src={room.image.webp.desktop}
-                          alt={room.image.alt}
-                          fill
-                          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                          className="object-cover transition-transform duration-300"
-                          {...(index === 0
-                            ? { loading: 'eager' as const, priority: true }
-                            : { loading: 'lazy' as const })}
-                        />
-                      </div>
-
-                      <CardHeader>
-                        {/* SEO subtitle preserved from old site */}
-                        <p className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground">
-                          {ROOM_SEO_SUBTITLES[room.slug] ?? room.genre}
-                        </p>
-                        <h3
-                          id={`bk-room-${room.slug}`}
-                          className="font-display text-xl font-medium leading-snug text-charcoal"
-                        >
-                          {room.name}
-                        </h3>
-                        <p className="font-body text-sm font-medium text-earth-brown">
-                          From &#8377;{formatPrice(room.pricePerNight)}/night
-                        </p>
-                      </CardHeader>
-
-                      <CardContent>
-                        <p className="font-body text-sm leading-relaxed text-charcoal/70">
-                          {room.tagline}
-                        </p>
-                      </CardContent>
-
-                      <CardFooter>
-                        <Link
-                          href={room.href}
-                          className="font-body text-sm font-medium text-earth-brown underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-1"
-                        >
-                          View Details →
-                        </Link>
-                      </CardFooter>
-                    </Card>
-                  </article>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="py-12 text-center">
-              <p className="font-body text-base text-charcoal/60">
-                View all accommodations at{' '}
-                <Link href="/stay" className="text-earth-brown underline underline-offset-2">
-                  our Stay page
-                </Link>
-                .
-              </p>
-            </div>
-          )}
-        </Container>
-      </Section>
-
-      {/* ── 5. Call Strip ────────────────────────────────────────────────────── */}
-      <section
-        className="bg-earth-brown py-14 text-center"
-        aria-label="Call for instant booking"
-      >
-        <Container>
-          <p className="mb-2 font-body text-xs uppercase tracking-[0.25em] text-ivory/60">
-            Available 9 AM – 6 PM daily
-          </p>
-          <h2 className="mb-3 font-display text-3xl font-medium text-ivory md:text-4xl">
-            Call for Instant Booking
-          </h2>
-          <p className="mb-6 font-display text-4xl font-medium text-ivory/90 md:text-5xl">
-            +91 9770558419
-          </p>
-          <a
-            href="tel:+919770558419"
-            className="inline-flex h-12 items-center justify-center rounded-xl border-2 border-ivory/60 px-10 font-body text-sm font-semibold uppercase tracking-wider text-ivory transition hover:bg-ivory hover:text-earth-brown focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ivory focus-visible:ring-offset-2 focus-visible:ring-offset-earth-brown"
-          >
-            <Phone className="mr-2 h-4 w-4" aria-hidden="true" />
-            Call Now
-          </a>
-        </Container>
-      </section>
-
-      {/* ── 6. Escape to the Wilds ───────────────────────────────────────────── */}
-      <Section className="bg-cream" label="Escape to the wilds">
-        <Container>
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-            <div>
-              <p className="mb-3 font-body text-xs uppercase tracking-[0.2em] text-earth-brown/70">
-                Just 1 hour from Bhopal
-              </p>
+          <div className="mx-auto max-w-3xl">
+            <div className="text-center">
               <h2 className="font-display text-3xl font-medium leading-tight text-charcoal md:text-4xl">
-                Escape to the Wilds
+                Need to talk to us first?
               </h2>
-              <div className="my-5 flex items-center gap-3" aria-hidden="true">
+              <div className="my-5 flex items-center justify-center gap-3" aria-hidden="true">
                 <span className="block h-px w-8 bg-earth-brown" />
                 <span className="block size-1.5 rotate-45 bg-earth-brown" />
                 <span className="block h-px w-8 bg-earth-brown" />
               </div>
-              <div className="space-y-4 font-body text-base leading-relaxed text-charcoal/80">
-                <p>
-                  Only 1 hour from Bhopal — Escape the city noise. Located in the heart of the
-                  Ratapani Tiger Reserve, Madhuban Eco Retreat offers a complete break from the
-                  digital world.
-                </p>
-                <p>
-                  60 km from Bhopal along scenic forest roads, the retreat sits on 20 acres of
-                  regenerated land adjacent to one of Madhya Pradesh&apos;s most biodiverse wildlife
-                  corridors.
-                </p>
-                <ul className="space-y-2">
-                  {[
-                    '70+ bird species in the surrounding forest',
-                    'Organic kitchen garden & farm-to-table dining',
-                    'Guided safaris into Ratapani Tiger Reserve',
-                    'Zero plastic policy. Solar-assisted operations.',
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-3">
-                      <span className="mt-1.5 block size-1.5 shrink-0 rotate-45 bg-earth-brown" aria-hidden="true" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <p className="font-body text-base leading-relaxed text-charcoal/70">
+                Special requests, group bookings, or questions about the property — reach us the
+                way you prefer.
+              </p>
             </div>
 
-            <div className="relative aspect-[4/3] overflow-hidden rounded-[16px] shadow-md">
-              <Image
-                src={`${R2_BASE}/home/experiences/forest-walks-and-nature-trails-1280.webp`}
-                alt="Forest walking trail through teak woodland at Madhuban Eco Retreat, adjacent to Ratapani Tiger Reserve"
-                fill
-                loading="lazy"
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover"
-              />
-            </div>
-          </div>
-        </Container>
-      </Section>
-
-      {/* ── 7. FAQs ──────────────────────────────────────────────────────────── */}
-      <Section className="bg-warm-beige/20" label="Booking FAQs">
-        <Container>
-          <Heading
-            as="h2"
-            text="FAQs"
-            subheading="Questions for a Meaningful Journey"
-            className="mb-10"
-          />
-          <div className="mx-auto max-w-3xl divide-y divide-border overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-            {FAQS.map((faq, i) => (
-              <details key={faq.question} className="group" open={i === 0}>
-                <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 font-body text-base font-medium text-charcoal transition hover:bg-cream [&::-webkit-details-marker]:hidden">
-                  {faq.question}
-                  <ChevronDown
-                    className="h-4 w-4 flex-shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
-                    aria-hidden="true"
-                  />
-                </summary>
-                <div
-                  className="px-5 pb-4 font-body text-[15px] leading-relaxed text-charcoal/70"
-                  data-speakable="true"
+            <ul
+              role="list"
+              className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3"
+            >
+              <li>
+                <a
+                  href={`tel:${PHONE_TEL}`}
+                  className="flex h-full flex-col items-center rounded-xl border border-border bg-white p-6 text-center transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
                 >
-                  {faq.answer}
-                </div>
-              </details>
-            ))}
+                  <span
+                    aria-hidden="true"
+                    className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-earth-brown/10"
+                  >
+                    <Phone className="h-5 w-5 text-earth-brown" strokeWidth={1.75} />
+                  </span>
+                  <p className="mb-1 font-body text-xs font-semibold uppercase tracking-[0.15em] text-earth-brown/70">
+                    Call us
+                  </p>
+                  <p className="font-display text-lg font-medium text-charcoal">{PHONE_DISPLAY}</p>
+                  <p className="mt-1 font-body text-xs text-muted-foreground">
+                    9 AM – 6 PM daily
+                  </p>
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-full flex-col items-center rounded-xl border border-border bg-white p-6 text-center transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-earth-brown/10"
+                  >
+                    <IconWhatsApp className="h-5 w-5 text-earth-brown" />
+                  </span>
+                  <p className="mb-1 font-body text-xs font-semibold uppercase tracking-[0.15em] text-earth-brown/70">
+                    WhatsApp
+                  </p>
+                  <p className="font-display text-lg font-medium text-charcoal">Chat with us</p>
+                  <p className="mt-1 font-body text-xs text-muted-foreground">
+                    Quick replies during office hours
+                  </p>
+                </a>
+              </li>
+
+              <li>
+                <Link
+                  href="/contact-us"
+                  className="flex h-full flex-col items-center rounded-xl border border-border bg-white p-6 text-center transition hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-earth-brown focus-visible:ring-offset-2"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-earth-brown/10"
+                  >
+                    <MailCheck className="h-5 w-5 text-earth-brown" strokeWidth={1.75} />
+                  </span>
+                  <p className="mb-1 font-body text-xs font-semibold uppercase tracking-[0.15em] text-earth-brown/70">
+                    Contact form
+                  </p>
+                  <p className="font-display text-lg font-medium text-charcoal">Send a message</p>
+                  <p className="mt-1 font-body text-xs text-muted-foreground">
+                    We reply within one business day
+                  </p>
+                </Link>
+              </li>
+            </ul>
           </div>
         </Container>
       </Section>
-
-      {/* ── 8. Final CTA ─────────────────────────────────────────────────────── */}
-      <section className="bg-forest-green py-20 text-center md:py-24" aria-label="Plan your stay">
-        <Container>
-          <p className="mb-2 font-body text-xs uppercase tracking-[0.2em] text-ivory/60">
-            Madhuban Eco Retreat · Ratapani Tiger Reserve Belt
-          </p>
-          <h2 className="mb-4 font-display text-3xl font-medium text-ivory md:text-5xl">
-            Plan Your Stay at Madhuban
-          </h2>
-          <p className="mx-auto mb-8 max-w-xl font-body text-base text-ivory/80">
-            Choose from six unique eco-luxury stays — from safari tents to a pool-side villa.
-            60&nbsp;km from Bhopal, surrounded by nature.
-          </p>
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link
-              href="/stay"
-              className="inline-flex h-12 items-center justify-center rounded-md bg-ivory px-8 font-body text-sm font-medium text-earth-brown transition hover:bg-warm-beige"
-            >
-              View All Rooms
-            </Link>
-            <Link
-              href="/contact-us"
-              className="inline-flex h-12 items-center justify-center rounded-md border border-ivory/50 px-8 font-body text-sm font-medium text-ivory transition hover:bg-ivory/10"
-            >
-              Have a question? Contact us →
-            </Link>
-          </div>
-        </Container>
-      </section>
     </>
   );
 }

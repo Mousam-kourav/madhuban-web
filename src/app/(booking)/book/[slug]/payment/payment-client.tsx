@@ -205,6 +205,10 @@ export function PaymentClient({
             </p>
           )}
 
+          <p className="mb-3 text-center font-body text-xs text-charcoal/70">
+            Free cancellation up to 7 days before check-in — full refund, no questions asked.
+          </p>
+
           <button
             onClick={handlePay}
             disabled={paying || !scriptReady || !orderData}
@@ -222,9 +226,58 @@ export function PaymentClient({
             )}
           </button>
 
-          <p className="mt-4 text-center font-body text-xs text-muted-foreground">
-            Secured by Razorpay · UPI, Cards, Net Banking accepted
-          </p>
+          {/* Trust strip — three rows */}
+          <ul
+            className="mt-5 space-y-2 font-body text-xs text-charcoal/70"
+            aria-label="Payment security and policies"
+          >
+            <li className="flex items-center gap-2">
+              {/* Inline Razorpay mark (no external CDN) */}
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 shrink-0"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M14.3 3l-4.4 8.2h3l-3.2 9.8L17.9 9.2h-3L18 3z"
+                  fill="#3395FF"
+                />
+              </svg>
+              <span>Secured by Razorpay — UPI, Cards, Net Banking, Wallets</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 shrink-0 text-earth-brown"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+                aria-hidden="true"
+              >
+                <rect x="4" y="10" width="16" height="10" rx="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8 10V7a4 4 0 018 0v3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span>PCI-DSS compliant · 256-bit TLS encryption</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <svg
+                viewBox="0 0 24 24"
+                className="h-4 w-4 shrink-0 text-earth-brown"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
+                <path
+                  d="M5 12l4 4L19 6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Free cancellation up to 7 days before check-in</span>
+            </li>
+          </ul>
 
           <div className="mt-4 border-t border-border pt-4">
             <a

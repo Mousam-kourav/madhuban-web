@@ -4,7 +4,7 @@ export const HERO_COPY = {
   h1: 'Connect With Wildlife & Nature',
   subhead:
     'Twenty acres of teak forest at the edge of Ratapani Tiger Reserve, two hours from Bhopal.',
-  ctaPrimary: { label: 'Book Your Stay', href: '/booking' },
+  ctaPrimary: { label: 'Book Your Stay', href: '/stay' },
   ctaSecondary: { label: 'Explore Experiences', href: '/experiences' },
 } as const;
 

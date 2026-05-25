@@ -39,16 +39,24 @@ export default function BookingLayout({
 
       <footer className="border-t border-border py-6 text-center font-body text-xs text-muted-foreground">
         <p>
-          Questions?{" "}
+          Need help?{" "}
           <a
-            href="https://wa.me/919770558419"
+            href="tel:+919770558419"
+            className="text-earth-brown underline-offset-4 hover:underline"
+          >
+            +91 9770558419
+          </a>{" "}
+          ·{" "}
+          <a
+            href={`https://wa.me/919770558419?text=${encodeURIComponent(
+              "Hi, I need help with my booking at Madhuban Eco Retreat.",
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-earth-brown underline-offset-4 hover:underline"
           >
-            WhatsApp us
-          </a>{" "}
-          · +91 97705 58419
+            WhatsApp
+          </a>
         </p>
       </footer>
     </div>

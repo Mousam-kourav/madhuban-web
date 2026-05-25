@@ -169,6 +169,13 @@ export function BookingWidget({
           )}
         </div>
 
+        {/* Min-nights note (informational, earth-brown) */}
+        {minNights > 1 && (
+          <p className="font-body text-xs text-earth-brown/80">
+            Minimum stay: {minNights} nights for this room.
+          </p>
+        )}
+
         {/* Price estimate */}
         {nights > 0 && (
           <p className="font-body text-sm text-charcoal/70">

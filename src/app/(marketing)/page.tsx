@@ -30,10 +30,10 @@ import { HOMEPAGE_FAQS } from '@/lib/content/faqs';
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Forest Resort near Ratapani Tiger Reserve, Bhopal',
-  titleOverride: 'Madhuban Eco Retreat | Eco-Luxury Resort Near Ratapani, Bhopal',
+  title: 'Forest Stay near Ratapani, Bhopal',
+  titleOverride: 'Madhuban Eco Retreat — Forest Stay near Ratapani, Bhopal',
   description:
-    'Experience eco-luxury at Madhuban Eco Retreat in Ratapani near Bhopal. Forest stays, nature trails, birdwatching, farm-to-table dining & sustainable travel.',
+    'A twenty-acre eco retreat at the edge of Ratapani Tiger Reserve. Safari tents, mud houses, pool villa, and twenty-plus included forest experiences, 90 minutes from Bhopal.',
   path: '/',
   ogImage: `${R2_BASE}/home/hero/hero-aerial-sunset-1920.jpg`,
   keywords: [

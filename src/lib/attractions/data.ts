@@ -37,7 +37,7 @@ export const ATTRACTIONS: Attraction[] = [
     category: 'Wildlife',
     imageAlt:
       'A tiger walks along a forest track in Ratapani Tiger Reserve, with tall teak trees on either side',
-    heroSubhead: "India's newest tiger reserve, beginning at the edge of the property.",
+    heroSubhead: 'The forest Madhuban sits at the edge of. Tigers, leopards, sloth bears, 200+ bird species.',
     cardDescription:
       "India's 57th tiger reserve wraps around Madhuban on three sides. Teak forests, sloth bears, leopards, and the slow patience of a real safari.",
     quickFacts: [
@@ -86,7 +86,7 @@ export const ATTRACTIONS: Attraction[] = [
     category: 'Heritage',
     imageAlt:
       'A large prehistoric rock shelter at Bhimbetka with smooth weathered sandstone walls and a wooden viewing platform',
-    heroSubhead: 'A UNESCO World Heritage Site holding some of the oldest art on earth.',
+    heroSubhead: '30,000 years of human mark-making, an hour from Madhuban. UNESCO World Heritage.',
     cardDescription:
       'Over 750 rock shelters and prehistoric paintings dating back 30,000 years — among the oldest known human art on earth.',
     quickFacts: [
@@ -135,7 +135,7 @@ export const ATTRACTIONS: Attraction[] = [
     category: 'Heritage',
     imageAlt:
       'The unfinished Bhojeshwar Mahadev Temple at Bhojpur, a massive sandstone structure under restoration scaffolding',
-    heroSubhead: "An unfinished 11th-century temple holding one of India’s largest Shiva lingams.",
+    heroSubhead: 'An unfinished 11th-century Shiva temple, larger than it has any right to be.',
     cardDescription:
       'An 11th-century Shiva temple, never finished, holding one of the largest stone lingams in India — 7.5 feet tall, carved from a single rock.',
     quickFacts: [
@@ -184,7 +184,7 @@ export const ATTRACTIONS: Attraction[] = [
     tags: ['Temple', 'Pilgrimage'],
     category: 'Temples',
     imageAlt: 'The Salkanpur Devi temple complex with multiple shrine spires under a dramatic monsoon sky',
-    heroSubhead: 'A hilltop shrine to Goddess Bijasan, five kilometres from the property.',
+    heroSubhead: 'A hilltop temple with a long view over the plains.',
     cardDescription:
       'Hilltop shrine to Goddess Bijasan, an incarnation of Durga, perched 800 feet above the plains. Around 1,400 stone steps to the top, or take the ropeway.',
     quickFacts: [
@@ -233,7 +233,7 @@ export const ATTRACTIONS: Attraction[] = [
     tags: ['Heritage', 'Trek'],
     category: 'Heritage',
     imageAlt: 'The hill on which Ginnaurgarh Fort stands, viewed from the Ratapani forest',
-    heroSubhead: 'A 15th-century Gond fort inside Ratapani, where a warrior queen made her last stand.',
+    heroSubhead: "A forgotten Gond citadel in the hills. Half a day's walk and a story worth the climb.",
     cardDescription:
       'A 15th-century Gond hilltop fort inside Ratapani, once held by Rani Kamlapati, the warrior queen whose name now belongs to a railway station.',
     quickFacts: [
@@ -283,7 +283,7 @@ export const ATTRACTIONS: Attraction[] = [
     category: 'Heritage',
     imageAlt:
       'The interior of a sandstone cave shelter at Saru Maru, with weathered orange and purple rock walls',
-    heroSubhead: 'A 3rd-century BCE monastic complex where Emperor Ashoka left his name in stone.',
+    heroSubhead: 'Ashokan rock-cut caves, second-century BCE, almost no tourists.',
     cardDescription:
       'A 3rd-century BCE monastic complex with two Ashokan inscriptions — one mentioning Emperor Ashoka’s visit while still a prince.',
     quickFacts: [
@@ -330,7 +330,7 @@ export const ATTRACTIONS: Attraction[] = [
     category: 'Adventure',
     imageAlt:
       'Trekkers descending a hill trail in the Kathotiya forest with the Vindhya hills in the distance',
-    heroSubhead: '17,000-year-old rock art and a tribal-led ecotourism village.',
+    heroSubhead: 'Less-visited cousins of Bhimbetka, hidden in a quiet ravine.',
     cardDescription:
       'Prehistoric paintings believed to be 17,000+ years old, in a forested village run as a tribal-led ecotourism site. Trekking, rock climbing, and Bhil culture.',
     quickFacts: [
@@ -378,7 +378,7 @@ export const ATTRACTIONS: Attraction[] = [
     category: 'Adventure',
     imageAlt:
       'The full length of Kolar Dam stretching across the reservoir under a blue sky with green hills behind',
-    heroSubhead: 'A quiet reservoir in the Vindhya foothills, surrounded by deciduous forest.',
+    heroSubhead: "Bhopal's water source, surrounded by birding territory and quiet drives.",
     cardDescription:
       'A 45-metre dam on the Kolar river surrounded by forest. Boating, birdwatching, and a slow afternoon away from anywhere busy.',
     quickFacts: [
@@ -427,7 +427,7 @@ export const ATTRACTIONS: Attraction[] = [
     imageAlt:
       'A tiger walks down a forest road at the entrance to Satpura Tiger Reserve in early morning light',
     heroSubhead:
-      "India’s most underrated tiger reserve — known for walking safaris and the Denwa river.",
+      'The classic central Indian tiger reserve, a longer day-trip — but a real one.',
     cardDescription:
       "India’s most underrated tiger reserve — known for walking safaris, canoeing on the Denwa, and wildlife you actually have time to look at.",
     quickFacts: [

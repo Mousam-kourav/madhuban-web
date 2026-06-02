@@ -13,11 +13,10 @@ import { FilterBar } from './filter-bar';
 const R2 = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 export const metadata: Metadata = buildMetadata({
-  titleOverride:
-    'Souvenir Shop | Madhuban Eco Retreat | Local Crafts, Books & Gifts Near Bhopal',
-  title: 'Souvenir Shop',
+  titleOverride: 'The Shop — Handicrafts & Souvenirs at Madhuban',
+  title: 'The Shop',
   description:
-    "Browse Madhuban's curated souvenir shop. Local handicrafts, books, regional food & spices, wellness products, and more — supporting tribal artisans near Ratapani.",
+    'Hand-crafted objects from the artisans of central India, available at Madhuban Eco Retreat. Tribal craft, Gond art, forest-sourced items.',
   path: '/souvenir-shop',
   ogImage: `${R2}/souvenir-shop/hero-1280.webp`,
   keywords: [
@@ -79,11 +78,11 @@ export default async function SouvenirShopPage({
             Madhuban Eco Retreat
           </p>
           <h1 className="font-display text-4xl font-light text-ivory md:text-6xl">
-            Take Madhuban Home With You
+            The shop
           </h1>
           <p className="mx-auto mt-3 max-w-lg font-body text-sm text-ivory/85 md:text-base">
-            Curated handicrafts, regional food, books and wellness — sourced from local artisans and
-            cooperatives around Ratapani.
+            Hand-crafted objects from the artisans of central India. Sourced, supported, sold
+            without markup.
           </p>
         </Container>
       </section>

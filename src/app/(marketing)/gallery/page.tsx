@@ -15,9 +15,9 @@ export const revalidate = 300;
 
 export const metadata: Metadata = buildMetadata({
   title: 'Gallery',
-  titleOverride: 'Madhuban Eco Gallery | Nature, Culture & Retreat Photo Collection',
+  titleOverride: 'Gallery — Madhuban Eco Retreat in Ratapani, Bhopal',
   description:
-    'Explore Madhuban Eco Retreat through our gallery — forest trails, safari tents, Aranyashala nature school, farm dining, and curated events near Ratapani, Bhopal.',
+    'Photographs of accommodations, the forest, dining, and recreation at Madhuban Eco Retreat. A twenty-acre eco resort near Ratapani Tiger Reserve, Bhopal.',
   path: '/gallery',
   keywords: [
     'madhuban eco retreat gallery',
@@ -69,8 +69,8 @@ export default async function GalleryPage() {
         <Container>
           <Heading
             as="h1"
-            text="Gallery"
-            subheading="A visual journey through Madhuban — from ancient forest trails to curated retreat moments."
+            text="Photographs"
+            subheading="Twenty acres of forest, three styles of accommodation, recreation, dining, and the people who make it work."
           />
         </Container>
       </Section>

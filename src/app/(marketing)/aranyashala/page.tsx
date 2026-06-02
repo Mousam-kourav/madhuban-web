@@ -42,9 +42,10 @@ import { AranyashalaWaForm } from '@/components/marketing/aranyashala/aranyashal
 
 // ── SEO ───────────────────────────────────────────────────────────────────────
 export const metadata: Metadata = buildMetadata({
-  title: 'Aranyashala',
-  titleOverride: 'Aranyashala | Nature School Camp Near Bhopal | Madhuban Eco Retreat',
-  description: "Aranyashala — Madhuban's nature school program. Multi-day naturalist courses for schools & colleges. Forest learning, life skills, heritage awareness near Ratapani.",
+  title: 'Aranyashala — Forest School',
+  titleOverride: 'Aranyashala — A Forest School at Madhuban Eco Retreat',
+  description:
+    "Aranyashala is Madhuban's residential nature programme for children. Hands-on forest learning, mindful living, real experiences — not screens.",
   path: '/aranyashala',
   ogImage: ARANYASHALA.hero.image.desktop,
   keywords: [

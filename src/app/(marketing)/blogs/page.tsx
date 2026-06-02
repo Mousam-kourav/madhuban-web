@@ -8,10 +8,10 @@ export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const base = buildMetadata({
-    title: "Journal",
-    titleOverride: "Madhuban Blog | Nature, Travel & Eco-Living Stories",
+    title: "Field Notes",
+    titleOverride: "Field Notes — Travel & Eco-Living Stories from Madhuban",
     description:
-      "Read nature stories, travel guides, wildlife insights, and eco-living tips from Madhuban Eco Retreat. Explore Ratapani and sustainable travel through our blog.",
+      "Travel guides to Ratapani and central India, slow-tourism essays, and field notes from Madhuban Eco Retreat near Bhopal.",
     path: "/blogs",
     keywords: [
       'madhuban blog',
@@ -54,13 +54,14 @@ export default async function BlogsPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/60" />
         <div className="relative z-10 text-center px-4">
           <p className="font-display text-2xl text-[var(--color-gold-accent)] mb-3">
-            Journal of the Earth
+            From the Forest
           </p>
           <h1 className="font-display text-4xl md:text-6xl text-[var(--color-ivory)] leading-tight max-w-3xl break-words">
-            Stories From Nature,
-            <br />
-            Wellness &amp; Wilderness
+            Field notes
           </h1>
+          <p className="mt-4 max-w-2xl mx-auto font-body text-base md:text-lg text-[var(--color-ivory)]/90">
+            Travel guides, slow-tourism essays, and small observations from the forest at Madhuban.
+          </p>
         </div>
       </section>
 

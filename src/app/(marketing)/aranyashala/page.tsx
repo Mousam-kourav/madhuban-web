@@ -47,7 +47,8 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Aranyashala is Madhuban's residential nature programme for children. Hands-on forest learning, mindful living, real experiences — not screens.",
   path: '/aranyashala',
-  ogImage: ARANYASHALA.hero.image.desktop,
+  ogImage: `${process.env.NEXT_PUBLIC_R2_BASE ?? ''}/og/aranyashala-1200x630.jpg`,
+  ogImageAlt: 'Aranyashala nature school students by the lakeside at Madhuban Eco Retreat',
   keywords: [
     'nature school near bhopal',
     'aranyashala madhuban',

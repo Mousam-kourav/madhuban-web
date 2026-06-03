@@ -35,7 +35,8 @@ export const metadata: Metadata = buildMetadata({
   description:
     'A twenty-acre eco retreat at the edge of Ratapani Tiger Reserve. Safari tents, mud houses, pool villa, and twenty-plus included forest experiences, 90 minutes from Bhopal.',
   path: '/',
-  ogImage: `${R2_BASE}/home/hero/hero-aerial-sunset-1920.jpg`,
+  ogImage: `${R2_BASE}/og/homepage-1200x630.jpg`,
+  ogImageAlt: 'Aerial view of Madhuban Eco Retreat at sunset, surrounded by Ratapani teak forest',
   keywords: [
     'eco retreat bhopal',
     'ratapani eco resort',

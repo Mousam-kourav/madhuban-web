@@ -15,6 +15,8 @@ export const metadata = buildMetadata({
   description:
     'Twenty-plus included experiences at Madhuban Eco Retreat — guided forest walks, pottery, yoga, birdwatching, bonfire, and slow hours near Bhopal.',
   path: '/experiences',
+  ogImage: `${R2_BASE}/og/experiences-1200x630.jpg`,
+  ogImageAlt: 'Guided forest walk through teak woodland at Madhuban Eco Retreat',
   keywords: [
     'experiences near bhopal',
     'forest walks ratapani',

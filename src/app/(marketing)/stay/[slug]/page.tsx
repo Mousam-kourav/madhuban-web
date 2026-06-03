@@ -13,6 +13,16 @@ export const revalidate = 60;
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
+// Rooms with curated 1200x630 OG images at og/{slug}-1200x630.jpg (Phase 12.E.2).
+// Other rooms fall back to the standard room hero crop.
+const CURATED_OG_ROOMS = new Set(['safari-tent', 'mud-house-1', 'pool-side-villa']);
+
+const ROOM_OG_ALT: Record<string, string> = {
+  'safari-tent': 'Madhuban Eco Retreat safari tent with private veranda overlooking the forest',
+  'mud-house-1': 'Gond-inspired mud house bedroom at Madhuban Eco Retreat with terracotta walls',
+  'pool-side-villa': 'Pool-side villa exterior at Madhuban Eco Retreat with infinity pool',
+};
+
 export async function generateStaticParams() {
   try {
     const slugs = await getAllRoomSlugs();
@@ -32,11 +42,16 @@ export async function generateMetadata({
     const dbRoom = await getRoomBySlug(slug);
     if (!dbRoom) return {};
 
+    const ogImage = CURATED_OG_ROOMS.has(dbRoom.slug)
+      ? `${R2_BASE}/og/${dbRoom.slug}-1200x630.jpg`
+      : `${R2_BASE}/home/rooms/${dbRoom.slug}-1-1280.jpg`;
+
     return buildMetadata({
       title: dbRoom.seo_title ?? dbRoom.name,
       description: dbRoom.seo_description ?? dbRoom.description_short ?? '',
       path: `/stay/${dbRoom.slug}`,
-      ogImage: `${R2_BASE}/home/rooms/${dbRoom.slug}-1-1280.jpg`,
+      ogImage,
+      ogImageAlt: ROOM_OG_ALT[dbRoom.slug],
     });
   } catch {
     return {};

@@ -17,6 +17,8 @@ interface BuildMetadataInput {
   path: string;
   /** Full URL to OG image. Falls back to default R2 logo. */
   ogImage?: string;
+  /** Alt text for the OG image. Falls back to a generic Madhuban label. */
+  ogImageAlt?: string;
   /** When true, emits robots: noindex, nofollow. Use for admin, booking/payment, staging. */
   noIndex?: boolean;
   /**
@@ -47,6 +49,7 @@ export function buildMetadata({
   description,
   path,
   ogImage,
+  ogImageAlt,
   noIndex = false,
   titleOverride,
   keywords,
@@ -54,6 +57,7 @@ export function buildMetadata({
 }: BuildMetadataInput): Metadata {
   const canonical = `${BASE_URL}${path}`;
   const image = ogImage ?? DEFAULT_OG_IMAGE;
+  const imageAlt = ogImageAlt ?? 'Madhuban Eco Retreat — Eco-Luxury Forest Resort near Bhopal';
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -72,7 +76,7 @@ export function buildMetadata({
       description,
       url: canonical,
       siteName: SITE_NAME,
-      images: [{ url: image, width: 1200, height: 630 }],
+      images: [{ url: image, width: 1200, height: 630, alt: imageAlt }],
       locale: 'en_IN',
       type: ogType,
     },
@@ -81,7 +85,7 @@ export function buildMetadata({
       site: '@madhubanretreat',
       title: titleOverride ?? title,
       description,
-      images: [image],
+      images: [{ url: image, alt: imageAlt }],
     },
     ...(noIndex && {
       robots: {

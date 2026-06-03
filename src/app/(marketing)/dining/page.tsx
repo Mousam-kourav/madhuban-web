@@ -20,7 +20,8 @@ export const metadata: Metadata = buildMetadata({
   description:
     "A forest-to-table kitchen at Madhuban Eco Retreat. Organic vegetarian menus built around the morning's harvest. Open to in-house guests near Bhopal.",
   path: '/dining',
-  ogImage: DINING.hero.image.desktop,
+  ogImage: `${process.env.NEXT_PUBLIC_R2_BASE ?? ''}/og/dining-1200x630.jpg`,
+  ogImageAlt: 'Farm-to-table vegetarian feast at Madhuban Eco Retreat',
   keywords: [
     'veg food near ratapani',
     'buffet near ratapani',

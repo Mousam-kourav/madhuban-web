@@ -5,6 +5,7 @@ import { getRooms } from '@/lib/rooms/queries';
 import { dbRoomToRoom } from '@/lib/rooms/mapper';
 import type { Room } from '@/lib/content/rooms';
 import { buildMetadata } from '@/lib/seo';
+import { R2_BASE } from '@/lib/r2';
 import { Seo } from '@/components/ui/seo';
 import { breadcrumbListFromPath } from '@/lib/schema/breadcrumb-list';
 import { Section } from '@/components/ui/section';
@@ -21,6 +22,8 @@ export const metadata: Metadata = buildMetadata({
   description:
     'Six accommodations at Madhuban Eco Retreat — camping tents, glamping, safari tents, two mud houses, and a pool-side villa. Near Ratapani, 90 minutes from Bhopal.',
   path: '/stay',
+  ogImage: `${R2_BASE}/og/stay-1200x630.jpg`,
+  ogImageAlt: 'Safari tent on stilts at Madhuban Eco Retreat with forest views',
   keywords: [
     'eco stay near bhopal',
     'safari tent near bhopal',

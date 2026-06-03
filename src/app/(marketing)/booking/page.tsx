@@ -24,7 +24,7 @@ export const metadata: Metadata = buildMetadata({
   title: 'Book',
   titleOverride: 'Book Madhuban Eco Retreat — Direct Booking, Best Rate',
   description:
-    'Reserve your stay at Madhuban Eco Retreat in Ratapani. Direct online booking, best rate guaranteed, no booking fees. Two hours from Bhopal.',
+    'Reserve your stay at Madhuban Eco Retreat in Ratapani. Direct online booking, best rate guaranteed, no booking fees. 90 minutes from Bhopal.',
   path: '/booking',
   ogImage: `${R2_BASE}/home/hero/hero-aerial-sunset-1280.webp`,
   keywords: [

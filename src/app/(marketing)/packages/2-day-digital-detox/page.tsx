@@ -13,7 +13,7 @@ export const metadata: Metadata = buildMetadata({
   title: '2-Day Digital Detox',
   titleOverride: '2-Day Digital Detox Retreat near Bhopal at Madhuban',
   description:
-    'A 48-hour digital detox at Madhuban Eco Retreat. Forest walks, slow meals, yoga, and zero screens. Two hours from Bhopal in Ratapani Tiger Reserve.',
+    'A 48-hour digital detox at Madhuban Eco Retreat. Forest walks, slow meals, yoga, and zero screens. 90 minutes from Bhopal in Ratapani Tiger Reserve.',
   path: '/packages/2-day-digital-detox',
   keywords: [
     'digital detox retreat near bhopal',

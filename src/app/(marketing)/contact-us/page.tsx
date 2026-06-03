@@ -14,9 +14,9 @@ import { ContactForm } from '@/components/forms/contact-form';
 
 export const metadata: Metadata = buildMetadata({
   title: 'Contact',
-  titleOverride: 'Contact Madhuban Eco Retreat | Jungle Retreat in Ratapani',
+  titleOverride: 'Contact Madhuban Eco Retreat — Ratapani, Bhopal',
   description:
-    'Contact Madhuban Eco Retreat, a top eco tourism and detox jungle retreat in Ratapani. Get a response within 24 hrs for any bookings & inquiries.',
+    'Reach the Madhuban Eco Retreat team for bookings, group stays, dietary requests, or directions. Ratapani, 90 minutes from Bhopal.',
   path: '/contact-us',
   keywords: [
     'Contact Madhuban Eco Retreat',
@@ -67,10 +67,10 @@ export default function ContactPage() {
             Madhuban Eco Retreat
           </p>
           <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl">
-            Get in Touch
+            Talk to us
           </h1>
           <p className="mt-3 max-w-xl font-body text-base text-ivory/90">
-            We reply within one working day. For a faster response, WhatsApp us.
+            For bookings, group stays, dietary requests, or directions. We respond within a day.
           </p>
         </div>
       </section>
@@ -91,7 +91,7 @@ export default function ContactPage() {
           >
             Whether you&apos;re planning a stay, arranging a day outing, or simply curious about
             the forest — we&apos;d love to hear from you. Nestled near Ratapani Wildlife Sanctuary,
-            Madhuban is 60&nbsp;km from Bhopal and reachable by road in under two hours.
+            Madhuban is 60&nbsp;km from Bhopal — roughly 90 minutes by road.
           </p>
         </Container>
       </Section>

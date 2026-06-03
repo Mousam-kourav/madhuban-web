@@ -88,9 +88,9 @@ type DiningData = {
 export const DINING: DiningData = {
   hero: {
     eyebrow: 'Madhuban Eco Retreat · Ratapani Wildlife Sanctuary',
-    title: 'Dining at Madhuban',
+    title: 'A forest-to-table kitchen',
     subtitle:
-      'Pure vegetarian, regional, and rooted in the land. From everyday open-air meals to private forest setups for two.',
+      "Organic produce from the on-site farm. Slow vegetarian menus shaped by what's been picked that morning.",
     image: {
       desktop: `${R2}/dining/hero-1280.webp`,
       mobile: `${R2}/dining/hero-800.webp`,

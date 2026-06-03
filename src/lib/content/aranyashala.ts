@@ -55,9 +55,9 @@ type Aranyashala = {
 export const ARANYASHALA: Aranyashala = {
   hero: {
     eyebrow: 'Madhuban Eco Retreat · Ratapani Wildlife Sanctuary',
-    title: 'Aranyashala — The Nature School',
+    title: 'Aranyashala — a school of the forest',
     subtitle:
-      'Imparting nature-based learning to the young generation through multi-day immersive forest camps.',
+      'A residential nature programme for children. Pitching tents, watching birds, working with clay, learning what the forest teaches.',
     image: {
       desktop: `${R2}/aranyashala/hero-1280.webp`,
       mobile: `${R2}/aranyashala/hero-800.webp`,

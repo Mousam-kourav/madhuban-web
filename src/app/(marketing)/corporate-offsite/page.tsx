@@ -94,7 +94,7 @@ export default function CorporateOffsitePage() {
             </div>
             <p className="font-body text-base leading-relaxed text-charcoal/80 md:text-lg">
               Madhuban hosts company offsites and structured team retreats adjacent to Ratapani
-              Tiger Reserve, two hours from Bhopal. You get the full property and a team on the
+              Tiger Reserve, 90 minutes from Bhopal. You get the full property and a team on the
               ground that handles agenda, meals, and logistics — so leadership can focus on the
               conversations that actually need to happen, surrounded by forest instead of meeting
               rooms.

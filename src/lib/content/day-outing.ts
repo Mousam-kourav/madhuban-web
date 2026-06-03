@@ -3,9 +3,9 @@ const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 export const DAY_OUTING = {
   hero: {
     eyebrow: 'Madhuban Eco Retreat',
-    h1: 'Experience a Nature-Filled Day at Madhuban Eco Retreat',
+    h1: 'A day in the forest',
     subheading:
-      'Escape the city and immerse yourself in forest-side luxury. A day of rejuvenation awaits just outside Bhopal.',
+      'Full property access for the day — meals, infinity pool, guided walks, recreation. 90 minutes from Bhopal, back home by night.',
     image: {
       desktop: `${R2_BASE}/home/day-outing/day-outing-hero-image-1280px.webp`,
       mobile: `${R2_BASE}/home/day-outing/day-outing-hero-image-800px.webp`,

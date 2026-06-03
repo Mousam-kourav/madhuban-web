@@ -9,9 +9,10 @@ import { Heading } from "@/components/ui/heading";
 import { BookingEnquiryForm } from "@/components/forms/booking-enquiry-form";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Plan Your Retreat",
+  title: "Enquire",
+  titleOverride: "Enquire — Madhuban Eco Retreat, Ratapani, Bhopal",
   description:
-    "Tell us your dates, preferred room, and group size. We'll confirm availability and send personalised details within one working day.",
+    "For group bookings, custom programmes, or special requests at Madhuban Eco Retreat in Ratapani. We respond within a day.",
   path: "/enquire",
 });
 
@@ -25,8 +26,8 @@ export default function EnquirePage() {
         <Container>
           <Heading
             as="h1"
-            text="Plan Your Retreat"
-            subheading="Tell us your dates and we'll confirm availability within one working day."
+            text="Tell us about your stay"
+            subheading="For group bookings, custom programmes, dietary requests, or anything outside a standard reservation."
             className="mb-4"
           />
           <p className="mx-auto max-w-[620px] text-center font-body text-base leading-relaxed text-charcoal/70">

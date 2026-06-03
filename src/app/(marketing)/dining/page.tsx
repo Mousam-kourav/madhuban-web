@@ -15,13 +15,13 @@ import { DiningWaForm } from '@/components/marketing/dining/dining-wa-form';
 
 // ── SEO ───────────────────────────────────────────────────────────────────────
 export const metadata: Metadata = buildMetadata({
-  titleOverride:
-    'Farm-to-Table Dining Ratapani | Pure Veg Buffet Near Bhopal',
-  title: 'Dining',
+  titleOverride: 'Farm-to-Table Dining at Madhuban, Ratapani',
+  title: 'Farm-to-Table Dining',
   description:
-    'Experience fresh farm-to-table dining at Madhuban Eco Retreat. Pure veg meals, organic produce, sustainable cuisine & clean eating near Ratapani.',
+    "A forest-to-table kitchen at Madhuban Eco Retreat. Organic vegetarian menus built around the morning's harvest. Open to in-house guests near Bhopal.",
   path: '/dining',
-  ogImage: DINING.hero.image.desktop,
+  ogImage: `${process.env.NEXT_PUBLIC_R2_BASE ?? ''}/og/dining-1200x630.jpg`,
+  ogImageAlt: 'Farm-to-table vegetarian feast at Madhuban Eco Retreat',
   keywords: [
     'veg food near ratapani',
     'buffet near ratapani',

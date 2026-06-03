@@ -12,10 +12,10 @@ import { BUSINESS } from '@/lib/content/business';
 import { ChevronDown } from 'lucide-react';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'About Us',
-  titleOverride: 'About Madhuban Eco Retreat – Best Eco Resort Near Bhopal & Ratapani',
+  title: 'About Madhuban',
+  titleOverride: 'About Madhuban — A Somaiya Group Eco Retreat in Ratapani',
   description:
-    'Discover Madhuban Eco Retreat near Bhopal—an eco-friendly jungle resort promoting slow tourism, sustainability, and meaningful nature-based experiences in Ratapani.',
+    "The story of Madhuban Eco Retreat — a Somaiya Group project built around slow tourism, eco-conscious architecture, and the forest at Ratapani's edge.",
   path: '/about-us',
   keywords: [
     'best resorts near ratapani',
@@ -176,10 +176,10 @@ export default function AboutPage() {
             Madhuban Eco Retreat · A Somaiya Group Initiative
           </p>
           <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl lg:text-7xl">
-            Where Sustainability<br className="hidden lg:block" /> Meets Hospitality
+            A retreat built by family,<br className="hidden lg:block" /> on a forest edge
           </h1>
           <p className="mt-4 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
-            A regenerative forest retreat on 20 acres near Ratapani Tiger Reserve, 60&nbsp;km from Bhopal
+            Created in partnership with the Somaiya Group, designed around what slow, considered tourism actually requires.
           </p>
         </div>
       </section>

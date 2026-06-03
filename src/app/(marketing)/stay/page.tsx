@@ -5,6 +5,7 @@ import { getRooms } from '@/lib/rooms/queries';
 import { dbRoomToRoom } from '@/lib/rooms/mapper';
 import type { Room } from '@/lib/content/rooms';
 import { buildMetadata } from '@/lib/seo';
+import { R2_BASE } from '@/lib/r2';
 import { Seo } from '@/components/ui/seo';
 import { breadcrumbListFromPath } from '@/lib/schema/breadcrumb-list';
 import { Section } from '@/components/ui/section';
@@ -16,11 +17,13 @@ import { formatPrice } from '@/lib/utils';
 export const revalidate = 60;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Stay With Us',
-  titleOverride: 'Eco Stay Near Bhopal – Safari Tents, Mud Houses, Glamping & Villas | Madhuban',
+  title: 'Eco Stays in Ratapani',
+  titleOverride: 'Eco Stays in Ratapani — Safari Tents, Mud Houses, Villas',
   description:
-    'Experience eco-friendly stays near Bhopal at Madhuban Eco Retreat. Safari tents, mud houses, glamping tents, poolside villas & camping near Ratapani.',
+    'Six accommodations at Madhuban Eco Retreat — camping tents, glamping, safari tents, two mud houses, and a pool-side villa. Near Ratapani, 90 minutes from Bhopal.',
   path: '/stay',
+  ogImage: `${R2_BASE}/og/stay-1200x630.jpg`,
+  ogImageAlt: 'Safari tent on stilts at Madhuban Eco Retreat with forest views',
   keywords: [
     'eco stay near bhopal',
     'safari tent near bhopal',
@@ -50,8 +53,8 @@ export default async function StayPage() {
         <Container>
           <Heading
             as="h1"
-            text="Stay With Us"
-            subheading="Six unique eco-luxury stays in the heart of Ratapani forest"
+            text="Six ways to stay in the forest"
+            subheading="From an off-grid camping tent to a pool-side villa, each home shaped by where it sits in the twenty acres."
             className="mb-6"
           />
           <p className="mx-auto max-w-[720px] text-center font-body text-base leading-relaxed text-charcoal/70">

@@ -9,12 +9,16 @@ import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { EXPERIENCES } from '@/lib/content/experiences';
 import { faqPage, breadcrumbListFromPath } from '@/lib/schema';
 
+const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
+
 export const metadata = buildMetadata({
-  title: 'Experiences & Activities',
-  titleOverride: 'Nature Experiences Ratapani | Forest Walks, Bird Watching & Activities',
+  title: 'Things to Do in Ratapani',
+  titleOverride: 'Things to Do in Ratapani — Experiences at Madhuban',
   description:
-    'Explore nature trails, bird watching, and recreational activities at Madhuban Eco Retreat near Bhopal. Eco-friendly experiences in Ratapani Wildlife Sanctuary.',
+    'Twenty-plus included experiences at Madhuban Eco Retreat — guided forest walks, pottery, yoga, birdwatching, bonfire, and slow hours near Bhopal.',
   path: '/experiences',
+  ogImage: `${R2_BASE}/og/experiences-1200x630.jpg`,
+  ogImageAlt: 'Guided forest walk through teak woodland at Madhuban Eco Retreat',
   keywords: [
     'experiences near bhopal',
     'forest walks ratapani',
@@ -59,8 +63,6 @@ const INDEX_FAQS = [
       'Yes, Madhuban is located in the Ratapani belt, adjacent to the Ratapani Tiger Reserve — part of MP\'s rich central Indian wilderness corridor, 60 km from Bhopal.',
   },
 ];
-
-const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 // TODO (Phase 12.F.1 — polish, NOT launch-blocking): awaiting banner asset from Mousam.
 // OLD R2 source (pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/banner/) no longer
@@ -136,11 +138,11 @@ export default function ExperiencesPage() {
             Madhuban Eco Retreat
           </p>
           <h1 className="font-display text-4xl font-medium text-ivory md:text-6xl lg:text-7xl">
-            Experience Life at Nature&#8217;s Rhythm
+            Slow days, full of small things
           </h1>
           <p className="mt-4 max-w-2xl font-body text-base text-ivory/90 md:text-lg">
-            Explore mindful, eco-friendly experiences designed around forests, wildlife, and peaceful
-            living near Bhopal
+            Twenty-plus experiences shape a stay at Madhuban — guided walks, pottery, yoga, bonfire
+            evenings, and quiet hours that don&#8217;t ask anything of you.
           </p>
         </div>
       </section>

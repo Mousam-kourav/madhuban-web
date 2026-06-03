@@ -1,9 +1,9 @@
 // Brand register decision (Soulful Premium Hybrid) and Direction Document v1.1 lift the original §10.3 constraint for editorial rewrites. Future copy changes proceed through architect-approved kickoffs.
 
 export const HERO_COPY = {
-  h1: 'Connect With Wildlife & Nature',
+  h1: 'A forest retreat at the edge of Ratapani',
   subhead:
-    'Twenty acres of teak forest at the edge of Ratapani Tiger Reserve, two hours from Bhopal.',
+    'Twenty acres of teak forest at the edge of Ratapani Tiger Reserve, 90 minutes from Bhopal.',
   ctaPrimary: { label: 'Book Your Stay', href: '/stay' },
   ctaSecondary: { label: 'Explore Experiences', href: '/experiences' },
 } as const;

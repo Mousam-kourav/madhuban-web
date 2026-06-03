@@ -40,10 +40,10 @@ import { DayOutingWaForm } from '@/components/marketing/day-outing/day-outing-wa
 
 // ── SEO — exact title + description preserved from old site (currently ranking) ─
 export const metadata: Metadata = buildMetadata({
-  title: 'Day Outing',
-  titleOverride: 'Resorts Near Bhopal for Day Outing | Madhuban Eco Retreat',
+  title: 'Day Outing near Bhopal',
+  titleOverride: 'Day Outing near Bhopal — Picnic Resort at Madhuban',
   description:
-    'Looking for resorts near Bhopal for day outing? Enjoy breakfast, lunch, pool access, nature walk & activities at Madhuban Eco Retreat.',
+    'A full day at Madhuban Eco Retreat — meals, pool access, guided walks, recreation. 90 minutes from Bhopal, at the edge of Ratapani Tiger Reserve.',
   path: '/day-outing',
   ogImage: DAY_OUTING.hero.image.desktop,
   keywords: [

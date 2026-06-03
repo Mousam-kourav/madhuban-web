@@ -8,9 +8,10 @@ import { ATTRACTIONS } from '@/lib/attractions/data';
 import { AttractionGrid } from './filter-chips';
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Nearby Attractions',
+  title: 'Places to Visit near Bhopal',
+  titleOverride: 'Places to Visit near Bhopal — 9 Attractions near Madhuban',
   description:
-    'Heritage sites, wildlife reserves, and temples within an easy drive of Madhuban Eco Retreat — including Ratapani Tiger Reserve, Bhimbetka, Bhojpur, and Salkanpur.',
+    'Bhimbetka rock shelters, Ginnaurgarh Fort, Satpura Tiger Reserve, Saru Maru Caves — nine destinations within easy reach of Madhuban Eco Retreat.',
   path: '/nearby-attractions',
   ogImage: `${R2_BASE}/attractions/ratapani-tiger-reserve/hero.webp`,
 });
@@ -48,13 +49,12 @@ export default function NearbyAttractionsPage() {
           id="hero-heading"
           className="text-4xl md:text-7xl font-display font-light text-charcoal mb-6 leading-tight break-words"
         >
-          Where the Forest Opens into History
+          Nine places, all within reach
         </h1>
 
         <p className="max-w-2xl mx-auto text-base md:text-lg font-body text-earth-brown leading-relaxed">
-          Within a short drive of the property — a thousand-year-old temple, India&apos;s newest
-          tiger reserve, prehistoric caves older than civilisation, and a Gond queen&apos;s hilltop
-          fort.
+          UNESCO rock shelters, a Gond fort, two tiger reserves, ancient temples — Madhuban opens
+          onto central India&apos;s quiet, layered places.
         </p>
       </section>
 

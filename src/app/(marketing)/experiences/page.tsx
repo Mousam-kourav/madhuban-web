@@ -9,6 +9,8 @@ import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { EXPERIENCES } from '@/lib/content/experiences';
 import { faqPage, breadcrumbListFromPath } from '@/lib/schema';
 
+const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
+
 export const metadata = buildMetadata({
   title: 'Things to Do in Ratapani',
   titleOverride: 'Things to Do in Ratapani — Experiences at Madhuban',
@@ -61,8 +63,6 @@ const INDEX_FAQS = [
       'Yes, Madhuban is located in the Ratapani belt, adjacent to the Ratapani Tiger Reserve — part of MP\'s rich central Indian wilderness corridor, 60 km from Bhopal.',
   },
 ];
-
-const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE ?? '';
 
 // TODO (Phase 12.F.1 — polish, NOT launch-blocking): awaiting banner asset from Mousam.
 // OLD R2 source (pub-ec3822a2d8d6482db36eb9dadc028ea6.r2.dev/experiences/banner/) no longer

@@ -1,32 +1,20 @@
--- Phase 12.E.1 — Per-room subhead + meta refresh
+-- Phase 12.E.1 — Per-room subhead + meta refresh (corrected)
 --
 -- Background: Direction Document v1.1 (Soulful Premium Hybrid register) rewrites
 -- the per-room tagline (rendered as the H1 subhead on /stay/[slug]), seo_title,
 -- and seo_description for all six accommodations. Distance phrasing aligned to
 -- the canonical "90 minutes from Bhopal" / "near Bhopal" pattern per Phase 12.E
--- Step 1 approval (not "two hours from Bhopal").
+-- Step 1 approval.
 --
--- Mapping confirmed:
---   - rooms.tagline → rendered as the room hero subhead via room.tagline in
---     src/components/marketing/room-detail/room-detail-page.tsx:83
---   - rooms.seo_title and rooms.seo_description → consumed by buildMetadata in
---     src/app/(marketing)/stay/[slug]/page.tsx (generateMetadata)
+-- CORRECTION: Direction Document v1.1 had stale occupancy claims for mud-house-1
+-- (sleeps 2-4), mud-house-2 (sleeps 4-6), and pool-side-villa (two-bedroom).
+-- Verified against actual room data: all sleep 2-3 max, pool-side-villa is one
+-- king bed. SQL strings corrected to reflect reality, not the doc.
+--
+-- Mud-house-2 "family" framing also reverted to "larger" / "roomier" —
+-- "family" implies higher capacity than reality (same as mud-house-1).
 --
 -- Idempotent: re-running has no effect once data is set to the target values.
---
--- HOW TO RUN:
---   1. Supabase dashboard → SQL Editor → New Query
---   2. Paste this entire file
---   3. Run
---   4. Eyeball the verification SELECT at the bottom — every row should show
---      the new tagline / seo_title / seo_description
---   5. Run BEFORE merging the Phase 12.E PR so production reflects the new
---      copy as soon as deployment completes
---
--- Note on glamping slug: rooms.ts uses slug 'glamping-tents' (plural). If the
--- DB row uses a different slug (e.g. singular 'glamping-tent'), the UPDATE
--- below will simply affect zero rows — adjust the WHERE clause to match the
--- actual DB slug before re-running.
 
 UPDATE rooms
 SET
@@ -39,21 +27,21 @@ UPDATE rooms
 SET
   tagline = 'The mud house, set in the orchard',
   seo_title = 'Mud House in Ratapani — Gond-Inspired Eco Stay',
-  seo_description = 'A Gond-inspired mud house set in the orchard, with a 360° rooftop terrace and modern eco amenities. Sleeps two to four. Madhuban Eco Retreat, near Bhopal.'
+  seo_description = 'A Gond-inspired mud house set in the orchard, with a 360° rooftop terrace and modern eco amenities. Sleeps two to three. Madhuban Eco Retreat, near Bhopal.'
 WHERE slug = 'mud-house-1';
 
 UPDATE rooms
 SET
-  tagline = 'A larger mud house, for the whole family',
-  seo_title = 'Family Mud House in Ratapani — Madhuban Eco Retreat',
-  seo_description = 'A family-sized mud house at Madhuban Eco Retreat with a private courtyard and orchard access. Sleeps four to six. Gond-inspired build, near Bhopal.'
+  tagline = 'The larger mud house, with a private courtyard',
+  seo_title = 'Larger Mud House in Ratapani — Madhuban Eco Retreat',
+  seo_description = 'A roomier Gond-inspired mud house at Madhuban Eco Retreat with a private courtyard and orchard access. Sleeps two to three in more space. Near Bhopal.'
 WHERE slug = 'mud-house-2';
 
 UPDATE rooms
 SET
   tagline = 'The pool-side villa',
   seo_title = 'Pool-Side Villa in Ratapani — Madhuban Eco Retreat',
-  seo_description = 'A two-bedroom pool-side villa with floor-to-ceiling glass facing the teak forest. Infinity pool access, premium eco amenities. Near Bhopal.'
+  seo_description = 'A villa with a king bed and floor-to-ceiling glass facing the teak forest. Infinity pool access, premium eco amenities. Sleeps two. Near Bhopal.'
 WHERE slug = 'pool-side-villa';
 
 UPDATE rooms

@@ -6,8 +6,37 @@ import { Container } from '@/components/ui/container';
 import { Heading } from '@/components/ui/heading';
 import { getPublishedFeaturedExperiences } from '@/lib/featured-experiences/queries';
 
+// Next.js signals control flow (dynamic bailout, redirect, notFound) by
+// throwing tagged errors. Those must reach the framework, never be swallowed
+// as if they were data-fetch failures.
+const NEXT_CONTROL_FLOW_DIGESTS = [
+  'DYNAMIC_SERVER_USAGE',
+  'NEXT_REDIRECT',
+  'NEXT_NOT_FOUND',
+  'NEXT_HTTP_ERROR_FALLBACK',
+  'BAILOUT_TO_CLIENT_SIDE_RENDERING',
+];
+
+function isNextControlFlowError(error: unknown): boolean {
+  const digest = (error as { digest?: unknown })?.digest;
+  return (
+    typeof digest === 'string' &&
+    NEXT_CONTROL_FLOW_DIGESTS.some((code) => digest.startsWith(code))
+  );
+}
+
 export async function FeaturedExperiences() {
-  const experiences = await getPublishedFeaturedExperiences();
+  // This is the only DB-backed section on the marketing homepage. It is
+  // optional content, so a Supabase outage must degrade to hiding the section
+  // rather than throwing and taking the whole homepage down with it.
+  let experiences: Awaited<ReturnType<typeof getPublishedFeaturedExperiences>>;
+  try {
+    experiences = await getPublishedFeaturedExperiences();
+  } catch (error) {
+    if (isNextControlFlowError(error)) throw error;
+    console.error("[FeaturedExperiences] failed to load, hiding section:", error);
+    return null;
+  }
 
   if (experiences.length === 0) {
     return null;

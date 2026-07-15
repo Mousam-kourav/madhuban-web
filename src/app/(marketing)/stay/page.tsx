@@ -10,6 +10,7 @@ import { Seo } from '@/components/ui/seo';
 import { breadcrumbListFromPath } from '@/lib/schema/breadcrumb-list';
 import { Section } from '@/components/ui/section';
 import { Container } from '@/components/ui/container';
+import { DataUnavailable } from '@/components/ui/data-unavailable';
 import { Heading } from '@/components/ui/heading';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { formatPrice } from '@/lib/utils';
@@ -36,12 +37,15 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function StayPage() {
+  // An outage previously fell through to an empty list, which reads as "we have
+  // no rooms". Say what is actually true instead.
   let rooms: Room[] = [];
   try {
     const dbRooms = await getRooms();
     rooms = dbRooms.map((r) => dbRoomToRoom(r, []));
-  } catch {
-    rooms = [];
+  } catch (error) {
+    console.error('[stay] room list fetch failed:', error);
+    return <DataUnavailable title="Accommodation Details Unavailable" />;
   }
 
   return (

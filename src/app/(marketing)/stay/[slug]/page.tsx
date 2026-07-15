@@ -8,6 +8,7 @@ import { hotelRoom } from '@/lib/schema/room';
 import { faqPage } from '@/lib/schema/faq-page';
 import { RoomDetailPage } from '@/components/marketing/room-detail/room-detail-page';
 import { MobileStickyBar } from '@/components/marketing/room-detail/mobile-sticky-bar';
+import { DataUnavailable } from '@/components/ui/data-unavailable';
 
 export const revalidate = 60;
 
@@ -65,16 +66,20 @@ export default async function StayDetailPage({
 }) {
   const { slug } = await params;
 
+  // Only the fetch is guarded, and `notFound()` stays outside the try: it
+  // signals control flow by throwing, so catching it here would swallow the
+  // signal. A database outage must not masquerade as a missing room.
   let dbRoom;
-  let dbFaqs;
   try {
     dbRoom = await getRoomBySlug(slug);
-    if (!dbRoom) notFound();
-    dbFaqs = await getRoomFaqs(dbRoom.id);
-  } catch {
-    notFound();
+  } catch (error) {
+    console.error(`[stay/${slug}] room fetch failed:`, error);
+    return <DataUnavailable title="Room Details Unavailable" />;
   }
 
+  if (!dbRoom) notFound();
+
+  const dbFaqs = await getRoomFaqs(dbRoom.id);
   const r = dbRoomToRoom(dbRoom, dbFaqs);
 
   return (

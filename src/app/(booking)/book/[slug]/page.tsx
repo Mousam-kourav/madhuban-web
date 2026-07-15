@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getRoomBySlug } from "@/lib/rooms/queries";
 import { buildMetadata } from "@/lib/seo";
+import { DataUnavailable } from "@/components/ui/data-unavailable";
 import { CheckoutForm } from "./checkout-form";
 
 export const revalidate = 60;
@@ -18,7 +19,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const room = await getRoomBySlug(slug);
+  const room = await getRoomBySlug(slug).catch(() => null);
   if (!room) return {};
   return buildMetadata({
     title: `Book ${room.name}`,
@@ -40,7 +41,15 @@ function addDays(d: string, n: number) {
 export default async function BookCheckoutPage({ params, searchParams }: Props) {
   const [{ slug }, sp] = await Promise.all([params, searchParams]);
 
-  const room = await getRoomBySlug(slug);
+  // `notFound()` stays outside the try: it signals control flow by throwing.
+  let room;
+  try {
+    room = await getRoomBySlug(slug);
+  } catch (error) {
+    console.error(`[book/${slug}] room fetch failed:`, error);
+    return <DataUnavailable title="Booking Temporarily Unavailable" />;
+  }
+
   if (!room) notFound();
 
   const today = todayStr();
